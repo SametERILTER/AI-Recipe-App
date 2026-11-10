@@ -215,12 +215,53 @@ const SavedRecipeDetail = ({ route, navigation }) => {
   const photographer = recipe.imageData?.photographer || null;
 
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isSavedInStorage, setIsSavedInStorage] = useState(false);
 
   useEffect(() => {
+    const checkSavedStatus = async () => {
+      try {
+        const existing = await AsyncStorage.getItem('saved_recipes');
+        if (existing) {
+          const list = JSON.parse(existing);
+          const targetName = (recipe.yemekAdi || extractRecipeName(recipe.description)).toLocaleLowerCase('tr-TR');
+          const found = list.some(r => (r.yemekAdi || '').toLocaleLowerCase('tr-TR') === targetName);
+          setIsSavedInStorage(found);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    checkSavedStatus();
+
     return () => {
       Speech.stop();
     };
-  }, []);
+  }, [recipe]);
+
+  const handleSaveToBookmark = async () => {
+    try {
+      const existing = await AsyncStorage.getItem('saved_recipes');
+      const list = existing ? JSON.parse(existing) : [];
+      const recipeName = recipe.yemekAdi || extractRecipeName(recipe.description);
+      const alreadyExists = list.some(
+        r => (r.yemekAdi || '').toLocaleLowerCase('tr-TR') === recipeName.toLocaleLowerCase('tr-TR')
+      );
+      if (!alreadyExists) {
+        list.push({
+          yemekAdi: recipeName,
+          malzemeler: recipe.malzemeler || [],
+          description: recipe.description,
+          imageData: recipe.imageData || null,
+          date: new Date().toISOString(),
+        });
+        await AsyncStorage.setItem('saved_recipes', JSON.stringify(list));
+      }
+      setIsSavedInStorage(true);
+      Alert.alert('Kaydedildi', `"${recipeName}" kaydedilen tariflerinize eklendi.`);
+    } catch (e) {
+      Alert.alert('Hata', 'Tarif kaydedilemedi.');
+    }
+  };
 
   const speakRecipe = () => {
     const title = recipe.yemekAdi || extractRecipeName(recipe.description);
@@ -318,8 +359,10 @@ const SavedRecipeDetail = ({ route, navigation }) => {
             try {
               const existing = await AsyncStorage.getItem('saved_recipes');
               let recipes = existing ? JSON.parse(existing) : [];
-              recipes = recipes.filter(r => r.date !== recipe.date);
+              const targetName = (recipe.yemekAdi || extractRecipeName(recipe.description)).toLocaleLowerCase('tr-TR');
+              recipes = recipes.filter(r => r.date !== recipe.date && (r.yemekAdi || '').toLocaleLowerCase('tr-TR') !== targetName);
               await AsyncStorage.setItem('saved_recipes', JSON.stringify(recipes));
+              setIsSavedInStorage(false);
               navigation.goBack();
             } catch (e) {
               Alert.alert('Hata', 'Tarif silinemedi.');
@@ -363,7 +406,10 @@ const SavedRecipeDetail = ({ route, navigation }) => {
     navigation.navigate('StartRecipe', {
       steps,
       tips,
-      recipeName: extractRecipeName(recipe.description)
+      recipeName: recipe.yemekAdi || extractRecipeName(recipe.description),
+      malzemeler: recipe.malzemeler || [],
+      description: recipe.description,
+      recipeImage: recipe.imageData || recipe.image || null,
     });
   };
 
@@ -397,12 +443,21 @@ const SavedRecipeDetail = ({ route, navigation }) => {
                 <Octicons name="share" size={18} color={theme.text} />
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.iconButton, { backgroundColor: '#fee2e2', borderColor: '#fecaca' }]}
-                onPress={handleDeleteRecipe}
-              >
-                <FontAwesome5 name="trash-alt" size={18} color="#ef4444" />
-              </TouchableOpacity>
+              {isSavedInStorage ? (
+                <TouchableOpacity
+                  style={[styles.iconButton, { backgroundColor: '#fee2e2', borderColor: '#fecaca' }]}
+                  onPress={handleDeleteRecipe}
+                >
+                  <FontAwesome5 name="trash-alt" size={18} color="#ef4444" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#fff7ed', borderColor: isDarkMode ? theme.border : '#fed7aa' }]}
+                  onPress={handleSaveToBookmark}
+                >
+                  <FontAwesome5 name="bookmark" size={18} color="#ff7043" />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}
@@ -445,12 +500,21 @@ const SavedRecipeDetail = ({ route, navigation }) => {
                   <Octicons name="share" size={18} color="#fff" />
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={[styles.iconButton, { backgroundColor: 'rgba(255, 71, 87, 0.25)', borderColor: 'rgba(255, 71, 87, 0.1)' }]}
-                  onPress={handleDeleteRecipe}
-                >
-                  <FontAwesome5 name="trash-alt" size={18} color="#fff" />
-                </TouchableOpacity>
+                {isSavedInStorage ? (
+                  <TouchableOpacity
+                    style={[styles.iconButton, { backgroundColor: 'rgba(255, 71, 87, 0.25)', borderColor: 'rgba(255, 71, 87, 0.1)' }]}
+                    onPress={handleDeleteRecipe}
+                  >
+                    <FontAwesome5 name="trash-alt" size={18} color="#fff" />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={[styles.iconButton, { backgroundColor: 'rgba(255, 112, 67, 0.35)', borderColor: 'rgba(255, 112, 67, 0.2)' }]}
+                    onPress={handleSaveToBookmark}
+                  >
+                    <FontAwesome5 name="bookmark" size={18} color="#fff" />
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           </View>
@@ -535,9 +599,15 @@ const SavedRecipeDetail = ({ route, navigation }) => {
             <TouchableOpacity onPress={handleShare} style={styles.stickyBackButton}>
               <Octicons name="share" size={18} color={theme.text} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleDeleteRecipe} style={styles.stickyBackButton}>
-              <FontAwesome5 name="trash-alt" size={18} color="#ef4444" />
-            </TouchableOpacity>
+            {isSavedInStorage ? (
+              <TouchableOpacity onPress={handleDeleteRecipe} style={styles.stickyBackButton}>
+                <FontAwesome5 name="trash-alt" size={18} color="#ef4444" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={handleSaveToBookmark} style={styles.stickyBackButton}>
+                <FontAwesome5 name="bookmark" size={18} color="#ff7043" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </Animated.View>

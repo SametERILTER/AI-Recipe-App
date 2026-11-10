@@ -32,6 +32,9 @@ const CategoryRecipes = () => {
     const formatRecipeForDetail = (recipe) => {
         const description = `**Yemek Adı:** ${recipe.isim}
 
+**Hazırlama Süresi:** ${recipe.sure}
+**Zorluk Seviyesi:** ${recipe.zorluk}
+
 **Malzemeler:**
 ${recipe.malzemeler.map(malzeme => `- ${malzeme}`).join('\n')}
 

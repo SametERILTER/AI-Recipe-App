@@ -118,17 +118,18 @@ const StartRecipe = ({ route, navigation }) => {
             const loadSettings = async () => {
                 try {
                     const val = await AsyncStorage.getItem('gesture_control');
+                    const sens = (await AsyncStorage.getItem('gesture_sensitivity')) || 'normal';
                     if (val !== null) {
                         const enabled = JSON.parse(val);
                         setGestureEnabled(enabled);
                         if (!enabled) {
                             _unsubscribe();
                         } else {
-                            _subscribe();
+                            _subscribe(sens);
                         }
                     } else {
                         setGestureEnabled(true);
-                        _subscribe();
+                        _subscribe(sens);
                     }
                 } catch (e) {
                     console.error(e);
@@ -238,20 +239,15 @@ const StartRecipe = ({ route, navigation }) => {
         return () => _unsubscribe();
     }, []);
 
-    const _subscribe = () => {
-        // Accelerometer (Sallama)
+    const _subscribe = (sensitivityLevel = 'normal') => {
+        const shakeThreshold = sensitivityLevel === 'high' ? 2.0 : sensitivityLevel === 'low' ? 3.6 : 2.8;
+        const darkThreshold = sensitivityLevel === 'high' ? 35 : sensitivityLevel === 'low' ? 12 : 20;
+
         // Accelerometer (Sallama)
         const subAcc = Accelerometer.addListener(accelerometerData => {
             const { x, y, z } = accelerometerData;
 
-            // Sadece İKİ YANA (X ekseni) sallamayı algıla.
-            // Toplam ivme yerine sadece X'in mutlak değerine bakıyoruz.
-            // Ayrıca X'in Y'den (dikey hareketten) daha baskın olmasını istiyoruz.
-
-            // Not: Normal duruşta Yerçekimi (Z veya Y) 1.0 olabilir.
-            // Sallama g-kuvveti min 1.5 - 2.0 civarı olmalı.
-
-            if (Math.abs(x) > 3.0) { // Eşik değer: 2.0G (Sertçe yana sallama)
+            if (Math.abs(x) > shakeThreshold) {
                 // Y'deki hareket (yukarı-aşağı) X'ten (sağa-sola) az olmalı ki çapraz algılamasın
                 if (Math.abs(x) > Math.abs(y)) {
                     const now = Date.now();
@@ -276,8 +272,7 @@ const StartRecipe = ({ route, navigation }) => {
                 subLight = LightSensor.addListener(data => {
                     const { illuminance } = data;
 
-                    // Daha hassas eşik: 20 lux (Ortam biraz loş olsa bile çalışır)
-                    const DARK_THRESHOLD = 20;
+                    const DARK_THRESHOLD = darkThreshold;
 
                     if (illuminance < DARK_THRESHOLD) {
                         if (!lastLightState.current) {
@@ -285,7 +280,6 @@ const StartRecipe = ({ route, navigation }) => {
                         }
                     } else {
                         // El çekildi (Aydınlık)
-                        // Histerezis: Aydınlık eşiği biraz daha yüksek olsun (30 lux) ki titreme olmasın
                         if (lastLightState.current && illuminance > (DARK_THRESHOLD + 5)) {
                             console.log("Hand Wave (Light) Triggered!");
                             const now = Date.now();

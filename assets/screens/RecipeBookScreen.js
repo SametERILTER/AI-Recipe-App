@@ -85,10 +85,10 @@ const RecipeBookScreen = () => {
       result = result.filter(r => r.category === activeCategory);
     }
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
+      const q = searchQuery.toLocaleLowerCase('tr-TR');
       result = result.filter(r =>
-        r.title.toLowerCase().includes(q) ||
-        r.ingredients.join(' ').toLowerCase().includes(q)
+        (r.title || '').toLocaleLowerCase('tr-TR').includes(q) ||
+        (r.ingredients || []).join(' ').toLocaleLowerCase('tr-TR').includes(q)
       );
     }
     setFilteredRecipes(result);

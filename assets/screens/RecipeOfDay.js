@@ -153,20 +153,26 @@ const RecipeOfDay = () => {
 
 **Hazırlama Süresi:** ${recipe.sure}
 **Zorluk Seviyesi:** ${recipe.zorluk}
-**Kalori:** Belirtilmemiş
 
 **Malzemeler:**
 ${recipe.malzemeler.map(m => `- ${m}`).join('\n')}
 
 **Hazırlanışı:**
 ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
-`;
+
+**İpuçları:**
+- ${recipe.sure} sürede hazırlanır
+- ${recipe.kisi} kişilik tarif
+- Zorluk seviyesi: ${recipe.zorluk}
+- Kategori: ${recipe.kategori}`;
 
         const recipeForDetail = {
             yemekAdi: recipe.isim,
+            malzemeler: recipe.malzemeler || [],
             description: formattedDescription,
-            date: new Date().toISOString(), // Dummy date
-            isReadOnly: true // Kayıtlı olmadığı bilinsin (Opsiyonel, SavedRecipeDetail'de işlenmesi gerekir)
+            imageData: null,
+            date: new Date().toISOString(),
+            isReadOnly: true
         };
 
         navigation.navigate('SavedRecipeDetail', { recipe: recipeForDetail });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -8,29 +8,55 @@ import {
     SafeAreaView,
     StatusBar,
     Switch,
-    Dimensions,
+    Modal,
+    Pressable,
 } from 'react-native';
-import { FontAwesome5, MaterialCommunityIcons, Octicons, Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { FontAwesome5, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import { useTheme } from '../context/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const SENSITIVITY_OPTIONS = [
+    { id: 'low', label: 'Düşük Hassasiyet', desc: 'Daha sert sallama gerektirir, yanlış algılamaları önler.' },
+    { id: 'normal', label: 'Normal Hassasiyet', desc: 'Standart el sallama ve telefon hareketi dengesi.' },
+    { id: 'high', label: 'Yüksek Hassasiyet', desc: 'Hafif sallama ve düşük ışık değişimlerinde bile hızlı tepki verir.' },
+];
+
+const COOKING_LEVEL_OPTIONS = [
+    { id: 'beginner', label: 'Yemek Yapmakta Yeniyim', desc: 'Adım adım, çok detaylı ve basit anlatım.' },
+    { id: 'intermediate', label: 'Biraz Biliyorum', desc: 'Standart detayda, anlaşılır ve pratik anlatım.' },
+    { id: 'advanced', label: 'Tecrübeliyim', desc: 'Hızlı, teknik detaylı ve profesyonel anlatım.' },
+];
+
 const SettingsScreen = () => {
     const navigation = useNavigation();
     const { isDarkMode, toggleTheme, theme } = useTheme();
-    const [notifications, setNotifications] = useState(true);
     const [gestureControl, setGestureControl] = useState(true);
+    const [sensitivity, setSensitivity] = useState('normal');
+    const [cookingLevel, setCookingLevel] = useState('intermediate');
+    const [sensitivityModalVisible, setSensitivityModalVisible] = useState(false);
+    const [levelModalVisible, setLevelModalVisible] = useState(false);
 
-    React.useEffect(() => {
-        loadSettings();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            loadSettings();
+        }, [])
+    );
 
     const loadSettings = async () => {
         try {
             const val = await AsyncStorage.getItem('gesture_control');
             if (val !== null) {
                 setGestureControl(JSON.parse(val));
+            }
+            const sens = await AsyncStorage.getItem('gesture_sensitivity');
+            if (sens) {
+                setSensitivity(sens);
+            }
+            const level = await AsyncStorage.getItem('chef_cooking_level');
+            if (level) {
+                setCookingLevel(level);
             }
         } catch (e) {
             console.error(e);
@@ -46,6 +72,26 @@ const SettingsScreen = () => {
         }
     };
 
+    const handleSensitivitySelect = async (val) => {
+        setSensitivity(val);
+        try {
+            await AsyncStorage.setItem('gesture_sensitivity', val);
+        } catch (e) {
+            console.error(e);
+        }
+        setSensitivityModalVisible(false);
+    };
+
+    const handleCookingLevelSelect = async (val) => {
+        setCookingLevel(val);
+        try {
+            await AsyncStorage.setItem('chef_cooking_level', val);
+        } catch (e) {
+            console.error(e);
+        }
+        setLevelModalVisible(false);
+    };
+
     const SettingItem = ({ icon, title, subtitle, value, onValueChange, iconType = 'font-awesome', type = 'toggle', onPress, iconColor = '#ff7043' }) => (
         <TouchableOpacity
             style={styles.settingItem}
@@ -56,8 +102,6 @@ const SettingsScreen = () => {
             <View style={[styles.iconContainer, { backgroundColor: iconColor + '15' }]}>
                 {iconType === 'material' ? (
                     <MaterialCommunityIcons name={icon} size={22} color={iconColor} />
-                ) : iconType === 'ionicons' ? (
-                    <Ionicons name={icon} size={22} color={iconColor} />
                 ) : (
                     <FontAwesome5 name={icon} size={18} color={iconColor} />
                 )}
@@ -85,6 +129,9 @@ const SettingsScreen = () => {
         <Text style={[styles.sectionHeader, { color: isDarkMode ? '#ff7043' : '#475569' }]}>{title}</Text>
     );
 
+    const currentSensitivityLabel = SENSITIVITY_OPTIONS.find(o => o.id === sensitivity)?.label || 'Normal Hassasiyet';
+    const currentLevelLabel = COOKING_LEVEL_OPTIONS.find(o => o.id === cookingLevel)?.label || 'Biraz Biliyorum';
+
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
@@ -96,34 +143,23 @@ const SettingsScreen = () => {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-                {/* Settings Sections */}
                 <View style={styles.section}>
-                    <SectionHeader title="Görünüm ve Bildirimler" />
+                    <SectionHeader title="Görünüm ve Yapay Zeka Şef" />
                     <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
                         <SettingItem
                             icon="moon"
                             title="Karanlık Mod"
-                            subtitle="Sisteme göre uyarla"
+                            subtitle={isDarkMode ? "Açık" : "Kapalı"}
                             value={isDarkMode}
                             onValueChange={toggleTheme}
                         />
                         <View style={[styles.divider, { backgroundColor: theme.divider }]} />
                         <SettingItem
-                            icon="notifications"
-                            iconType="ionicons"
-                            title="Bildirimler"
-                            subtitle="Yeni tarifler ve hatırlatıcılar"
-                            value={notifications}
-                            onValueChange={setNotifications}
-                            iconColor="#6366f1"
-                        />
-                        <View style={[styles.divider, { backgroundColor: theme.divider }]} />
-                        <SettingItem
-                            icon="language"
-                            iconType="ionicons"
-                            title="Dil"
-                            subtitle="Türkçe (Türkiye)"
+                            icon="robot"
+                            title="Yapay Zeka Şef Seviyesi"
+                            subtitle={currentLevelLabel}
                             type="button"
+                            onPress={() => setLevelModalVisible(true)}
                             iconColor="#10b981"
                         />
                     </View>
@@ -134,7 +170,7 @@ const SettingsScreen = () => {
                             icon="human-handsup"
                             iconType="material"
                             title="Temassız Kontrol"
-                            subtitle="Sensör ve sallama hareketleri"
+                            subtitle="Sensör ve sallama hareketleri ile adım geçme"
                             value={gestureControl}
                             onValueChange={handleGestureToggle}
                             iconColor="#ec4899"
@@ -144,8 +180,9 @@ const SettingsScreen = () => {
                             icon="tune"
                             iconType="material"
                             title="Hassasiyet Ayarları"
-                            subtitle="Sensör tepki süresini ayarla"
+                            subtitle={currentSensitivityLabel}
                             type="button"
+                            onPress={() => setSensitivityModalVisible(true)}
                             iconColor="#8b5cf6"
                         />
                     </View>
@@ -155,6 +192,7 @@ const SettingsScreen = () => {
                         <SettingItem
                             icon="question-circle"
                             title="Yardım Merkezi"
+                            subtitle="Sıkça sorulan sorular ve kullanım ipuçları"
                             type="button"
                             onPress={() => navigation.navigate('HelpCenter')}
                             iconColor="#64748b"
@@ -163,17 +201,81 @@ const SettingsScreen = () => {
                         <SettingItem
                             icon="info-circle"
                             title="Uygulama Hakkında"
+                            subtitle="Sürüm ve özellik bilgileri"
                             type="button"
                             onPress={() => navigation.navigate('AboutApp')}
                             iconColor="#64748b"
                         />
-                        <View style={[styles.divider, { backgroundColor: theme.divider }]} />
                     </View>
                 </View>
 
-                <Text style={[styles.versionText, { color: theme.secondaryText }]}>Versiyon 1.2.0 • Love from Kitchen</Text>
+                <Text style={[styles.versionText, { color: theme.secondaryText }]}>Sürüm 1.2.0</Text>
                 <View style={{ height: 100 }} />
             </ScrollView>
+
+            {/* Hassasiyet Ayarları Modalı */}
+            <Modal visible={sensitivityModalVisible} transparent animationType="fade" onRequestClose={() => setSensitivityModalVisible(false)}>
+                <View style={styles.modalOverlay}>
+                    <Pressable style={StyleSheet.absoluteFill} onPress={() => setSensitivityModalVisible(false)} />
+                    <View style={[styles.modalBox, { backgroundColor: theme.background, borderColor: theme.border }]}>
+                        <Text style={[styles.modalTitle, { color: theme.text }]}>Sensör Hassasiyeti</Text>
+                        <Text style={[styles.modalSub, { color: theme.secondaryText }]}>
+                            Tarif adımlarında telefonu sallama ve el sensörü tepki eşiği:
+                        </Text>
+                        {SENSITIVITY_OPTIONS.map(opt => {
+                            const selected = sensitivity === opt.id;
+                            return (
+                                <TouchableOpacity
+                                    key={opt.id}
+                                    style={[
+                                        styles.optionCard,
+                                        { backgroundColor: theme.card, borderColor: selected ? '#ff7043' : theme.border }
+                                    ]}
+                                    onPress={() => handleSensitivitySelect(opt.id)}
+                                >
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={[styles.optionLabel, { color: selected ? '#ff7043' : theme.text }]}>{opt.label}</Text>
+                                        <Text style={[styles.optionDesc, { color: theme.secondaryText }]}>{opt.desc}</Text>
+                                    </View>
+                                    {selected && <FontAwesome5 name="check-circle" size={18} color="#ff7043" solid />}
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Şef Seviyesi Modalı */}
+            <Modal visible={levelModalVisible} transparent animationType="fade" onRequestClose={() => setLevelModalVisible(false)}>
+                <View style={styles.modalOverlay}>
+                    <Pressable style={StyleSheet.absoluteFill} onPress={() => setLevelModalVisible(false)} />
+                    <View style={[styles.modalBox, { backgroundColor: theme.background, borderColor: theme.border }]}>
+                        <Text style={[styles.modalTitle, { color: theme.text }]}>Yapay Zeka Şef Seviyesi</Text>
+                        <Text style={[styles.modalSub, { color: theme.secondaryText }]}>
+                            Üretilen tariflerin anlatım dili ve detay seviyesi:
+                        </Text>
+                        {COOKING_LEVEL_OPTIONS.map(opt => {
+                            const selected = cookingLevel === opt.id;
+                            return (
+                                <TouchableOpacity
+                                    key={opt.id}
+                                    style={[
+                                        styles.optionCard,
+                                        { backgroundColor: theme.card, borderColor: selected ? '#ff7043' : theme.border }
+                                    ]}
+                                    onPress={() => handleCookingLevelSelect(opt.id)}
+                                >
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={[styles.optionLabel, { color: selected ? '#ff7043' : theme.text }]}>{opt.label}</Text>
+                                        <Text style={[styles.optionDesc, { color: theme.secondaryText }]}>{opt.desc}</Text>
+                                    </View>
+                                    {selected && <FontAwesome5 name="check-circle" size={18} color="#ff7043" solid />}
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 };
@@ -192,9 +294,6 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
         borderBottomWidth: 1,
         zIndex: 10,
-    },
-    header: {
-        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 32,
@@ -254,8 +353,47 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 12,
         fontFamily: 'TextNormal',
-        marginBottom: 20,
-    }
+        marginTop: 8,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(15, 23, 42, 0.55)',
+        justifyContent: 'center',
+        padding: 24,
+    },
+    modalBox: {
+        borderRadius: 24,
+        padding: 22,
+        borderWidth: 1,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontFamily: 'TextExtraBold',
+        marginBottom: 6,
+    },
+    modalSub: {
+        fontSize: 13,
+        fontFamily: 'TextNormal',
+        marginBottom: 16,
+    },
+    optionCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 14,
+        borderRadius: 16,
+        borderWidth: 1.5,
+        marginBottom: 10,
+    },
+    optionLabel: {
+        fontSize: 15,
+        fontFamily: 'TextBold',
+        marginBottom: 3,
+    },
+    optionDesc: {
+        fontSize: 12,
+        fontFamily: 'TextNormal',
+        lineHeight: 17,
+    },
 });
 
 export default SettingsScreen;

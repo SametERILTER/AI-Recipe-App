@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 
 
@@ -39,9 +39,11 @@ const SavedRecipes = () => {
     setRefreshing(false);
   };
 
-  useEffect(() => {
-    loadRecipes();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadRecipes();
+    }, [])
+  );
 
   useEffect(() => {
     let result = [...recipes];
@@ -51,17 +53,19 @@ const SavedRecipes = () => {
       const cat = categories.find(c => c.name === activeCategory);
       if (cat && cat.keywords) {
         result = result.filter(r => {
-          const title = r.yemekAdi.toLowerCase();
-          return cat.keywords.some(kw => title.includes(kw));
+          const title = (r.yemekAdi || '').toLocaleLowerCase('tr-TR');
+          return cat.keywords.some(kw => title.includes(kw.toLocaleLowerCase('tr-TR')));
         });
       }
     }
 
     // 2. Arama Filtresi
     if (search.trim()) {
-      const s = search.toLowerCase();
+      const s = search.toLocaleLowerCase('tr-TR');
       result = result.filter(
-        r => r.yemekAdi.toLowerCase().includes(s) || (r.malzemeler && r.malzemeler.join(', ').toLowerCase().includes(s))
+        r =>
+          (r.yemekAdi || '').toLocaleLowerCase('tr-TR').includes(s) ||
+          (Array.isArray(r.malzemeler) && r.malzemeler.join(', ').toLocaleLowerCase('tr-TR').includes(s))
       );
     }
 
@@ -103,7 +107,7 @@ const SavedRecipes = () => {
         </View>
         <View style={{ flex: 1, paddingRight: 8 }}>
           <Text style={[styles.recipeListTitle, { color: theme.text }]} numberOfLines={1}>{item.yemekAdi}</Text>
-          <Text style={[styles.recipeListSub, { color: theme.secondaryText }]} numberOfLines={1}>{item.malzemeler.join(', ')}</Text>
+          <Text style={[styles.recipeListSub, { color: theme.secondaryText }]} numberOfLines={1}>{(item.malzemeler || []).join(', ')}</Text>
         </View>
         <View style={styles.chevronBox}>
           <FontAwesome5 name="chevron-right" size={12} color="#cbd5e1" />
