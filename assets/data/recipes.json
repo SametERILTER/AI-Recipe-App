@@ -2913,40 +2913,6 @@
     },
     {
       "id": 96,
-      "isim": "Meyhane Pilavı",
-      "kategori": "pilav",
-      "malzemeler": [
-        "2 su bardağı pilavlık bulgur",
-        "1 adet soğan",
-        "2 adet yeşil biber, 1 adet kırmızı biber",
-        "1 adet büyük domates (rendelenmiş)",
-        "1 yemek kaşığı domates salçası",
-        "3.5 su bardağı sıcak su veya et suyu",
-        "2 yemek kaşığı tereyağı, 2 yemek kaşığı sıvı yağ",
-        "Kuru nane, pul biber, tuz"
-      ],
-      "hazirlanis": [
-        "Tencerede tereyağı ve sıvı yağı kızdırın. Yemeklik doğranmış soğanları ekleyip pembeleşene kadar kavurun.",
-        "Biberleri ekleyip 2-3 dakika daha çevirmeye devam edin.",
-        "Salçayı ekleyip kokusu çıkana kadar kavurduktan sonra rendelenmiş domatesi ilave edin ve domatesler suyunu hafif çekene kadar pişirin.",
-        "Bulguru tencereye ekleyin. Bulgurun salçalı ve domatesli harçla tamamen renk alması için 1-2 dakika sürekli karıştırarak kavurun.",
-        "Sıcak suyu veya et suyunu ekleyin. Tuzunu ve kuru naneyi ilave edin.",
-        "Tencerenin kapağını kapatın. Önce yüksek ateşte kaynatın, sonra en kısık ateşte bulgurlar suyunu çekip delik delik olana kadar yaklaşık 15-18 dakika pişirin.",
-        "Ocağı kapatın, tencerenin üzerine havlu kağıt koyup kapağı kapatın.",
-        "En az 15 dakika demlendirdikten sonra karıştırıp servis yapın. Yanına en çok çırpılmış ayran yakışır."
-      ],
-      "sure": "35 dakika",
-      "zorluk": "kolay",
-      "kisi": 4,
-      "etiketler": [
-        "pilav",
-        "bulgur",
-        "meyhane",
-        "yöresel"
-      ]
-    },
-    {
-      "id": 97,
       "isim": "Domatesli Pirinç Pilavı",
       "kategori": "pilav",
       "malzemeler": [
@@ -2976,7 +2942,7 @@
       ]
     },
     {
-      "id": 98,
+      "id": 97,
       "isim": "Özbek Pilavı",
       "kategori": "pilav",
       "malzemeler": [
@@ -3009,7 +2975,7 @@
       ]
     },
     {
-      "id": 99,
+      "id": 98,
       "isim": "İç Pilav",
       "kategori": "pilav",
       "malzemeler": [
@@ -3039,7 +3005,7 @@
       ]
     },
     {
-      "id": 100,
+      "id": 99,
       "isim": "Arpa Şehriyeli Tavuklu Pilav",
       "kategori": "pilav",
       "malzemeler": [
@@ -3070,7 +3036,7 @@
       ]
     },
     {
-      "id": 101,
+      "id": 100,
       "isim": "Avcı Böreği",
       "kategori": "börek",
       "malzemeler": [
@@ -3100,7 +3066,7 @@
       ]
     },
     {
-      "id": 102,
+      "id": 101,
       "isim": "Arnavut Ciğeri",
       "kategori": "ara sıcak",
       "malzemeler": [
@@ -3132,7 +3098,7 @@
       ]
     },
     {
-      "id": 103,
+      "id": 102,
       "isim": "Pastırmalı Sıcak Humus",
       "kategori": "ara sıcak",
       "malzemeler": [
@@ -3164,7 +3130,7 @@
       ]
     },
     {
-      "id": 104,
+      "id": 103,
       "isim": "Kıymalı Su Böreği",
       "kategori": "börek",
       "malzemeler": [
@@ -3195,7 +3161,7 @@
       ]
     },
     {
-      "id": 105,
+      "id": 104,
       "isim": "Ispanaklı ve Peynirli Gül Böreği",
       "kategori": "börek",
       "malzemeler": [
@@ -3225,7 +3191,7 @@
       ]
     },
     {
-      "id": 106,
+      "id": 105,
       "isim": "Kalamar Tava ve Tarator Sos",
       "kategori": "ara sıcak",
       "malzemeler": [
@@ -3255,7 +3221,7 @@
       ]
     },
     {
-      "id": 107,
+      "id": 106,
       "isim": "İçli Köfte (Haşlama Usulü)",
       "kategori": "ara sıcak",
       "malzemeler": [
@@ -3284,7 +3250,7 @@
       ]
     },
     {
-      "id": 108,
+      "id": 107,
       "isim": "Kıymalı Muska Böreği",
       "kategori": "börek",
       "malzemeler": [
@@ -3314,7 +3280,7 @@
       ]
     },
     {
-      "id": 109,
+      "id": 108,
       "isim": "Peynirli Sigara Böreği (Fırında Hafif Versiyon)",
       "kategori": "börek",
       "malzemeler": [
@@ -3344,7 +3310,7 @@
       ]
     },
     {
-      "id": 110,
+      "id": 109,
       "isim": "Sebzeli Mücver",
       "kategori": "ara sıcak",
       "malzemeler": [
@@ -3376,7 +3342,7 @@
       ]
     },
     {
-      "id": 111,
+      "id": 110,
       "isim": "Terbiyeli Tavuk Suyu Çorbası",
       "kategori": "çorba",
       "malzemeler": [
@@ -3408,7 +3374,7 @@
       ]
     },
     {
-      "id": 112,
+      "id": 111,
       "isim": "Sütlü Kabak Çorbası",
       "kategori": "çorba",
       "malzemeler": [
@@ -3442,7 +3408,7 @@
       ]
     },
     {
-      "id": 113,
+      "id": 112,
       "isim": "Lebeniye Çorbası",
       "kategori": "çorba",
       "malzemeler": [
@@ -3471,7 +3437,7 @@
       ]
     },
     {
-      "id": 114,
+      "id": 113,
       "isim": "Közlenmiş Domates Çorbası",
       "kategori": "çorba",
       "malzemeler": [
@@ -3504,7 +3470,7 @@
       ]
     },
     {
-      "id": 115,
+      "id": 114,
       "isim": "Paçalı Çorba (Düğün Çorbası Usulü)",
       "kategori": "çorba",
       "malzemeler": [
@@ -3532,7 +3498,7 @@
       ]
     },
     {
-      "id": 116,
+      "id": 115,
       "isim": "Karides Güveç",
       "kategori": "ara sıcak",
       "malzemeler": [
@@ -3565,38 +3531,7 @@
       ]
     },
     {
-      "id": 117,
-      "isim": "Kadınbudu Köfte",
-      "kategori": "ana yemek",
-      "malzemeler": [
-        "500g orta yağlı kıyma",
-        "1 çay bardağı haşlanmış pirinç",
-        "1 adet soğan",
-        "1 adet yumurta (içine), 2 adet yumurta (bulamak için)",
-        "1 su bardağı galeta unu",
-        "Tuz, karabiber, yenibahar"
-      ],
-      "hazirlanis": [
-        "Kıymanın yarısını (250g) bir tavada doğranmış soğanla birlikte suyunu çekip rengi dönene kadar kavurun. Soğumaya bırakın.",
-        "Geniş bir kapta; kavrulmuş kıymayı, kalan çiğ kıymayı, haşlanmış (ve iyice süzülmüş) pirinci, bir adet yumurtayı ve tüm baharatları birleştirin.",
-        "Tüm malzemeler tamamen özleşene kadar en az 5-10 dakika yoğurun. (Yoğurduktan sonra buzdolabında 30-40 dakika dinlendirmek şekil vermeyi kolaylaştırır).",
-        "Hamurdan yumurta büyüklüğünde parçalar koparın ve elinizle yassı, oval bir form verin.",
-        "Köfteleri önce galeta ununa, ardından iyice çırpılmış 2 adet yumurtaya bulayın.",
-        "Geniş bir tavada bol sıvı yağı kızdırın. Köfteleri arkalı önlü nar gibi kızartın.",
-        "Kağıt havlu üzerine alıp fazla yağını süzdürün. Yanında patates püresi veya piyazla servis yapın. Hem sıcak hem soğuk yenilebilen eşsiz bir lezzettir."
-      ],
-      "sure": "1 saat",
-      "zorluk": "orta",
-      "kisi": 4,
-      "etiketler": [
-        "köfte",
-        "etli",
-        "pirinçli",
-        "geleneksel"
-      ]
-    },
-    {
-      "id": 118,
+      "id": 116,
       "isim": "Fındık Lahmacun",
       "kategori": "ara sıcak",
       "malzemeler": [
@@ -3624,7 +3559,7 @@
       ]
     },
     {
-      "id": 119,
+      "id": 117,
       "isim": "Kağıtta Pastırma",
       "kategori": "ara sıcak",
       "malzemeler": [
@@ -3656,7 +3591,7 @@
       ]
     },
     {
-      "id": 120,
+      "id": 118,
       "isim": "Kremalı Mantar Graten",
       "kategori": "ara sıcak",
       "malzemeler": [
@@ -3689,7 +3624,7 @@
       ]
     },
     {
-      "id": 121,
+      "id": 119,
       "isim": "El Açması Peynirli Gözleme",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -3718,7 +3653,7 @@
       ]
     },
     {
-      "id": 122,
+      "id": 120,
       "isim": "Yumurtalı Ekmek (Anne Usulü)",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -3749,7 +3684,7 @@
       ]
     },
     {
-      "id": 123,
+      "id": 121,
       "isim": "Kavurmalı Yumurta",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -3778,7 +3713,7 @@
       ]
     },
     {
-      "id": 124,
+      "id": 122,
       "isim": "Acuka (Kahvaltılık Sos)",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -3808,7 +3743,7 @@
       ]
     },
     {
-      "id": 125,
+      "id": 123,
       "isim": "Avokado Soslu Poşe Yumurtalı Tost",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -3838,7 +3773,7 @@
       ]
     },
     {
-      "id": 126,
+      "id": 124,
       "isim": "Peynirli ve Dereotlu Kaşık Dökmesi",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -3869,7 +3804,7 @@
       ]
     },
     {
-      "id": 127,
+      "id": 125,
       "isim": "Lavaş Tostu (Peynirli ve Sucuklu)",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -3899,7 +3834,7 @@
       ]
     },
     {
-      "id": 128,
+      "id": 126,
       "isim": "Fırında Baharatlı Kahvaltı Patatesi",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -3926,7 +3861,7 @@
       ]
     },
     {
-      "id": 129,
+      "id": 127,
       "isim": "Hellim Peynirli Omlet",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -3955,7 +3890,7 @@
       ]
     },
     {
-      "id": 130,
+      "id": 128,
       "isim": "Bazlama Tohumu Tostu",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -3986,7 +3921,7 @@
       ]
     },
     {
-      "id": 131,
+      "id": 129,
       "isim": "Çılbır (Yoğurtlu Poşe Yumurta)",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -4018,7 +3953,7 @@
       ]
     },
     {
-      "id": 132,
+      "id": 130,
       "isim": "Kuymak (Mıhlama)",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -4049,7 +3984,7 @@
       ]
     },
     {
-      "id": 133,
+      "id": 131,
       "isim": "Puf Puf Pişi (Maya Kullanmadan)",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -4082,7 +4017,7 @@
       ]
     },
     {
-      "id": 134,
+      "id": 132,
       "isim": "Hatay Usulü Zahterli Kahvaltılık Peynir",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -4111,7 +4046,7 @@
       ]
     },
     {
-      "id": 135,
+      "id": 133,
       "isim": "Domates Soslu Karışık Sebze Kızartması",
       "kategori": "kahvaltı",
       "malzemeler": [
@@ -4140,7 +4075,7 @@
       ]
     },
     {
-      "id": 136,
+      "id": 134,
       "isim": "Sodalı Peynirli Tepsi Böreği",
       "kategori": "börek",
       "malzemeler": [
@@ -4170,7 +4105,7 @@
       ]
     },
     {
-      "id": 137,
+      "id": 135,
       "isim": "Pırasalı ve Peynirli Arnavut Böreği Usulü",
       "kategori": "börek",
       "malzemeler": [
@@ -4199,7 +4134,7 @@
       ]
     },
     {
-      "id": 138,
+      "id": 136,
       "isim": "Milföyden Pratik Tahinli Çörek",
       "kategori": "börek",
       "malzemeler": [
@@ -4227,7 +4162,7 @@
       ]
     },
     {
-      "id": 139,
+      "id": 137,
       "isim": "Hazır Yufkadan Kıymalı Kol Böreği",
       "kategori": "börek",
       "malzemeler": [
@@ -4257,7 +4192,7 @@
       ]
     },
     {
-      "id": 140,
+      "id": 138,
       "isim": "Fırında Hafif Paçanga Böreği",
       "kategori": "börek",
       "malzemeler": [
@@ -4290,7 +4225,7 @@
       ]
     },
     {
-      "id": 141,
+      "id": 139,
       "isim": "Zeytinyağlı Enginar",
       "kategori": "zeytinyağlı",
       "malzemeler": [
@@ -4324,7 +4259,7 @@
       ]
     },
     {
-      "id": 142,
+      "id": 140,
       "isim": "Zeytinyağlı Taze Fasulye",
       "kategori": "zeytinyağlı",
       "malzemeler": [
@@ -4355,7 +4290,7 @@
       ]
     },
     {
-      "id": 143,
+      "id": 141,
       "isim": "Zeytinyağlı Barbunya Pilaki",
       "kategori": "zeytinyağlı",
       "malzemeler": [
@@ -4385,7 +4320,7 @@
       ]
     },
     {
-      "id": 144,
+      "id": 142,
       "isim": "Zeytinyağlı Yaprak Sarma (Vişneli)",
       "kategori": "zeytinyağlı",
       "malzemeler": [
@@ -4415,7 +4350,7 @@
       ]
     },
     {
-      "id": 145,
+      "id": 143,
       "isim": "Zeytinyağlı Pırasa",
       "kategori": "zeytinyağlı",
       "malzemeler": [
@@ -4443,34 +4378,7 @@
       ]
     },
     {
-      "id": 146,
-      "isim": "İmambayıldı",
-      "kategori": "zeytinyağlı",
-      "malzemeler": [
-        "4 adet patlıcan",
-        "2 adet soğan",
-        "3 diş sarımsak, 3 adet domates",
-        "1 su bardağı zeytinyağı",
-        "Tuz, şeker, maydanoz"
-      ],
-      "hazirlanis": [
-        "Patlıcanları alacalı soyup tuzlu suda bekletin, ardından kurulayıp yağda kızartın.",
-        "Harcı için soğan, sarımsak ve domatesi soteleyin. Maydanoz, tuz ve şekeri ekleyin.",
-        "Patlıcanların ortasını açıp bu harçla doldurun.",
-        "Tencereye yarım bardak su ekleyip patlıcanlar iyice yumuşayana kadar 20 dakika pişirin.",
-        "Soğuk servis yapın."
-      ],
-      "sure": "1 saat",
-      "zorluk": "orta",
-      "kisi": 4,
-      "etiketler": [
-        "patlıcan",
-        "zeytinyağlı",
-        "imambayıldı"
-      ]
-    },
-    {
-      "id": 147,
+      "id": 144,
       "isim": "Zeytinyağlı Kereviz",
       "kategori": "zeytinyağlı",
       "malzemeler": [
@@ -4497,7 +4405,7 @@
       ]
     },
     {
-      "id": 148,
+      "id": 145,
       "isim": "Zeytinyağlı Yer Elması",
       "kategori": "zeytinyağlı",
       "malzemeler": [
@@ -4522,7 +4430,7 @@
       ]
     },
     {
-      "id": 149,
+      "id": 146,
       "isim": "Zeytinyağlı Bakla (Dereotlu)",
       "kategori": "zeytinyağlı",
       "malzemeler": [
@@ -4548,7 +4456,7 @@
       ]
     },
     {
-      "id": 150,
+      "id": 147,
       "isim": "Deniz Börülcesi",
       "kategori": "zeytinyağlı",
       "malzemeler": [
@@ -4570,135 +4478,7 @@
       ]
     },
     {
-      "id": 151,
-      "isim": "Fırın Sütlaç",
-      "kategori": "tatlı",
-      "malzemeler": [
-        "1 litre süt",
-        "1 su bardağı toz şeker",
-        "Yarım su bardağı pirinç",
-        "2 su bardağı su (pirinci haşlamak için)",
-        "1 yemek kaşığı nişasta (mısır veya buğday)",
-        "1 adet yumurta sarısı",
-        "1 paket vanilya"
-      ],
-      "hazirlanis": [
-        "Pirinçleri yıkayıp 2 bardak su ile suyunu tamamen çekene kadar haşlayın.",
-        "Haşlanan pirinçlerin üzerine sütü ve vanilyayı ekleyip kaynamaya bırakın.",
-        "Karışım kaynamaya başlayınca toz şekeri ekleyin.",
-        "Nişasta ve yumurta sarısını bir kasede az miktarda su veya süt ile iyice çırpın. Bu karışıma kaynayan sütten bir kepçe ekleyip ılıştırın (temperleme).",
-        "Hazırladığınız nişastalı karışımı yavaş yavaş tencereye ekleyin ve kıvam alana kadar yaklaşık 10 dakika daha kısık ateşte pişirin.",
-        "Sütlaçları fırına dayanıklı toprak kaplara veya kaselere paylaştırın.",
-        "Fırın tepsisine kaselerin yarısına gelecek kadar soğuk su doldurun.",
-        "Önceden ısıtılmış 200 derece fırının sadece üst ızgara ayarında, sütlaçların üzeri yanık benekler oluşana kadar yaklaşık 10-15 dakika pişirin.",
-        "Soğuduktan sonra servis edin."
-      ],
-      "sure": "1 saat",
-      "zorluk": "orta",
-      "kisi": 6,
-      "etiketler": [
-        "tatlı",
-        "sütlü",
-        "sütlaç",
-        "fırın"
-      ]
-    },
-    {
-      "id": 152,
-      "isim": "Revani",
-      "kategori": "tatlı",
-      "malzemeler": [
-        "3 adet yumurta",
-        "1 su bardağı toz şeker, 1 su bardağı yoğurt",
-        "1 su bardağı irmik, 1 su bardağı sıvı yağ",
-        "1.5 su bardağı un, 1 paket kabartma tozu, 1 paket vanilya",
-        "Şerbeti için: 3 su bardağı toz şeker, 4 su bardağı su, birkaç damla limon suyu"
-      ],
-      "hazirlanis": [
-        "Önce şerbeti hazırlayın: Şeker ve suyu tencereye alıp kaynatın. Kaynamaya başlayınca limon suyunu ekleyip bir süre daha tıkırdatın ve tamamen soğumaya bırakın.",
-        "Kek için yumurta ve şekeri beyazlaşana kadar iyice çırpın.",
-        "Sıvı yağ, yoğurt ve irmiği ekleyip karıştırmaya devam edin.",
-        "Elenmiş un, kabartma tozu ve vanilyayı ekleyip fırça yardımıyla yağlanmış fırın kabına dökün.",
-        "180 derece önceden ısıtılmış fırında üzeri nar gibi kızarana kadar yaklaşık 30-35 dakika pişirin.",
-        "Fırından çıkan sıcak kekin üzerine tamamen soğumuş olan şerbeti her yerine gelecek şekilde gezdirin.",
-        "Şerbetini tamamen çekmesi için en az 2 saat dinlendirin. Üzerine Hindistan cevizi veya Antep fıstığı serperek servis yapın."
-      ],
-      "sure": "50 dakika",
-      "zorluk": "kolay",
-      "kisi": 8,
-      "etiketler": [
-        "tatlı",
-        "şerbetli",
-        "revani",
-        "irmikli"
-      ]
-    },
-    {
-      "id": 153,
-      "isim": "Kazandibi",
-      "kategori": "tatlı",
-      "malzemeler": [
-        "1 litre süt",
-        "1 su bardağı toz şeker",
-        "2 yemek kaşığı mısır nişastası",
-        "2 yemek kaşığı pirinç unu",
-        "1 tatlı kaşığı tereyağı",
-        "Tepsiyi yakmak için: 3 yemek kaşığı pudra şekeri veya toz şeker"
-      ],
-      "hazirlanis": [
-        "Süt, şeker, nişasta ve pirinç ununu bir tencerede birleştirin. Pürüzsüz olana kadar çırpın ve ocağa alın.",
-        "Sürekli karıştırarak muhallebi kıvamına gelene kadar pişirin. Piştikten sonra tereyağını ekleyip karıştırın.",
-        "Dikdörtgen bir fırın tepsisinin tabanını tereyağı ile yağlayın ve her yerine pudra şekeri serpin.",
-        "Hazırladığınız muhallebiden bir kepçe alıp tepsinin tabanına yayın.",
-        "Tepsiyi ocağın üzerinde gezdirerek (veya fırın ızgarasında) tabandaki şekerler karamelize olup kontrollü bir şekilde yanana kadar bekleyin.",
-        "Yanık kokusu gelmeye başlayınca kalan muhallebiyi tepsiye dökün ve üzerini düzeltin.",
-        "Oda sıcaklığına gelince buzdolabına kaldırın ve en az 3-4 saat (tercihen bir gece) dinlendirin.",
-        "Rulo yaparak veya spatula yardımıyla yanık kısmı üstte kalacak şekilde servis yapın."
-      ],
-      "sure": "1 saat",
-      "zorluk": "zor",
-      "kisi": 6,
-      "etiketler": [
-        "tatlı",
-        "sütlü",
-        "kazandibi",
-        "karamelize"
-      ]
-    },
-    {
-      "id": 154,
-      "isim": "Şekerpare",
-      "kategori": "tatlı",
-      "malzemeler": [
-        "125g tereyağı (oda sıcaklığında)",
-        "Yarım su bardağı pudra şekeri",
-        "2 adet yumurta (birinin sarısı üzerine)",
-        "Yarım su bardağı irmik, 1 paket kabartma tozu",
-        "2.5 - 3 su bardağı un",
-        "Şerbeti için: 3 su bardağı şeker, 3 su bardağı su, limon suyu"
-      ],
-      "hazirlanis": [
-        "Şerbeti hazırlayıp ılımaya bırakın.",
-        "Hamur için tereyağı, pudra şekeri ve yumurtayı karıştırın. İrmik ve kabartma tozunu ekleyin.",
-        "Unu azar azar ekleyerek ele yapışmayan yumuşak bir hamur elde edin.",
-        "Hamurdan ceviz büyüklüğünde parçalar koparıp yuvarlayın veya oval şekil verin.",
-        "Tepsiye dizip üzerlerine yumurta sarısı sürün ve çatalla üzerlerine çizik atın (veya fındık batırın).",
-        "180 derece fırında üzerleri güzelce kızarana kadar yaklaşık 25-30 dakika pişirin.",
-        "Fırından çıkan sıcak kurabiyelerin üzerine ılık şerbeti gezdirin.",
-        "Şerbetini iyice çekmesi için birkaç saat dinlendirip servis yapın."
-      ],
-      "sure": "1 saat",
-      "zorluk": "orta",
-      "kisi": 8,
-      "etiketler": [
-        "tatlı",
-        "şerbetli",
-        "şekerpare",
-        "geleneksel"
-      ]
-    },
-    {
-      "id": 155,
+      "id": 148,
       "isim": "Çilekli Magnolya",
       "kategori": "tatlı",
       "malzemeler": [
@@ -4729,7 +4509,7 @@
       ]
     },
     {
-      "id": 156,
+      "id": 149,
       "isim": "Trileçe (Karamelli)",
       "kategori": "tatlı",
       "malzemeler": [
@@ -4756,7 +4536,7 @@
       ]
     },
     {
-      "id": 157,
+      "id": 150,
       "isim": "Tahinli ve Cevizli Kabak Tatlısı",
       "kategori": "tatlı",
       "malzemeler": [
@@ -4783,7 +4563,7 @@
       ]
     },
     {
-      "id": 158,
+      "id": 151,
       "isim": "Ayva Tatlısı",
       "kategori": "tatlı",
       "malzemeler": [
@@ -4812,34 +4592,7 @@
       ]
     },
     {
-      "id": 159,
-      "isim": "Elmalı Turta",
-      "kategori": "tatlı",
-      "malzemeler": [
-        "Hamuru için: 250g tereyağı, yarım bardak şeker, 1 yumurta, 3-3.5 bardak un",
-        "İç harcı için: 4 adet elma, 1 tatlı kaşığı tarçın, yarım bardak ceviz, yarım bardak şeker"
-      ],
-      "hazirlanis": [
-        "Elmaları rendeleyin, şeker ve tarçınla suyunu çekene kadar kavurun. Cevizleri ekleyip soğumaya bırakın.",
-        "Hamur malzemelerini yoğurup yumuşak bir hamur elde edin. Hamurun bir kısmını ayırıp dondurucuya koyun (üzerine rendelemek için).",
-        "Kalan hamuru bir turta kalıbına yayın, kenarlarını yükseltin.",
-        "İçine elmalı harcı yayın.",
-        "Dondurucudaki hamuru çıkarıp turtanın üzerine her yeri kaplayacak şekilde rendeleyin.",
-        "180 derece fırında üzeri altın rengi olana kadar pişirin.",
-        "Ilınınca pudra şekeri serperek servis yapın."
-      ],
-      "sure": "1 saat",
-      "zorluk": "orta",
-      "kisi": 8,
-      "etiketler": [
-        "turta",
-        "tatlı",
-        "elmalı",
-        "çayyanı"
-      ]
-    },
-    {
-      "id": 160,
+      "id": 152,
       "isim": "Sütlü Nuriye Tadında Pratik Tatlı",
       "kategori": "tatlı",
       "malzemeler": [
@@ -4867,7 +4620,7 @@
       ]
     },
     {
-      "id": 161,
+      "id": 153,
       "isim": "Tane Tane Pirinç Pilavı",
       "kategori": "pilav",
       "malzemeler": [
@@ -4901,7 +4654,7 @@
       ]
     },
     {
-      "id": 162,
+      "id": 154,
       "isim": "Meyhane Pilavı (Sebzeli Bulgur Pilavı)",
       "kategori": "pilav",
       "malzemeler": [
@@ -4937,7 +4690,7 @@
       ]
     },
     {
-      "id": 163,
+      "id": 155,
       "isim": "İç Pilav (Kuş Üzümlü ve Fıstıklı)",
       "kategori": "pilav",
       "malzemeler": [
@@ -4972,7 +4725,7 @@
       ]
     },
     {
-      "id": 164,
+      "id": 156,
       "isim": "Perde Pilavı (Siirt Usulü)",
       "kategori": "pilav",
       "malzemeler": [
@@ -5002,7 +4755,7 @@
       ]
     },
     {
-      "id": 165,
+      "id": 157,
       "isim": "Şehriyeli Bulgur Pilavı",
       "kategori": "pilav",
       "malzemeler": [
@@ -5032,7 +4785,7 @@
       ]
     },
     {
-      "id": 166,
+      "id": 158,
       "isim": "Buhara Pilavı (Kuzu Etli)",
       "kategori": "pilav",
       "malzemeler": [
@@ -5063,7 +4816,7 @@
       ]
     },
     {
-      "id": 167,
+      "id": 159,
       "isim": "Siyez Bulgur Pilavı (Sağlıklı)",
       "kategori": "pilav",
       "malzemeler": [
@@ -5093,37 +4846,7 @@
       ]
     },
     {
-      "id": 168,
-      "isim": "Domatesli Pirinç Pilavı",
-      "kategori": "pilav",
-      "malzemeler": [
-        "2 su bardağı pirinç",
-        "3 adet olgun domates (rendelenmiş)",
-        "2 yemek kaşığı tereyağı",
-        "2.5 su bardağı sıcak su",
-        "Tuz, karabiber"
-      ],
-      "hazirlanis": [
-        "Pirinçleri yıkayıp süzün.",
-        "Tereyağını tencerede eritin. Rendelenmiş domatesleri ekleyin ve domateslerin çiğ kokusu gidene kadar 5 dakika pişirin.",
-        "Pirinçleri ekleyip domatesli sosla beraber 2-3 dakika kavurun.",
-        "Sıcak suyu (domateslerin suyu olduğu için suyu normal pilava göre biraz daha az tutuyoruz) ve tuzu ekleyin.",
-        "Kısık ateşte suyunu çekene kadar pişirin.",
-        "Piştikten sonra üzerine bol taze çekilmiş karabiber ekleyip demlenmeye bırakın.",
-        "Özellikle yaz aylarında taze domateslerle yapılan, pembe renkli ve iştah açıcı bir pilavdır."
-      ],
-      "sure": "35 dakika",
-      "zorluk": "kolay",
-      "kisi": 4,
-      "etiketler": [
-        "pilav",
-        "domatesli",
-        "yazpilavı",
-        "taze"
-      ]
-    },
-    {
-      "id": 169,
+      "id": 160,
       "isim": "Ali Paşa Pilavı (Köfteli ve Bezelyeli)",
       "kategori": "pilav",
       "malzemeler": [
@@ -5153,7 +4876,7 @@
       ]
     },
     {
-      "id": 170,
+      "id": 161,
       "isim": "Firik Pilavı (Gaziantep Usulü)",
       "kategori": "pilav",
       "malzemeler": [
@@ -5182,7 +4905,7 @@
       ]
     },
     {
-      "id": 171,
+      "id": 162,
       "isim": "Geleneksel Haydari",
       "kategori": "meze",
       "malzemeler": [
@@ -5214,7 +4937,7 @@
       ]
     },
     {
-      "id": 172,
+      "id": 163,
       "isim": "Hatay Usulü Humus",
       "kategori": "meze",
       "malzemeler": [
@@ -5246,7 +4969,7 @@
       ]
     },
     {
-      "id": 173,
+      "id": 164,
       "isim": "Atom (Yoğurtlu Soslu Acı Biber)",
       "kategori": "meze",
       "malzemeler": [
@@ -5277,7 +5000,7 @@
       ]
     },
     {
-      "id": 174,
+      "id": 165,
       "isim": "Mütebbel (Tahinli Patlıcan Ezmesi)",
       "kategori": "meze",
       "malzemeler": [
@@ -5307,7 +5030,7 @@
       ]
     },
     {
-      "id": 175,
+      "id": 166,
       "isim": "Girit Ezmesi (Peynirli Meze)",
       "kategori": "meze",
       "malzemeler": [
@@ -5338,7 +5061,7 @@
       ]
     },
     {
-      "id": 176,
+      "id": 167,
       "isim": "Havuç Tarator",
       "kategori": "meze",
       "malzemeler": [
@@ -5368,7 +5091,7 @@
       ]
     },
     {
-      "id": 177,
+      "id": 168,
       "isim": "Köpoğlu (Yoğurtlu Patlıcan Kızartması)",
       "kategori": "meze",
       "malzemeler": [
@@ -5395,7 +5118,7 @@
       ]
     },
     {
-      "id": 178,
+      "id": 169,
       "isim": "Muhammara (Cevizli Ezme)",
       "kategori": "meze",
       "malzemeler": [
@@ -5424,7 +5147,7 @@
       ]
     },
     {
-      "id": 179,
+      "id": 170,
       "isim": "Geleneksel Şakşuka",
       "kategori": "meze",
       "malzemeler": [
@@ -5451,7 +5174,7 @@
       ]
     },
     {
-      "id": 180,
+      "id": 171,
       "isim": "Fava (Kuru Bakla Ezmesi)",
       "kategori": "meze",
       "malzemeler": [

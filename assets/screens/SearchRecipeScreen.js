@@ -30,7 +30,7 @@ const SearchRecipeScreen = () => {
   const navigation = useNavigation();
 
   const getCategoryIcon = (category) => {
-    switch (category.toLowerCase()) {
+    switch (category.toLocaleLowerCase('tr-TR')) {
       case 'ana yemek': return { lib: 'FontAwesome5', name: 'utensils' };
       case 'börek': return { lib: 'FontAwesome5', name: 'bread-slice' };
       case 'kahvaltı': return { lib: 'MaterialCommunityIcons', name: 'egg-fried' };
@@ -39,6 +39,7 @@ const SearchRecipeScreen = () => {
       case 'pilav': return { lib: 'FontAwesome6', name: 'bowl-rice' };
       case 'ara sıcak': return { lib: 'FontAwesome5', name: 'fire-alt' };
       case 'meze': return { lib: 'FontAwesome5', name: 'leaf' };
+      case 'zeytinyağlı': return { lib: 'FontAwesome5', name: 'seedling' };
       default: return { lib: 'FontAwesome5', name: 'utensil-spoon' };
     }
   };
@@ -102,13 +103,13 @@ const SearchRecipeScreen = () => {
     }
 
     setIsSearching(true);
-    const lowerQuery = query.toLowerCase();
+    const lowerQuery = query.toLocaleLowerCase('tr-TR');
 
     const results = recipesData.tarifler.filter(recipe => {
-      if (recipe.isim.toLowerCase().includes(lowerQuery)) return true;
-      if (recipe.kategori.toLowerCase().includes(lowerQuery)) return true;
-      if (recipe.malzemeler.some(malzeme => malzeme.toLowerCase().includes(lowerQuery))) return true;
-      if (recipe.etiketler.some(etiket => etiket.toLowerCase().includes(lowerQuery))) return true;
+      if (recipe.isim.toLocaleLowerCase('tr-TR').includes(lowerQuery)) return true;
+      if (recipe.kategori.toLocaleLowerCase('tr-TR').includes(lowerQuery)) return true;
+      if (recipe.malzemeler.some(malzeme => malzeme.toLocaleLowerCase('tr-TR').includes(lowerQuery))) return true;
+      if (recipe.etiketler.some(etiket => etiket.toLocaleLowerCase('tr-TR').includes(lowerQuery))) return true;
       return false;
     });
 
@@ -340,8 +341,8 @@ ${recipe.hazirlanis.map((adim, index) => `${index + 1}. ${adim}`).join('\n')}
 
             {/* Categories Section */}
             <View style={{ marginTop: 20 }}>
-              {categories.map((cat, index) => (
-                <View key={index} style={{ marginBottom: 24 }}>
+              {categories.map((cat) => (
+                <View key={cat.name} style={{ marginBottom: 24 }}>
                   <TouchableOpacity
                     activeOpacity={0.7}
                     onPress={() => navigation.navigate('CategoryRecipes', { categoryName: cat.name })}

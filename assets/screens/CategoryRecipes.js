@@ -26,7 +26,7 @@ const CategoryRecipes = () => {
 
 
     const categoryRecipes = recipesData.tarifler.filter(
-        (recipe) => recipe.kategori.toLowerCase() === categoryName.toLowerCase()
+        (recipe) => recipe.kategori.toLocaleLowerCase('tr-TR') === categoryName.toLocaleLowerCase('tr-TR')
     );
 
     const formatRecipeForDetail = (recipe) => {
