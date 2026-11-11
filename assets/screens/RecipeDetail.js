@@ -26,6 +26,51 @@ import { useTheme } from '../context/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 
+function categorizeError(error) {
+  const errStr = ((error && (error.message || error.toString())) || '').toLowerCase();
+
+  if (errStr.includes('api_key') || errStr.includes('api key')) {
+    return {
+      error: true,
+      type: 'key',
+      title: 'Servis Yapılandırma Hatası',
+      message: 'Yapay zeka servisi için geçerli bir API anahtarı bulunamadı. Lütfen ayarları kontrol edin.',
+    };
+  }
+
+  if (errStr.includes('429') || errStr.includes('resource_exhausted') || errStr.includes('quota')) {
+    return {
+      error: true,
+      type: 'quota',
+      title: 'Günlük İstek Limiti Doldu',
+      message: 'Yapay zeka servisinin günlük kullanım kotasına ulaşıldı. Lütfen daha sonra tekrar deneyin.',
+    };
+  }
+
+  if (
+    errStr.includes('network') ||
+    errStr.includes('fetch') ||
+    errStr.includes('timeout') ||
+    errStr.includes('enotfound') ||
+    errStr.includes('econnrefused') ||
+    errStr.includes('failed to fetch') ||
+    errStr.includes('internet')
+  ) {
+    return {
+      error: true,
+      type: 'network',
+      title: 'İnternet Bağlantısı Yok',
+      message: 'Yapay zeka servisine bağlanılamadı. İnternet bağlantınızı kontrol edip lütfen tekrar deneyin.',
+    };
+  }
+
+  return {
+    error: true,
+    type: 'general',
+    title: 'Bir Sorun Oluştu',
+    message: 'Tarif hazırlanırken beklenmedik bir hata meydana geldi. Lütfen tekrar deneyin.',
+  };
+}
 
 async function geminiRecipe(malzemeler, mealType, servingSize = 2, category = 'meal') {
 
@@ -102,10 +147,12 @@ Eğer tarif yoksa sadece "Tarif bulunamadı." yaz.
       topK: 40,
     });
 
-    if (!text || text.includes("Tarif bulunamadı")) {
+    if (!text || text.trim() === '' || text.includes("Tarif bulunamadı")) {
       return {
-        title: 'AI Tarif Önerisi',
-        description: 'Tarif bulunamadı.',
+        error: true,
+        type: 'not_found',
+        title: 'Uygun Tarif Bulunamadı',
+        message: 'Seçtiğiniz malzemelerle uygun bir tarif üretilemedi. Farklı veya daha fazla malzeme ekleyerek tekrar deneyebilirsiniz.',
       };
     }
 
@@ -116,18 +163,7 @@ Eğer tarif yoksa sadece "Tarif bulunamadı." yaz.
 
   } catch (error) {
     console.error("SDK HATASI:", error);
-
-    let errorMsg = 'Tarif alınırken bir hata oluştu.';
-    if (error.message?.includes('API_KEY_MISSING')) {
-      errorMsg = 'API anahtarı bulunamadı. Lütfen .env dosyasına EXPO_PUBLIC_GEMINI_API_KEY ekleyin.';
-    } else if (error.message?.includes('429')) {
-      errorMsg = 'Günlük limit doldu. Lütfen yarın tekrar deneyin veya yeni bir API anahtarı girin.';
-    }
-
-    return {
-      title: 'Hata',
-      description: errorMsg,
-    };
+    return categorizeError(error);
   }
 }
 
@@ -202,10 +238,12 @@ Lütfen sıradan tarifler yerine, daha yaratıcı ve farklı bir seçenek sun.
       topK: 40,
     });
 
-    if (!text || text.includes("Tarif bulunamadı")) {
+    if (!text || text.trim() === '' || text.includes("Tarif bulunamadı")) {
       return {
-        title: 'AI Tarif Önerisi',
-        description: 'Tarif bulunamadı.',
+        error: true,
+        type: 'not_found',
+        title: 'Uygun Tarif Bulunamadı',
+        message: 'Rastgele tarif hazırlanırken uygun bir sonuç bulunamadı. Lütfen tekrar deneyin.',
       };
     }
 
@@ -216,18 +254,7 @@ Lütfen sıradan tarifler yerine, daha yaratıcı ve farklı bir seçenek sun.
 
   } catch (error) {
     console.error("SDK HATASI (Random):", error);
-
-    let errorMsg = 'Tarif alınırken bir hata oluştu.';
-    if (error.message?.includes('API_KEY_MISSING')) {
-      errorMsg = 'API anahtarı bulunamadı. Lütfen .env dosyasına EXPO_PUBLIC_GEMINI_API_KEY ekleyin.';
-    } else if (error.message?.includes('429')) {
-      errorMsg = 'Günlük limit doldu. Lütfen yarın tekrar deneyin veya yeni bir API anahtarı girin.';
-    }
-
-    return {
-      title: 'Hata',
-      description: errorMsg,
-    };
+    return categorizeError(error);
   }
 }
 
@@ -804,6 +831,7 @@ const RecipeDetail = ({ route, navigation }) => {
   const { isDarkMode, theme } = useTheme();
   const { malzemeler = [], mealType, mealTime, style, isRandom, servingSize = 2, category } = route.params;
   const [loading, setLoading] = useState(true);
+  const [errorInfo, setErrorInfo] = useState(null);
   const [tarif, setTarif] = useState(null);
   const [recipeImage, setRecipeImage] = useState(null);
   const [photographer, setPhotographer] = useState(null);
@@ -850,6 +878,7 @@ const RecipeDetail = ({ route, navigation }) => {
 
   const generateRecipe = async () => {
     setLoading(true);
+    setErrorInfo(null);
     try {
       let result;
       if (isRandom) {
@@ -857,8 +886,13 @@ const RecipeDetail = ({ route, navigation }) => {
       } else {
         result = await geminiRecipe(malzemeler, mealType, servingSize, category);
       }
-      setTarif(result);
-      if (result && result.description) {
+
+      if (result && result.error) {
+        setErrorInfo(result);
+        setTarif(null);
+      } else if (result && result.description) {
+        setTarif(result);
+        setErrorInfo(null);
         const searchTerms = extractImageSearchTerms(result.description);
         loadRecipeImage(searchTerms);
 
@@ -869,9 +903,19 @@ const RecipeDetail = ({ route, navigation }) => {
           const exists = recipes.some(r => r.yemekAdi === extractRecipeName(result.description));
           setIsSaved(exists);
         }
+      } else {
+        setErrorInfo({
+          error: true,
+          type: 'general',
+          title: 'Bir Sorun Oluştu',
+          message: 'Tarif hazırlanırken beklenmedik bir hata meydana geldi. Lütfen tekrar deneyin.',
+        });
+        setTarif(null);
       }
     } catch (error) {
       console.error('Tarif üretme hatası:', error);
+      setErrorInfo(categorizeError(error));
+      setTarif(null);
     } finally {
       setLoading(false);
     }
@@ -1020,6 +1064,63 @@ const RecipeDetail = ({ route, navigation }) => {
 
   if (loading) {
     return <LoadingAnimation malzemeler={malzemeler} mealTypeText={getMealTypeText(mealType)} isRandom={isRandom} mealTime={mealTime} style={style} />;
+  }
+
+  if (errorInfo && !loading) {
+    const isNetwork = errorInfo.type === 'network';
+    const isQuota = errorInfo.type === 'quota';
+    const isKey = errorInfo.type === 'key';
+    const isNotFound = errorInfo.type === 'not_found';
+    const iconName = isNetwork ? 'wifi' : (isQuota ? 'hourglass-end' : (isKey ? 'key' : (isNotFound ? 'utensils' : 'exclamation-circle')));
+
+    return (
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={styles.errorHeader}>
+          <TouchableOpacity
+            style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderWidth: 0 }]}
+            onPress={() => navigation.goBack()}
+          >
+            <FontAwesome5 name="arrow-left" size={18} color={theme.text} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.errorContainer}>
+          <View style={[styles.errorCard, { backgroundColor: isDarkMode ? theme.card : '#ffffff' }]}>
+            <View style={[styles.errorIconBubble, { backgroundColor: isDarkMode ? 'rgba(255, 112, 67, 0.15)' : '#fff3e0' }]}>
+              <FontAwesome5 name={iconName} size={34} color="#ff7043" />
+            </View>
+
+            <Text style={[styles.errorTitle, { color: theme.text }]}>
+              {errorInfo.title || 'Tarif Hazırlanamadı'}
+            </Text>
+
+            <Text style={[styles.errorMessage, { color: theme.secondaryText }]}>
+              {errorInfo.message || 'Lütfen internet bağlantınızı kontrol edip tekrar deneyin.'}
+            </Text>
+
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={generateRecipe}
+              activeOpacity={0.85}
+            >
+              <FontAwesome5 name="redo-alt" size={14} color="#fff" style={{ marginRight: 10 }} />
+              <Text style={styles.retryButtonText}>Tekrar Dene</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.secondaryErrorButton, { backgroundColor: isDarkMode ? '#262626' : '#f5f5f5' }]}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.8}
+            >
+              <FontAwesome5 name="arrow-left" size={12} color={theme.text} style={{ marginRight: 8 }} />
+              <Text style={[styles.secondaryErrorButtonText, { color: theme.text }]}>
+                {isRandom ? 'Ana Sayfaya Dön' : 'Malzemeleri Düzenle'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
   }
 
   if (!tarif) return null;
@@ -1842,6 +1943,87 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 2,
     fontFamily: 'PoppinsBold',
+  },
+  errorHeader: {
+    paddingTop: 54,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    flexDirection: 'row',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    marginTop: -40,
+  },
+  errorCard: {
+    width: '100%',
+    borderRadius: 24,
+    paddingVertical: 32,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
+    borderWidth: 0,
+  },
+  errorIconBubble: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontFamily: 'PoppinsBold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  errorMessage: {
+    fontSize: 14,
+    fontFamily: 'PoppinsRegular',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ff7043',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    width: '100%',
+    marginBottom: 10,
+    shadowColor: '#ff7043',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  retryButtonText: {
+    fontSize: 15,
+    fontFamily: 'PoppinsBold',
+    color: '#ffffff',
+  },
+  secondaryErrorButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 13,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    width: '100%',
+  },
+  secondaryErrorButtonText: {
+    fontSize: 14,
+    fontFamily: 'PoppinsMedium',
   },
 });
 
