@@ -74,9 +74,10 @@ SADECE aşağıdaki formatta tarifi ver. Başka HİÇBİR giriş cümlesi, açı
 **Hazırlama Süresi:** [Örn: 30 dk]
 **Zorluk Seviyesi:** [Örn: Kolay, Orta, Zor]
 **Kalori:** [Örn: 450 kcal]
+**Porsiyon:** [Örn: ${servingSize} Kişilik]
 
 **Malzemeler:**
-- [malzeme listesi] (Malzeme miktarlarını ${servingSize} kişi için ayarla ama kişi sayısını ayrıca bir başlık olarak YAZMA)
+- [malzeme listesi] (Malzeme miktarlarını ${servingSize} kişi için ayarla)
 
 **Hazırlanışı:**
 1. [adım 1] [Şefin Tavsiyesi: Varsa püf noktası]
@@ -174,9 +175,10 @@ SADECE aşağıdaki formatta tarifi ver.Başka HİÇBİR giriş cümlesi, açık
 **Hazırlama Süresi:** [Örn: 30 dk]
 **Zorluk Seviyesi:** [Örn: Kolay, Orta, Zor]
 **Kalori:** [Örn: 450 kcal]
+**Porsiyon:** [Örn: ${servingSize} Kişilik]
 
 **Malzemeler:**
-- [malzeme listesi] (Malzeme miktarlarını ${servingSize} kişi için ayarla ama kişi sayısını ayrıca bir başlık olarak YAZMA)
+- [malzeme listesi] (Malzeme miktarlarını ${servingSize} kişi için ayarla)
 
 **Hazırlanışı:**
 1.[adım 1][Şefin Tavsiyesi: Varsa püf noktası]
@@ -582,7 +584,8 @@ function renderFormattedText(text, theme, isDarkMode) {
         title.toLowerCase().includes('yemek adı') ||
         title.toLowerCase().includes('hazırlama süresi') ||
         title.toLowerCase().includes('zorluk seviyesi') ||
-        title.toLowerCase().includes('kalori')
+        title.toLowerCase().includes('kalori') ||
+        title.toLowerCase().includes('porsiyon')
       ) {
         skipUntilNextSection = true;
         return null;
@@ -701,7 +704,7 @@ function renderFormattedText(text, theme, isDarkMode) {
     // Tire ile başlayan liste öğeleri
     if (/^-/.test(line.trim())) {
       return (
-        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
+        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: isDarkMode ? theme.card : '#ffffff', borderBottomColor: theme.border }]}>
           <View style={styles.ingredientIconContainer}>
             <FontAwesome5 name="check" size={10} color="#ff7043" />
           </View>
@@ -762,18 +765,26 @@ function extractRecipeName(description) {
 }
 
 // Süre, Zorluk ve Kalori bilgilerini çıkaran fonksiyon
-function extractMetadata(description) {
+function extractMetadata(description, fallbackServingSize) {
   const timeMatch = description.match(/\*\*\s*Hazırlama Süresi\s*:\s*\*\*\s*(.*)/i) ||
     description.match(/\*\*\s*Hazırlama Süresi\s*:\s*(.*)/i);
   const difficultyMatch = description.match(/\*\*\s*Zorluk Seviyesi\s*:\s*\*\*\s*(.*)/i) ||
     description.match(/\*\*\s*Zorluk Seviyesi\s*:\s*(.*)/i);
   const calorieMatch = description.match(/\*\*\s*Kalori\s*:\s*\*\*\s*(.*)/i) ||
     description.match(/\*\*\s*Kalori\s*:\s*(.*)/i);
+  const portionMatch = description.match(/\*\*\s*Porsiyon\s*:\s*\*\*\s*(.*)/i) ||
+    description.match(/\*\*\s*Porsiyon\s*:\s*(.*)/i);
+
+  let portionVal = portionMatch ? portionMatch[1].trim().replace(/\*\*/g, '') : null;
+  if (!portionVal && fallbackServingSize) {
+    portionVal = `${fallbackServingSize} Kişilik`;
+  }
 
   return {
     time: timeMatch ? timeMatch[1].trim().replace(/\*\*/g, '') : '30-45 dk',
     difficulty: difficultyMatch ? difficultyMatch[1].trim().replace(/\*\*/g, '') : 'Orta',
-    calories: calorieMatch ? calorieMatch[1].trim().replace(/\*\*/g, '') : '400 kcal'
+    calories: calorieMatch ? calorieMatch[1].trim().replace(/\*\*/g, '') : '400 kcal',
+    portion: portionVal || '2 Kişilik'
   };
 }
 
@@ -1129,23 +1140,28 @@ const RecipeDetail = ({ route, navigation }) => {
               {/* Meta Bilgileri Kutuları (SavedRecipeDetail.js stili) */}
               <View style={styles.metaContainer}>
                 {(() => {
-                  const meta = extractMetadata(tarif.description);
+                  const meta = extractMetadata(tarif.description, servingSize);
                   return (
                     <View style={styles.metaRow}>
                       <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
-                        <FontAwesome5 name="clock" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
+                        <FontAwesome5 name="clock" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
                         <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Süre</Text>
                         <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.time}</Text>
                       </View>
                       <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
-                        <FontAwesome5 name="chart-bar" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
+                        <FontAwesome5 name="chart-bar" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
                         <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Zorluk</Text>
                         <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.difficulty}</Text>
                       </View>
                       <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
-                        <FontAwesome5 name="fire-alt" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
+                        <FontAwesome5 name="fire-alt" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
                         <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Kalori</Text>
                         <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.calories}</Text>
+                      </View>
+                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
+                        <FontAwesome5 name="users" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
+                        <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Porsiyon</Text>
+                        <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.portion}</Text>
                       </View>
                     </View>
                   );
@@ -1804,25 +1820,25 @@ const styles = StyleSheet.create({
   },
   metaRow: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 8,
     justifyContent: 'center',
   },
   metaBox: {
-    width: 95,
-    height: 85,
-    borderRadius: 16,
+    flex: 1,
+    height: 82,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 4,
     borderWidth: 0,
   },
   metaLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: 'PoppinsRegular',
     textAlign: 'center',
   },
   metaValue: {
-    fontSize: 13,
+    fontSize: 12,
     textAlign: 'center',
     marginTop: 2,
     fontFamily: 'PoppinsBold',

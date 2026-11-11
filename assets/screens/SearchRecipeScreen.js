@@ -143,6 +143,7 @@ const SearchRecipeScreen = () => {
 **Hazırlama Süresi:** ${recipe.sure}
 **Zorluk Seviyesi:** ${recipe.zorluk}
 **Kalori:** ${recipe.kalori || '350 kcal'}
+**Porsiyon:** ${recipe.kisi ? `${recipe.kisi} Kişilik` : '4 Kişilik'}
 
 **Malzemeler:**
 ${recipe.malzemeler.map(malzeme => `- ${malzeme}`).join('\n')}

@@ -70,7 +70,8 @@ function renderFormattedText(text, theme, isDarkMode) {
         title.toLowerCase().includes('yemek adı') ||
         title.toLowerCase().includes('hazırlama süresi') ||
         title.toLowerCase().includes('zorluk seviyesi') ||
-        title.toLowerCase().includes('kalori')
+        title.toLowerCase().includes('kalori') ||
+        title.toLowerCase().includes('porsiyon')
       ) {
         skipUntilNextSection = true;
         return null;
@@ -183,7 +184,7 @@ function renderFormattedText(text, theme, isDarkMode) {
 
     if (/^-/.test(line.trim())) {
       return (
-        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: theme.card, borderBottomColor: theme.border, borderWidth: 0 }]}>
+        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: isDarkMode ? theme.card : '#ffffff', borderBottomColor: theme.border, borderWidth: 0 }]}>
           <View style={styles.ingredientIconContainer}>
             <FontAwesome5 name="check" size={10} color="#ff7043" />
           </View>
@@ -553,30 +554,38 @@ const SavedRecipeDetail = ({ route, navigation }) => {
               const prepTime = recipe.description.match(/\*\*\s*Hazırlama Süresi:\*\*\s*(.*)/i)?.[1]?.trim() || '-';
               const difficulty = recipe.description.match(/\*\*\s*Zorluk Seviyesi:\*\*\s*(.*)/i)?.[1]?.trim() || '-';
               const calorie = recipe.description.match(/\*\*\s*Kalori:\*\*\s*(.*)/i)?.[1]?.trim() || '-';
+              const portion = recipe.description.match(/\*\*\s*Porsiyon:\*\*\s*(.*)/i)?.[1]?.trim() || (recipe.kisi ? `${recipe.kisi} Kişilik` : '-');
 
-              if (prepTime === '-' && difficulty === '-' && calorie === '-') return null;
+              if (prepTime === '-' && difficulty === '-' && calorie === '-' && portion === '-') return null;
 
               return (
-                <View style={{ flexDirection: 'row', gap: 25, justifyContent: 'center' }}>
+                <View style={{ flexDirection: 'row', gap: 8, justifyContent: 'center' }}>
                   {prepTime !== '-' && (
-                    <View style={{ width: 95, height: 85, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 16, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
-                      <FontAwesome5 name="clock" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
-                      <Text style={{ fontSize: 12, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Süre</Text>
-                      <Text style={{ fontSize: 13, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{prepTime}</Text>
+                    <View style={{ flex: 1, height: 82, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
+                      <FontAwesome5 name="clock" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
+                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Süre</Text>
+                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{prepTime}</Text>
                     </View>
                   )}
                   {difficulty !== '-' && (
-                    <View style={{ width: 95, height: 85, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 16, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
-                      <FontAwesome5 name="chart-bar" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
-                      <Text style={{ fontSize: 12, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Zorluk</Text>
-                      <Text style={{ fontSize: 13, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{difficulty}</Text>
+                    <View style={{ flex: 1, height: 82, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
+                      <FontAwesome5 name="chart-bar" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
+                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Zorluk</Text>
+                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{difficulty}</Text>
                     </View>
                   )}
                   {calorie !== '-' && (
-                    <View style={{ width: 95, height: 85, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 16, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
-                      <FontAwesome5 name="fire-alt" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
-                      <Text style={{ fontSize: 12, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Kalori</Text>
-                      <Text style={{ fontSize: 13, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{calorie}</Text>
+                    <View style={{ flex: 1, height: 82, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
+                      <FontAwesome5 name="fire-alt" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
+                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Kalori</Text>
+                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{calorie}</Text>
+                    </View>
+                  )}
+                  {portion !== '-' && (
+                    <View style={{ flex: 1, height: 82, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
+                      <FontAwesome5 name="users" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
+                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Porsiyon</Text>
+                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{portion}</Text>
                     </View>
                   )}
                 </View>
