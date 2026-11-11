@@ -6,11 +6,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
-  ScrollView,
   FlatList,
   Dimensions,
-  ImageBackground
 } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  interpolate,
+  Extrapolation,
+} from 'react-native-reanimated';
 import { FontAwesome5, MaterialCommunityIcons, FontAwesome6 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import recipesData from '../data/recipes.json';
@@ -228,17 +233,87 @@ ${recipe.hazirlanis.map((adim, index) => `${index + 1}. ${adim}`).join('\n')}
     </TouchableOpacity>
   );
 
+  const scrollY = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const fixedHeaderStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollY.value,
+      [14, 46],
+      [0, 1],
+      Extrapolation.CLAMP
+    );
+    return { opacity };
+  });
+
+  const centeredHeaderTitleStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollY.value,
+      [20, 52],
+      [0, 1],
+      Extrapolation.CLAMP
+    );
+    const translateY = interpolate(
+      scrollY.value,
+      [20, 52],
+      [6, 0],
+      Extrapolation.CLAMP
+    );
+    return {
+      opacity,
+      transform: [{ translateY }],
+    };
+  });
+
+  const bigHeaderStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollY.value,
+      [0, 36],
+      [1, 0],
+      Extrapolation.CLAMP
+    );
+    const translateY = interpolate(
+      scrollY.value,
+      [0, 36],
+      [0, -10],
+      Extrapolation.CLAMP
+    );
+    return {
+      opacity,
+      transform: [{ translateY }],
+    };
+  });
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={isDarkMode ? theme.background : "#f5f5f5"} />
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.background} />
 
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: isDarkMode ? theme.background : "#fff" }]}>
-        <Text style={[styles.title, { color: theme.text }]}>Tarifler</Text>
-        <Text style={[styles.subtitle, { color: theme.secondaryText }]}>Binlerce lezzetli tarif elinizin altında</Text>
-      </View>
+      {/* Scroll Edilince Beliren Sabit Header */}
+      <Animated.View style={[styles.fixedHeader, { backgroundColor: theme.background }, fixedHeaderStyle]} pointerEvents="none">
+        <Animated.Text
+          style={[styles.centeredHeaderTitle, { color: theme.text }, centeredHeaderTitleStyle]}
+          numberOfLines={1}
+        >
+          Tarifler
+        </Animated.Text>
+      </Animated.View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
+      <Animated.ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContainer}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+      >
+        {/* Sayfa İçi Büyük Header */}
+        <Animated.View style={[styles.header, bigHeaderStyle]}>
+          <Text style={[styles.title, { color: theme.text }]}>Tarifler</Text>
+          <Text style={[styles.subtitle, { color: theme.secondaryText }]}>Binlerce lezzetli tarif elinizin altında</Text>
+        </Animated.View>
         <View style={styles.searchContainer}>
           <View style={[styles.inputWrapper, { backgroundColor: theme.card, borderColor: inputFocused ? '#ff7043' : theme.border }]}>
             <FontAwesome5 name="search" size={16} color={inputFocused ? '#ff7043' : theme.secondaryText} style={{ marginLeft: 16 }} />
@@ -406,7 +481,7 @@ ${recipe.hazirlanis.map((adim, index) => `${index + 1}. ${adim}`).join('\n')}
         )}
 
         <View style={{ height: 40 }} />
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 };
@@ -416,9 +491,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingTop: 60,
     paddingHorizontal: 24,
-    paddingBottom: 20,
+    paddingBottom: 16,
+  },
+  fixedHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingTop: 44,
+    height: 90,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    zIndex: 10,
+  },
+  centeredHeaderTitle: {
+    fontSize: 18,
+    fontFamily: 'PoppinsBold',
+    textAlign: 'center',
   },
   title: {
     fontSize: 28,
@@ -430,6 +521,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   scrollContainer: {
+    paddingTop: 56,
     paddingBottom: 40,
   },
   searchContainer: {
