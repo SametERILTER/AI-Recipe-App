@@ -4,13 +4,19 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
-    ScrollView,
     SafeAreaView,
     StatusBar,
     Switch,
     Modal,
     Pressable,
 } from 'react-native';
+import Animated, {
+    useSharedValue,
+    useAnimatedScrollHandler,
+    useAnimatedStyle,
+    interpolate,
+    Extrapolation,
+} from 'react-native-reanimated';
 import { FontAwesome5, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
@@ -116,8 +122,8 @@ const SettingsScreen = () => {
                 <Switch
                     value={value}
                     onValueChange={onValueChange}
-                    trackColor={{ false: isDarkMode ? '#334155' : '#e2e8f0', true: '#ff704330' }}
-                    thumbColor={value ? '#ff7043' : (isDarkMode ? '#94a3b8' : '#f1f5f9')}
+                    trackColor={{ false: isDarkMode ? '#383838' : '#e5e5e5', true: '#ff704330' }}
+                    thumbColor={value ? '#ff7043' : (isDarkMode ? '#a3a3a3' : '#eeeeee')}
                 />
             ) : (
                 <Octicons name="chevron-right" size={16} color={theme.secondaryText} />
@@ -126,23 +132,83 @@ const SettingsScreen = () => {
     );
 
     const SectionHeader = ({ title }) => (
-        <Text style={[styles.sectionHeader, { color: isDarkMode ? '#ff7043' : '#475569' }]}>{title}</Text>
+        <Text style={[styles.sectionHeader, { color: isDarkMode ? '#ff7043' : '#525252' }]}>{title}</Text>
     );
 
     const currentSensitivityLabel = SENSITIVITY_OPTIONS.find(o => o.id === sensitivity)?.label || 'Normal Hassasiyet';
     const currentLevelLabel = COOKING_LEVEL_OPTIONS.find(o => o.id === cookingLevel)?.label || 'Biraz Biliyorum';
 
+    const scrollY = useSharedValue(0);
+
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            scrollY.value = event.contentOffset.y;
+        },
+    });
+
+    const centeredHeaderTitleStyle = useAnimatedStyle(() => {
+        const opacity = interpolate(
+            scrollY.value,
+            [30, 65],
+            [0, 1],
+            Extrapolation.CLAMP
+        );
+        const translateY = interpolate(
+            scrollY.value,
+            [30, 65],
+            [6, 0],
+            Extrapolation.CLAMP
+        );
+        return {
+            opacity,
+            transform: [{ translateY }],
+        };
+    });
+
+    const bigTitleStyle = useAnimatedStyle(() => {
+        const opacity = interpolate(
+            scrollY.value,
+            [0, 40],
+            [1, 0],
+            Extrapolation.CLAMP
+        );
+        const translateY = interpolate(
+            scrollY.value,
+            [0, 40],
+            [0, -10],
+            Extrapolation.CLAMP
+        );
+        return {
+            opacity,
+            transform: [{ translateY }],
+        };
+    });
+
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
             <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
 
             {/* Sabit Header */}
-            <View style={[styles.fixedHeader, { backgroundColor: theme.background, borderBottomColor: theme.border }]}>
-                <Text style={[styles.headerTitle, { color: theme.text }]}>Ayarlar</Text>
-                <Text style={[styles.headerSubtitle, { color: theme.secondaryText }]}>Uygulama deneyimini özelleştir</Text>
+            <View style={[styles.fixedHeader, { backgroundColor: theme.background }]} pointerEvents="box-none">
+                <Animated.Text
+                    style={[styles.centeredHeaderTitle, { color: theme.text }, centeredHeaderTitleStyle]}
+                    numberOfLines={1}
+                >
+                    Ayarlar
+                </Animated.Text>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+            <Animated.ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
+            >
+                {/* Sayfa İçi Büyük Başlık */}
+                <Animated.View style={[styles.bigTitleContainer, bigTitleStyle]}>
+                    <Text style={[styles.headerTitle, { color: theme.text }]}>Ayarlar</Text>
+                </Animated.View>
+
                 <View style={styles.section}>
                     <SectionHeader title="Görünüm ve Yapay Zeka Şef" />
                     <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
@@ -195,7 +261,7 @@ const SettingsScreen = () => {
                             subtitle="Sıkça sorulan sorular ve kullanım ipuçları"
                             type="button"
                             onPress={() => navigation.navigate('HelpCenter')}
-                            iconColor="#64748b"
+                            iconColor="#737373"
                         />
                         <View style={[styles.divider, { backgroundColor: theme.divider }]} />
                         <SettingItem
@@ -204,14 +270,13 @@ const SettingsScreen = () => {
                             subtitle="Sürüm ve özellik bilgileri"
                             type="button"
                             onPress={() => navigation.navigate('AboutApp')}
-                            iconColor="#64748b"
+                            iconColor="#737373"
                         />
                     </View>
                 </View>
 
-                <Text style={[styles.versionText, { color: theme.secondaryText }]}>Sürüm 1.2.0</Text>
                 <View style={{ height: 100 }} />
-            </ScrollView>
+            </Animated.ScrollView>
 
             {/* Hassasiyet Ayarları Modalı */}
             <Modal visible={sensitivityModalVisible} transparent animationType="fade" onRequestClose={() => setSensitivityModalVisible(false)}>
@@ -276,7 +341,7 @@ const SettingsScreen = () => {
                     </View>
                 </View>
             </Modal>
-        </SafeAreaView>
+        </View>
     );
 };
 
@@ -286,30 +351,41 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingTop: 20,
+        paddingTop: 104,
+        paddingBottom: 40,
     },
     fixedHeader: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        paddingTop: 50,
+        height: 98,
+        justifyContent: 'center',
+        alignItems: 'center',
         paddingHorizontal: 24,
-        paddingTop: 60,
-        paddingBottom: 20,
-        borderBottomWidth: 1,
         zIndex: 10,
+    },
+    centeredHeaderTitle: {
+        fontSize: 18,
+        fontFamily: 'PoppinsBold',
+        textAlign: 'center',
+    },
+    bigTitleContainer: {
+        paddingTop: 4,
+        paddingBottom: 20,
+        paddingHorizontal: 4,
     },
     headerTitle: {
         fontSize: 32,
-        fontFamily: 'TextExtraBold',
-    },
-    headerSubtitle: {
-        fontSize: 15,
-        fontFamily: 'TextNormal',
-        marginTop: 4,
+        fontFamily: 'PoppinsExtraBold',
     },
     section: {
         marginBottom: 24,
     },
     sectionHeader: {
         fontSize: 16,
-        fontFamily: 'TextExtraBold',
+        fontFamily: 'PoppinsExtraBold',
         marginBottom: 12,
         marginLeft: 4,
         letterSpacing: 0.5,
@@ -318,7 +394,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         padding: 8,
         marginBottom: 24,
-        borderWidth: 1,
+        borderWidth: 0,
     },
     settingItem: {
         flexDirection: 'row',
@@ -338,11 +414,11 @@ const styles = StyleSheet.create({
     },
     settingTitle: {
         fontSize: 15,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
     },
     settingSubtitle: {
         fontSize: 12,
-        fontFamily: 'TextNormal',
+        fontFamily: 'PoppinsRegular',
         marginTop: 2,
     },
     divider: {
@@ -352,7 +428,7 @@ const styles = StyleSheet.create({
     versionText: {
         textAlign: 'center',
         fontSize: 12,
-        fontFamily: 'TextNormal',
+        fontFamily: 'PoppinsRegular',
         marginTop: 8,
     },
     modalOverlay: {
@@ -364,16 +440,16 @@ const styles = StyleSheet.create({
     modalBox: {
         borderRadius: 24,
         padding: 22,
-        borderWidth: 1,
+        borderWidth: 0,
     },
     modalTitle: {
         fontSize: 20,
-        fontFamily: 'TextExtraBold',
+        fontFamily: 'PoppinsExtraBold',
         marginBottom: 6,
     },
     modalSub: {
         fontSize: 13,
-        fontFamily: 'TextNormal',
+        fontFamily: 'PoppinsRegular',
         marginBottom: 16,
     },
     optionCard: {
@@ -381,17 +457,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 14,
         borderRadius: 16,
-        borderWidth: 1.5,
+        borderWidth: 0,
         marginBottom: 10,
     },
     optionLabel: {
         fontSize: 15,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         marginBottom: 3,
     },
     optionDesc: {
         fontSize: 12,
-        fontFamily: 'TextNormal',
+        fontFamily: 'PoppinsRegular',
         lineHeight: 17,
     },
 });

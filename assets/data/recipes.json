@@ -35,7 +35,8 @@
         "mercimek",
         "klasik",
         "sıcak"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 2,
@@ -69,7 +70,8 @@
         "et",
         "bursa",
         "özel"
-      ]
+      ],
+      "kalori": "480 kcal"
     },
     {
       "id": 3,
@@ -103,7 +105,8 @@
         "peynir",
         "hamur işi",
         "misafir"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 4,
@@ -139,7 +142,8 @@
         "bulgur",
         "sebzeli",
         "geleneksel"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 5,
@@ -171,7 +175,8 @@
         "şerbetli",
         "bayram",
         "klasik"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 6,
@@ -201,7 +206,8 @@
         "kebap",
         "sokak lezzeti",
         "türk pizza"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 7,
@@ -236,7 +242,8 @@
         "kış",
         "geleneksel",
         "bakliyat"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 8,
@@ -267,7 +274,8 @@
         "acı",
         "ızgara",
         "adana"
-      ]
+      ],
+      "kalori": "480 kcal"
     },
     {
       "id": 9,
@@ -301,7 +309,8 @@
         "sütlü",
         "fırın",
         "hafif"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 10,
@@ -331,7 +340,8 @@
         "çıtır",
         "peynir",
         "çay saati"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 11,
@@ -364,7 +374,8 @@
         "domates",
         "kaşar",
         "pratik"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 12,
@@ -392,7 +403,8 @@
         "kıymalı",
         "hamur işi",
         "fırın"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 13,
@@ -422,7 +434,8 @@
         "pirinç",
         "klasik",
         "tane tane"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 14,
@@ -453,7 +466,8 @@
         "peynirli",
         "sıcak",
         "hatay"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 15,
@@ -481,7 +495,8 @@
         "kahvaltı",
         "kızartma",
         "pratik"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 16,
@@ -511,7 +526,8 @@
         "tavuk",
         "şifa",
         "kış"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 17,
@@ -540,7 +556,8 @@
         "acısız",
         "ızgara",
         "geleneksel"
-      ]
+      ],
+      "kalori": "480 kcal"
     },
     {
       "id": 18,
@@ -570,7 +587,8 @@
         "sütlü",
         "yanık",
         "klasik"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 19,
@@ -602,7 +620,8 @@
         "ıspanak",
         "sebzeli",
         "fırın"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 20,
@@ -631,7 +650,8 @@
         "nohut",
         "sokak lezzeti",
         "doyurucu"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 21,
@@ -658,7 +678,8 @@
         "hamur",
         "kayseri",
         "geleneksel"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 22,
@@ -688,7 +709,8 @@
         "patlıcan",
         "soğuk",
         "vejetaryen"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 23,
@@ -716,7 +738,8 @@
         "şerbetli",
         "irmik",
         "klasik"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 24,
@@ -741,7 +764,8 @@
         "et",
         "patlıcan",
         "özel"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 25,
@@ -769,7 +793,8 @@
         "geleneksel",
         "bol malzemeli",
         "bereket"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 26,
@@ -797,7 +822,8 @@
         "kıyma",
         "klasik",
         "yaz"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 27,
@@ -826,7 +852,8 @@
         "bulgur",
         "çay saati",
         "vegan"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 28,
@@ -852,7 +879,8 @@
         "nohut",
         "sağlıklı",
         "vegan"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 29,
@@ -877,7 +905,8 @@
         "meze",
         "acı",
         "sokak"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 30,
@@ -906,7 +935,8 @@
         "şerbetli",
         "kurabiye",
         "klasik"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 31,
@@ -934,7 +964,8 @@
         "yoğurt",
         "ferah",
         "geleneksel"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 32,
@@ -962,7 +993,8 @@
         "sebze",
         "yaz",
         "pratik"
-      ]
+      ],
+      "kalori": "300 kcal"
     },
     {
       "id": 33,
@@ -989,7 +1021,8 @@
         "yumurta",
         "pratik",
         "ekmek banmalık"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 34,
@@ -1016,7 +1049,8 @@
         "fırın",
         "suluyemek",
         "klasik"
-      ]
+      ],
+      "kalori": "480 kcal"
     },
     {
       "id": 35,
@@ -1039,7 +1073,8 @@
         "sebze",
         "yaz",
         "meze"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 36,
@@ -1065,7 +1100,8 @@
         "pratik",
         "ana yemek",
         "tencere"
-      ]
+      ],
+      "kalori": "350 kcal"
     },
     {
       "id": 37,
@@ -1092,7 +1128,8 @@
         "çay saati",
         "mercimek",
         "besleyici"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 38,
@@ -1120,7 +1157,8 @@
         "bisküvili",
         "kolay",
         "soğuk"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 39,
@@ -1145,7 +1183,8 @@
         "kabak",
         "kış",
         "hafif"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 40,
@@ -1172,7 +1211,8 @@
         "zeytinyağlı",
         "vegan",
         "klasik"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 41,
@@ -1207,7 +1247,8 @@
         "tencere yemeği",
         "klasik",
         "akşam"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 42,
@@ -1238,7 +1279,8 @@
         "geleneksel",
         "şifa",
         "kış"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 43,
@@ -1267,7 +1309,8 @@
         "sütlü",
         "balkan",
         "popüler"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 44,
@@ -1296,7 +1339,8 @@
         "karadeniz",
         "yöresel",
         "peynirli"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 45,
@@ -1326,7 +1370,8 @@
         "tavuk",
         "davet",
         "görsel şölen"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 46,
@@ -1358,7 +1403,8 @@
         "sokak lezzeti",
         "dürüms",
         "mersin"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 47,
@@ -1384,7 +1430,8 @@
         "patlıcan",
         "yoğurtlu",
         "gaziantep"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 48,
@@ -1412,7 +1459,8 @@
         "elmalı",
         "çay saati",
         "meyveli"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 49,
@@ -1443,7 +1491,8 @@
         "tencere",
         "klasik",
         "sulu yemek"
-      ]
+      ],
+      "kalori": "480 kcal"
     },
     {
       "id": 50,
@@ -1471,7 +1520,8 @@
         "yoğurt",
         "ferah",
         "yaz"
-      ]
+      ],
+      "kalori": "140 kcal"
     },
     {
       "id": 51,
@@ -1500,7 +1550,8 @@
         "deniz ürünü",
         "karadeniz",
         "kızartma"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 52,
@@ -1535,7 +1586,8 @@
         "meze",
         "geleneksel",
         "ikramlık"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 53,
@@ -1567,7 +1619,8 @@
         "tavuk",
         "fırın",
         "özel yemek"
-      ]
+      ],
+      "kalori": "350 kcal"
     },
     {
       "id": 54,
@@ -1600,7 +1653,8 @@
         "sütlü",
         "meyveli",
         "hafif"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 55,
@@ -1631,7 +1685,8 @@
         "güveç",
         "sağlıklı",
         "fırın"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 56,
@@ -1659,7 +1714,8 @@
         "meze",
         "protein",
         "pratik"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 57,
@@ -1686,7 +1742,8 @@
         "kahvaltı",
         "hamur işi",
         "pratik"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 58,
@@ -1715,7 +1772,8 @@
         "özel gün",
         "et suyu",
         "geleneksel"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 59,
@@ -1744,7 +1802,8 @@
         "et",
         "yoğurtlu",
         "popüler"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 60,
@@ -1775,7 +1834,8 @@
         "klasik",
         "kızartma",
         "et"
-      ]
+      ],
+      "kalori": "480 kcal"
     },
     {
       "id": 61,
@@ -1810,7 +1870,8 @@
         "yöresel",
         "sarımsaklı",
         "vejetaryen"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 62,
@@ -1843,7 +1904,8 @@
         "yanık",
         "modern",
         "premium"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 63,
@@ -1877,7 +1939,8 @@
         "bodrum",
         "patatesli",
         "yoğurtlu"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 64,
@@ -1906,7 +1969,8 @@
         "izmir",
         "tatlı krizi",
         "akışkan"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 65,
@@ -1937,7 +2001,8 @@
         "terbiyeli",
         "besleyici",
         "anne yemeği"
-      ]
+      ],
+      "kalori": "480 kcal"
     },
     {
       "id": 66,
@@ -1973,7 +2038,8 @@
         "et",
         "klasik",
         "fırın"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 67,
@@ -2009,7 +2075,8 @@
         "barbunya",
         "vejetaryen",
         "sağlıklı"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 68,
@@ -2043,7 +2110,8 @@
         "şerbetli",
         "antep fıstığı",
         "çıtır"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 69,
@@ -2079,7 +2147,8 @@
         "sebzeli",
         "tencere yemeği",
         "besleyici"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 70,
@@ -2112,7 +2181,8 @@
         "kadayıf",
         "muhallebili",
         "çıtır"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 71,
@@ -2143,7 +2213,8 @@
         "kıymalı",
         "hamur işi",
         "geleneksel"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 72,
@@ -2178,7 +2249,8 @@
         "güveç",
         "et",
         "belen"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 73,
@@ -2209,7 +2281,8 @@
         "samsun",
         "peynirli",
         "yumurta"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 74,
@@ -2244,7 +2317,8 @@
         "et",
         "yoğurtlu",
         "geleneksel"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 75,
@@ -2275,7 +2349,8 @@
         "sütlü",
         "baklava",
         "hafif"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 76,
@@ -2307,7 +2382,8 @@
         "kebap",
         "kıymalı",
         "fırın"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 77,
@@ -2336,7 +2412,8 @@
         "çikolatalı",
         "fransız",
         "krema"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 78,
@@ -2368,7 +2445,8 @@
         "et",
         "buğday",
         "doyurucu"
-      ]
+      ],
+      "kalori": "480 kcal"
     },
     {
       "id": 79,
@@ -2403,7 +2481,8 @@
         "balık",
         "pilav",
         "hamsi"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 80,
@@ -2431,7 +2510,8 @@
         "sebzeli",
         "yaz",
         "ekonomik"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 81,
@@ -2466,7 +2546,8 @@
         "antep",
         "kurudolma",
         "geleneksel"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 82,
@@ -2496,7 +2577,8 @@
         "makarna",
         "kremalı",
         "popüler"
-      ]
+      ],
+      "kalori": "350 kcal"
     },
     {
       "id": 83,
@@ -2525,7 +2607,8 @@
         "kıbrıs",
         "kremalı",
         "hafif"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 84,
@@ -2556,7 +2639,8 @@
         "kebap",
         "kağıtkebabı",
         "et"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 85,
@@ -2588,7 +2672,8 @@
         "fırın",
         "peynirli",
         "doyurucu"
-      ]
+      ],
+      "kalori": "360 kcal"
     },
     {
       "id": 86,
@@ -2622,7 +2707,8 @@
         "tavuk",
         "cevizli",
         "özel"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 87,
@@ -2656,7 +2742,8 @@
         "pastırmalı",
         "fırın",
         "ara sıcak"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 88,
@@ -2687,7 +2774,8 @@
         "izmir",
         "şerbetli",
         "çıtır"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 89,
@@ -2718,7 +2806,8 @@
         "gratın",
         "sağlıklı",
         "peynirli"
-      ]
+      ],
+      "kalori": "420 kcal"
     },
     {
       "id": 90,
@@ -2754,7 +2843,8 @@
         "büryan",
         "tavuk",
         "yöresel"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 91,
@@ -2783,7 +2873,8 @@
         "karadeniz",
         "peynirli",
         "mıhlama"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 92,
@@ -2814,7 +2905,8 @@
         "yumurta",
         "yoğurtlu",
         "protein"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 93,
@@ -2846,7 +2938,8 @@
         "pratik",
         "ekmek",
         "israfsız"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 94,
@@ -2876,7 +2969,8 @@
         "patates",
         "sucuklu",
         "tava"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 95,
@@ -2909,7 +3003,8 @@
         "pişi",
         "pratik",
         "hamurişi"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 96,
@@ -2939,7 +3034,8 @@
         "pirinç",
         "domatesli",
         "yaz"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 97,
@@ -2972,7 +3068,8 @@
         "özbek",
         "etli",
         "havuçlu"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 98,
@@ -3002,7 +3099,8 @@
         "aromatik",
         "fıstıklı",
         "baharatlı"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 99,
@@ -3033,7 +3131,8 @@
         "şehriye",
         "tavuklu",
         "doyurucu"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 100,
@@ -3063,7 +3162,8 @@
         "avcı",
         "kıymalı",
         "çıtır"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 101,
@@ -3095,7 +3195,8 @@
         "ara sıcak",
         "geleneksel",
         "lokum"
-      ]
+      ],
+      "kalori": "300 kcal"
     },
     {
       "id": 102,
@@ -3127,7 +3228,8 @@
         "meze",
         "pastırmalı",
         "lübnan"
-      ]
+      ],
+      "kalori": "300 kcal"
     },
     {
       "id": 103,
@@ -3158,7 +3260,8 @@
         "suböreği",
         "geleneksel",
         "kıymalı"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 104,
@@ -3188,7 +3291,8 @@
         "ıspanaklı",
         "gülböreği",
         "peynirli"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 105,
@@ -3218,7 +3322,8 @@
         "denizürünü",
         "tarator",
         "ara sıcak"
-      ]
+      ],
+      "kalori": "300 kcal"
     },
     {
       "id": 106,
@@ -3247,7 +3352,8 @@
         "yöresel",
         "haşlama",
         "etli"
-      ]
+      ],
+      "kalori": "480 kcal"
     },
     {
       "id": 107,
@@ -3277,7 +3383,8 @@
         "muska",
         "kıymalı",
         "pratik"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 108,
@@ -3307,7 +3414,8 @@
         "sigaraböreği",
         "peynirli",
         "hafif"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 109,
@@ -3339,7 +3447,8 @@
         "sebze",
         "ara sıcak",
         "vejetaryen"
-      ]
+      ],
+      "kalori": "300 kcal"
     },
     {
       "id": 110,
@@ -3371,7 +3480,8 @@
         "tavuk",
         "şifa",
         "terbiyeli"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 111,
@@ -3405,7 +3515,8 @@
         "kabak",
         "sütlü",
         "hafif"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 112,
@@ -3434,7 +3545,8 @@
         "yöresel",
         "yoğurtlu",
         "etli"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 113,
@@ -3467,7 +3579,8 @@
         "köz",
         "domates",
         "klasik"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 114,
@@ -3495,7 +3608,8 @@
         "etli",
         "zengin",
         "yoğun"
-      ]
+      ],
+      "kalori": "180 kcal"
     },
     {
       "id": 115,
@@ -3528,7 +3642,8 @@
         "denizürünü",
         "güveç",
         "ara sıcak"
-      ]
+      ],
+      "kalori": "300 kcal"
     },
     {
       "id": 116,
@@ -3556,7 +3671,8 @@
         "fındık",
         "etli",
         "atıştırmalık"
-      ]
+      ],
+      "kalori": "300 kcal"
     },
     {
       "id": 117,
@@ -3588,7 +3704,8 @@
         "ara sıcak",
         "fırın",
         "pratik"
-      ]
+      ],
+      "kalori": "300 kcal"
     },
     {
       "id": 118,
@@ -3621,7 +3738,8 @@
         "graten",
         "kremalı",
         "ara sıcak"
-      ]
+      ],
+      "kalori": "300 kcal"
     },
     {
       "id": 119,
@@ -3650,7 +3768,8 @@
         "gözleme",
         "hamurişi",
         "peynirli"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 120,
@@ -3681,7 +3800,8 @@
         "pratik",
         "yumurta",
         "ekmek"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 121,
@@ -3710,7 +3830,8 @@
         "kavurmalı",
         "protein",
         "geleneksel"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 122,
@@ -3740,7 +3861,8 @@
         "sos",
         "cevizli",
         "meze"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 123,
@@ -3770,7 +3892,8 @@
         "sağlıklı",
         "avokado",
         "modern"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 124,
@@ -3801,7 +3924,8 @@
         "pratik",
         "tava",
         "dereotlu"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 125,
@@ -3831,7 +3955,8 @@
         "tost",
         "lavaş",
         "sucuklu"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 126,
@@ -3858,7 +3983,8 @@
         "patates",
         "fırın",
         "sağlıklı"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 127,
@@ -3887,7 +4013,8 @@
         "omlet",
         "hellim",
         "peynirli"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 128,
@@ -3918,7 +4045,8 @@
         "bazlama",
         "tost",
         "doyurucu"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 129,
@@ -3950,7 +4078,8 @@
         "yumurta",
         "yoğurtlu",
         "geleneksel"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 130,
@@ -3981,7 +4110,8 @@
         "karadeniz",
         "mıhlama",
         "peynirli"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 131,
@@ -4014,7 +4144,8 @@
         "pişi",
         "pratik",
         "hamurişi"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 132,
@@ -4043,7 +4174,8 @@
         "yöresel",
         "hatay",
         "sağlıklı"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 133,
@@ -4072,7 +4204,8 @@
         "kızartma",
         "sebze",
         "soslu"
-      ]
+      ],
+      "kalori": "280 kcal"
     },
     {
       "id": 134,
@@ -4102,7 +4235,8 @@
         "sodalı",
         "tepsi",
         "peynirli"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 135,
@@ -4131,7 +4265,8 @@
         "pırasalı",
         "yoğurtlu",
         "sebzeli"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 136,
@@ -4159,7 +4294,8 @@
         "tahinli",
         "milföy",
         "tatlımsı"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 137,
@@ -4189,7 +4325,8 @@
         "kıymalı",
         "kolböreği",
         "geleneksel"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 138,
@@ -4222,7 +4359,8 @@
         "pastırmalı",
         "paçanga",
         "çıtır"
-      ]
+      ],
+      "kalori": "380 kcal"
     },
     {
       "id": 139,
@@ -4256,7 +4394,8 @@
         "zeytinyağlı",
         "enginar",
         "sağlıklı"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 140,
@@ -4287,7 +4426,8 @@
         "zeytinyağlı",
         "fasulye",
         "klasik"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 141,
@@ -4317,7 +4457,8 @@
         "barbunya",
         "zeytinyağlı",
         "pilaki"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 142,
@@ -4347,7 +4488,8 @@
         "sarma",
         "zeytinyağlı",
         "vişneli"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 143,
@@ -4375,7 +4517,8 @@
         "zeytinyağlı",
         "pırasa",
         "portakallı"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 144,
@@ -4402,7 +4545,8 @@
         "zeytinyağlı",
         "kereviz",
         "kışyemeği"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 145,
@@ -4427,7 +4571,8 @@
         "yerelması",
         "zeytinyağlı",
         "sağlıklı"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 146,
@@ -4453,7 +4598,8 @@
         "bakla",
         "zeytinyağlı",
         "yoğurtlu"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 147,
@@ -4475,7 +4621,8 @@
         "denizbörülcesi",
         "zeytinyağlı",
         "ege"
-      ]
+      ],
+      "kalori": "220 kcal"
     },
     {
       "id": 148,
@@ -4506,7 +4653,8 @@
         "magnolya",
         "meyveli",
         "hafif"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 149,
@@ -4533,7 +4681,8 @@
         "tatlı",
         "karamelli",
         "arnavut"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 150,
@@ -4560,7 +4709,8 @@
         "tatlı",
         "tahinli",
         "sağlıklı"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 151,
@@ -4589,7 +4739,8 @@
         "ayva",
         "kaymaklı",
         "kıştatlısı"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 152,
@@ -4617,7 +4768,8 @@
         "sütlü",
         "baklava",
         "nuriye"
-      ]
+      ],
+      "kalori": "340 kcal"
     },
     {
       "id": 153,
@@ -4651,7 +4803,8 @@
         "pirinç",
         "klasik",
         "eşlikçi"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 154,
@@ -4687,7 +4840,8 @@
         "bulgur",
         "sebzeli",
         "doyurucu"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 155,
@@ -4722,7 +4876,8 @@
         "pirinç",
         "baharatlı",
         "özel"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 156,
@@ -4752,7 +4907,8 @@
         "özel",
         "yöresel",
         "ziyafet"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 157,
@@ -4782,7 +4938,8 @@
         "bulgur",
         "şehriyeli",
         "pratik"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 158,
@@ -4813,7 +4970,8 @@
         "etli",
         "nohutlu",
         "havuçlu"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 159,
@@ -4843,7 +5001,8 @@
         "bulgur",
         "sağlıklı",
         "diyet"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 160,
@@ -4873,7 +5032,8 @@
         "köfteli",
         "garnitürlü",
         "gösterişli"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 161,
@@ -4902,7 +5062,8 @@
         "bulgur",
         "yöresel",
         "isli"
-      ]
+      ],
+      "kalori": "320 kcal"
     },
     {
       "id": 162,
@@ -4934,7 +5095,8 @@
         "haydari",
         "yoğurtlu",
         "klasik"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 163,
@@ -4966,7 +5128,8 @@
         "meze",
         "nohut",
         "yöresel"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 164,
@@ -4997,7 +5160,8 @@
         "meze",
         "yoğurtlu",
         "acı"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 165,
@@ -5027,7 +5191,8 @@
         "meze",
         "patlıcan",
         "yoğurtlu"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 166,
@@ -5058,7 +5223,8 @@
         "meze",
         "peynirli",
         "ege"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 167,
@@ -5088,7 +5254,8 @@
         "tarator",
         "yoğurtlu",
         "meze"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 168,
@@ -5115,7 +5282,8 @@
         "meze",
         "patlıcan",
         "kızartma"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 169,
@@ -5144,7 +5312,8 @@
         "meze",
         "acı",
         "cevizli"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 170,
@@ -5171,7 +5340,8 @@
         "meze",
         "sebze",
         "kızartma"
-      ]
+      ],
+      "kalori": "190 kcal"
     },
     {
       "id": 171,
@@ -5200,7 +5370,8 @@
         "meze",
         "ege",
         "bakla"
-      ]
+      ],
+      "kalori": "190 kcal"
     }
   ]
 }

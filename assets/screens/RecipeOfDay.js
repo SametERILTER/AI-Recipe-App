@@ -153,6 +153,7 @@ const RecipeOfDay = () => {
 
 **Hazırlama Süresi:** ${recipe.sure}
 **Zorluk Seviyesi:** ${recipe.zorluk}
+**Kalori:** ${recipe.kalori || '350 kcal'}
 
 **Malzemeler:**
 ${recipe.malzemeler.map(m => `- ${m}`).join('\n')}
@@ -164,6 +165,7 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
 - ${recipe.sure} sürede hazırlanır
 - ${recipe.kisi} kişilik tarif
 - Zorluk seviyesi: ${recipe.zorluk}
+- Kalori: ${recipe.kalori || '350 kcal'}
 - Kategori: ${recipe.kategori}`;
 
         const recipeForDetail = {
@@ -299,7 +301,7 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                     borderRadius: 20,
                     overflow: 'hidden',
                     backgroundColor: theme.card,
-                    borderWidth: 1,
+                    borderWidth: 0,
                     borderColor: theme.border,
                 }}>
                     {/* Tek Büyük Resim */}
@@ -313,10 +315,10 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 180, justifyContent: 'flex-end', padding: 16 }}
                     >
                         <View style={styles.cardContent}>
-                            <Text style={{ fontFamily: 'TextBold', fontSize: 24, color: '#fff', textShadowColor: 'rgba(0, 0, 0, 0.3)', textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3 }}>
+                            <Text style={{ fontFamily: 'PoppinsBold', fontSize: 24, color: '#fff', textShadowColor: 'rgba(0, 0, 0, 0.3)', textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3 }}>
                                 Akşam Menüsü
                             </Text>
-                            <Text style={{ fontFamily: 'TextRegular', fontSize: 14, color: '#ecfeff' }}>
+                            <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 14, color: '#ecfeff' }}>
                                 3 Lezzet Bir Arada
                             </Text>
                         </View>
@@ -326,15 +328,15 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                     <View style={{ backgroundColor: theme.card, paddingVertical: 5 }}>
                         {menu.dinnerSet.soup && (
                             <TouchableOpacity
-                                style={{ flexDirection: 'row', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: theme.border }}
+                                style={{ flexDirection: 'row', alignItems: 'center', padding: 12, borderWidth: 0, borderBottomColor: theme.border }}
                                 onPress={() => handleRecipePress(menu.dinnerSet.soup, images.dinner, 'Çorba')}
                             >
                                 <View style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: isDarkMode ? '#eff6ff20' : '#eff6ff', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
                                     <FontAwesome5 name="mug-hot" size={16} color="#3b82f6" />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={{ fontFamily: 'TextRegular', fontSize: 12, color: theme.secondaryText, marginBottom: 2 }}>Başlangıç</Text>
-                                    <Text style={{ fontFamily: 'TextBold', fontSize: 15, color: theme.text }}>{menu.dinnerSet.soup.isim}</Text>
+                                    <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 12, color: theme.secondaryText, marginBottom: 2 }}>Başlangıç</Text>
+                                    <Text style={{ fontFamily: 'PoppinsBold', fontSize: 15, color: theme.text }}>{menu.dinnerSet.soup.isim}</Text>
                                 </View>
                                 <FontAwesome5 name="chevron-right" size={12} color={theme.border} />
                             </TouchableOpacity>
@@ -342,15 +344,15 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
 
                         {menu.dinnerSet.side && (
                             <TouchableOpacity
-                                style={{ flexDirection: 'row', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: theme.border }}
+                                style={{ flexDirection: 'row', alignItems: 'center', padding: 12, borderWidth: 0, borderBottomColor: theme.border }}
                                 onPress={() => handleRecipePress(menu.dinnerSet.side, images.dinner, 'Yan Lezzet')}
                             >
                                 <View style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: isDarkMode ? '#f0fdf420' : '#f0fdf4', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
                                     <FontAwesome5 name="leaf" size={16} color="#22c55e" />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={{ fontFamily: 'TextRegular', fontSize: 12, color: theme.secondaryText, marginBottom: 2 }}>Yan Lezzet</Text>
-                                    <Text style={{ fontFamily: 'TextBold', fontSize: 15, color: theme.text }}>{menu.dinnerSet.side.isim}</Text>
+                                    <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 12, color: theme.secondaryText, marginBottom: 2 }}>Yan Lezzet</Text>
+                                    <Text style={{ fontFamily: 'PoppinsBold', fontSize: 15, color: theme.text }}>{menu.dinnerSet.side.isim}</Text>
                                 </View>
                                 <FontAwesome5 name="chevron-right" size={12} color={theme.border} />
                             </TouchableOpacity>
@@ -365,8 +367,8 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                                     <FontAwesome5 name="utensils" size={16} color="#9333ea" />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={{ fontFamily: 'TextBold', fontSize: 11, color: "#9333ea", marginBottom: 2 }}>ANA ÖĞÜN</Text>
-                                    <Text style={{ fontFamily: 'TextBold', fontSize: 16, color: isDarkMode ? '#c084fc' : '#6b21a8' }}>{menu.dinnerSet.main.isim}</Text>
+                                    <Text style={{ fontFamily: 'PoppinsBold', fontSize: 11, color: "#9333ea", marginBottom: 2 }}>ANA ÖĞÜN</Text>
+                                    <Text style={{ fontFamily: 'PoppinsBold', fontSize: 16, color: isDarkMode ? '#c084fc' : '#6b21a8' }}>{menu.dinnerSet.main.isim}</Text>
                                 </View>
                                 <FontAwesome5 name="chevron-right" size={12} color={isDarkMode ? '#581c87' : '#d8b4fe'} />
                             </TouchableOpacity>
@@ -374,8 +376,8 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                     </View>
                 </View>
 
-                <View style={[styles.infoContainer, { backgroundColor: isDarkMode ? theme.card : '#f1f5f9', borderColor: theme.border }]}>
-                    <FontAwesome5 name="info-circle" size={24} color={isDarkMode ? "#475569" : "#94a3b8"} style={{ marginRight: 16 }} />
+                <View style={[styles.infoContainer, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: theme.border }]}>
+                    <FontAwesome5 name="info-circle" size={24} color={isDarkMode ? "#525252" : "#a3a3a3"} style={{ marginRight: 16 }} />
                     <View style={{ flex: 1 }}>
                         <Text style={[styles.infoTitle, { color: theme.text }]}>Menüler Günlük Olarak Yenilenir</Text>
                         <Text style={[styles.infoText, { color: theme.secondaryText }]}>
@@ -410,13 +412,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 20,
         backgroundColor: '#fff',
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
+        borderWidth: 0,
+        borderColor: '#e5e5e5',
     },
     headerTitle: {
         fontSize: 20,
-        fontFamily: 'TextBold',
-        color: '#1e293b',
+        fontFamily: 'PoppinsBold',
+        color: '#262626',
     },
     scrollContent: {
         paddingHorizontal: 20,
@@ -424,8 +426,8 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 15,
-        fontFamily: 'TextRegular',
-        color: '#64748b',
+        fontFamily: 'PoppinsRegular',
+        color: '#737373',
         marginBottom: 30,
         textAlign: 'center',
     },
@@ -452,15 +454,15 @@ const styles = StyleSheet.create({
     },
     mealTitle: {
         fontSize: 18,
-        fontFamily: 'TextBold',
-        color: '#334155',
+        fontFamily: 'PoppinsBold',
+        color: '#383838',
     },
     card: {
         height: 180,
         borderRadius: 20,
         overflow: 'hidden',
         backgroundColor: '#fff',
-        shadowColor: "#64748b",
+        shadowColor: "#737373",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
@@ -500,46 +502,46 @@ const styles = StyleSheet.create({
     tagText: {
         color: '#fff',
         fontSize: 11,
-        fontFamily: 'TextMedium',
+        fontFamily: 'PoppinsMedium',
     },
     recipeName: {
         fontSize: 20,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#fff',
         marginBottom: 4,
     },
     recipeIngredients: {
         fontSize: 13,
-        fontFamily: 'TextRegular',
+        fontFamily: 'PoppinsRegular',
         color: 'rgba(255,255,255,0.9)',
     },
     connectorLine: {
         height: 20,
         width: 2,
-        backgroundColor: '#e2e8f0',
+        backgroundColor: '#e5e5e5',
         marginLeft: 16, // iconBox center (16)
         marginVertical: 4,
     },
     infoContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f1f5f9',
+        backgroundColor: '#eeeeee',
         padding: 16,
         borderRadius: 16,
         marginTop: 54,
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
+        borderWidth: 0,
+        borderColor: '#e5e5e5',
     },
     infoTitle: {
         fontSize: 14,
-        fontFamily: 'TextBold',
-        color: '#475569',
+        fontFamily: 'PoppinsBold',
+        color: '#525252',
         marginBottom: 2,
     },
     infoText: {
         fontSize: 12,
-        fontFamily: 'TextRegular',
-        color: '#64748b',
+        fontFamily: 'PoppinsRegular',
+        color: '#737373',
         lineHeight: 16,
     }
 });

@@ -11,7 +11,7 @@ import {
   Alert,
   Share
 } from 'react-native';
-import { FontAwesome5, Octicons } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Speech from 'expo-speech';
@@ -38,7 +38,7 @@ function parseInlineBold(text, baseStyle) {
       {parts.map((part, index) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           return (
-            <Text key={index} style={{ fontFamily: 'TextBold' }}>
+            <Text key={index} style={{ fontFamily: 'PoppinsBold' }}>
               {part.substring(2, part.length - 2)}
             </Text>
           );
@@ -122,7 +122,22 @@ function renderFormattedText(text, theme, isDarkMode) {
           </View>
           <View style={{ flex: 1 }}>
             {(() => {
-              const stepTextRaw = line.replace(/^\d+\.\s*/, '').replace(/\[Şefin Tavsiyesi:.*?\]/, '').trim();
+              const stepBody = line.replace(/^\d+\.\s*/, '');
+              let tip = null;
+              let stepTextRaw = stepBody;
+
+              const markerRegex = /(\[|\*\*)?\s*Şefin Tavsiyesi:/i;
+              const match = stepBody.match(markerRegex);
+              if (match) {
+                const markerIndex = match.index;
+                stepTextRaw = stepBody.substring(0, markerIndex).trim();
+                const rawTip = stepBody.substring(markerIndex);
+                tip = rawTip
+                  .replace(/^(\[|\*\*)?\s*Şefin Tavsiyesi:?\s*(\*\*)?\s*/i, '')
+                  .replace(/(\]|\*\*)\s*$/, '')
+                  .trim();
+              }
+
               const termRegex = /(\(?\*\*Temel Mutfak Terimi:?\s*(.*?)\*\*\)?|\(Temel Mutfak Terimi:?\s*(.*?)\)|Temel Mutfak Terimi:?\s*(.*))/i;
               const termMatch = stepTextRaw.match(termRegex);
 
@@ -139,7 +154,7 @@ function renderFormattedText(text, theme, isDarkMode) {
                 <View>
                   {cleanText.length > 0 && parseInlineBold(cleanText, [styles.stepText, { color: theme.text }])}
                   {termContent && (
-                    <View style={[styles.termBox, { backgroundColor: isDarkMode ? '#0ea5e915' : '#f0f9ff', borderColor: isDarkMode ? '#0ea5e940' : '#bae6fd', borderWidth: 1 }]}>
+                    <View style={[styles.termBox, { backgroundColor: isDarkMode ? '#0ea5e915' : '#f0f9ff', borderColor: isDarkMode ? '#0ea5e940' : '#bae6fd', borderWidth: 0 }]}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                         <FontAwesome5 name="info-circle" size={12} color="#0ea5e9" style={{ marginRight: 6 }} />
                         <Text style={[styles.termTitle, { color: isDarkMode ? '#38bdf8' : '#0369a1' }]}>Mutfak Sözlüğü</Text>
@@ -147,25 +162,19 @@ function renderFormattedText(text, theme, isDarkMode) {
                       <Text style={[styles.termText, { color: isDarkMode ? '#7dd3fc' : '#075985' }]}>{termContent}</Text>
                     </View>
                   )}
+                  {tip && (
+                    <View style={[styles.chefTipContainer, { backgroundColor: isDarkMode ? '#f59e0b15' : '#fff7ed' }]}>
+                      <View style={styles.chefTipHeader}>
+                        <MaterialCommunityIcons name="chef-hat" size={14} color="#f59e0b" style={{ marginRight: 8 }} />
+                        <Text style={[styles.chefTipTitle, { color: isDarkMode ? '#fbbf24' : '#9a3412' }]}>Şefin Notu</Text>
+                      </View>
+                      <Text style={[styles.chefTipText, { color: isDarkMode ? '#fcd34d' : '#9a3412' }]}>
+                        {tip}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               );
-            })()}
-            {(() => {
-              const match = line.match(/\[Şefin Tavsiyesi:\s*(.*?)\]/);
-              if (match) {
-                return (
-                  <View style={{ marginTop: 10, backgroundColor: isDarkMode ? '#f59e0b15' : '#fffbeb', padding: 12, borderRadius: 12, borderWidth: 1, borderColor: isDarkMode ? '#f59e0b40' : '#fef3c7' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                      <FontAwesome5 name="lightbulb" size={14} color="#f59e0b" style={{ marginRight: 8 }} />
-                      <Text style={{ color: isDarkMode ? '#fbbf24' : '#92400e', fontFamily: 'TextBold', fontSize: 13 }}>Şefin Notu</Text>
-                    </View>
-                    <Text style={{ color: isDarkMode ? '#fcd34d' : '#b45309', fontFamily: 'TextRegular', fontSize: 13, lineHeight: 20 }}>
-                      {match[1]}
-                    </Text>
-                  </View>
-                );
-              }
-              return null;
             })()}
           </View>
         </View>
@@ -173,10 +182,8 @@ function renderFormattedText(text, theme, isDarkMode) {
     }
 
     if (/^-/.test(line.trim())) {
-      bulletCounter++;
-      const isAlt = bulletCounter % 2 !== 0;
       return (
-        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: theme.card, borderBottomColor: theme.border, borderBottomWidth: 1 }, isAlt && [styles.ingredientRowAlt, { backgroundColor: theme.background }]]}>
+        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: theme.card, borderBottomColor: theme.border, borderWidth: 0 }]}>
           <View style={styles.ingredientIconContainer}>
             <FontAwesome5 name="check" size={10} color="#ff7043" />
           </View>
@@ -429,7 +436,7 @@ const SavedRecipeDetail = ({ route, navigation }) => {
         {!hasImage && (
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 20 }}>
             <TouchableOpacity
-              style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f1f5f9', borderColor: isDarkMode ? theme.border : '#e2e8f0' }]}
+              style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}
               onPress={() => navigation.goBack()}
             >
               <FontAwesome5 name="arrow-left" size={20} color={theme.text} />
@@ -437,7 +444,7 @@ const SavedRecipeDetail = ({ route, navigation }) => {
 
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <TouchableOpacity
-                style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f1f5f9', borderColor: isDarkMode ? theme.border : '#e2e8f0' }]}
+                style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}
                 onPress={handleShare}
               >
                 <Octicons name="share" size={18} color={theme.text} />
@@ -552,24 +559,24 @@ const SavedRecipeDetail = ({ route, navigation }) => {
               return (
                 <View style={{ flexDirection: 'row', gap: 25, justifyContent: 'center' }}>
                   {prepTime !== '-' && (
-                    <View style={{ width: 95, height: 85, backgroundColor: isDarkMode ? theme.card : '#f8fafc', borderRadius: 16, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0.5, borderColor: isDarkMode ? theme.border : '#e2e8f0' }}>
+                    <View style={{ width: 95, height: 85, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 16, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
                       <FontAwesome5 name="clock" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
-                      <Text style={{ fontSize: 12, color: theme.secondaryText, fontFamily: 'TextRegular', textAlign: 'center' }}>Süre</Text>
-                      <Text style={{ fontSize: 13, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'TextBold' }} numberOfLines={1}>{prepTime}</Text>
+                      <Text style={{ fontSize: 12, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Süre</Text>
+                      <Text style={{ fontSize: 13, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{prepTime}</Text>
                     </View>
                   )}
                   {difficulty !== '-' && (
-                    <View style={{ width: 95, height: 85, backgroundColor: isDarkMode ? theme.card : '#f8fafc', borderRadius: 16, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0.5, borderColor: isDarkMode ? theme.border : '#e2e8f0' }}>
+                    <View style={{ width: 95, height: 85, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 16, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
                       <FontAwesome5 name="chart-bar" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
-                      <Text style={{ fontSize: 12, color: theme.secondaryText, fontFamily: 'TextRegular', textAlign: 'center' }}>Zorluk</Text>
-                      <Text style={{ fontSize: 13, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'TextBold' }} numberOfLines={1}>{difficulty}</Text>
+                      <Text style={{ fontSize: 12, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Zorluk</Text>
+                      <Text style={{ fontSize: 13, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{difficulty}</Text>
                     </View>
                   )}
                   {calorie !== '-' && (
-                    <View style={{ width: 95, height: 85, backgroundColor: isDarkMode ? theme.card : '#f8fafc', borderRadius: 16, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0.5, borderColor: isDarkMode ? theme.border : '#e2e8f0' }}>
+                    <View style={{ width: 95, height: 85, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 16, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
                       <FontAwesome5 name="fire-alt" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
-                      <Text style={{ fontSize: 12, color: theme.secondaryText, fontFamily: 'TextRegular', textAlign: 'center' }}>Kalori</Text>
-                      <Text style={{ fontSize: 13, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'TextBold' }} numberOfLines={1}>{calorie}</Text>
+                      <Text style={{ fontSize: 12, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Kalori</Text>
+                      <Text style={{ fontSize: 13, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{calorie}</Text>
                     </View>
                   )}
                 </View>
@@ -646,8 +653,8 @@ const styles = StyleSheet.create({
   },
   recipeName: {
     fontSize: 28,
-    fontFamily: 'TextExtraBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsExtraBold',
+    color: '#262626',
     marginBottom: 12,
   },
   rightSideContainer: {
@@ -671,23 +678,23 @@ const styles = StyleSheet.create({
   ingredientsText: {
     fontSize: 14,
     color: '#ff7043',
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginLeft: 6,
   },
   metaTag: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderWidth: 0,
+    borderColor: '#e5e5e5',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
   },
   metaText: {
     fontSize: 13,
-    color: '#64748b',
-    fontFamily: 'TextBold',
+    color: '#737373',
+    fontFamily: 'PoppinsBold',
     marginLeft: 6,
   },
   recipeCard: {
@@ -700,7 +707,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 16,
     paddingBottom: 8,
-    borderBottomWidth: 2,
+    borderWidth: 0,
     borderBottomColor: 'rgba(255, 112, 67, 0.2)',
   },
   imageOverlay: {
@@ -718,14 +725,14 @@ const styles = StyleSheet.create({
   imageCaption: {
     color: '#fff',
     fontSize: 10,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     textAlign: 'center',
     opacity: 0.7,
   },
   imageCredit: {
     color: '#fff',
     fontSize: 10,
-    fontFamily: 'TextRegular',
+    fontFamily: 'PoppinsRegular',
     textAlign: 'center',
   },
   sectionIcon: {
@@ -733,8 +740,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'TextBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsBold',
+    color: '#262626',
   },
   stepContainer: {
     flexDirection: 'row',
@@ -767,14 +774,14 @@ const styles = StyleSheet.create({
   },
   stepNumberText: {
     fontSize: 14,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     color: '#fff',
   },
   stepText: {
     flex: 1,
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 24,
     paddingTop: 2,
   },
@@ -784,8 +791,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderWidth: 0,
+    borderBottomColor: '#eeeeee',
   },
   ingredientRowAlt: {
     backgroundColor: '#f3f5f7ff',
@@ -803,7 +810,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2a3340',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 22,
   },
   bulletContainer: {
@@ -824,13 +831,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 24,
   },
   normalText: {
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 24,
     marginBottom: 8,
   },
@@ -870,7 +877,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   startButton: {
@@ -902,7 +909,7 @@ const styles = StyleSheet.create({
   startButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     zIndex: 6
   },
   stickyHeader: {
@@ -915,7 +922,7 @@ const styles = StyleSheet.create({
     zIndex: 100,
     justifyContent: 'flex-end',
     paddingBottom: 16,
-    borderBottomWidth: 0.5,
+    borderWidth: 0,
     borderBottomColor: '#f8fcffff',
     shadowColor: '#0000006d',
     shadowOpacity: 0.05,
@@ -937,8 +944,8 @@ const styles = StyleSheet.create({
   },
   stickyHeaderTitle: {
     fontSize: 18,
-    fontFamily: 'TextBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsBold',
+    color: '#262626',
     flex: 1,
     textAlign: 'center',
   },
@@ -959,7 +966,7 @@ const styles = StyleSheet.create({
   voiceButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   termBox: {
     marginTop: 12,
@@ -969,7 +976,7 @@ const styles = StyleSheet.create({
   },
   termTitle: {
     fontSize: 12,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     color: '#0369a1',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -977,8 +984,30 @@ const styles = StyleSheet.create({
   termText: {
     fontSize: 13,
     color: '#075985',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 18,
+  },
+  chefTipContainer: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: '#fff7ed',
+    borderRadius: 16,
+  },
+  chefTipHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  chefTipTitle: {
+    fontSize: 15,
+    fontFamily: 'PoppinsBold',
+    color: '#262626',
+  },
+  chefTipText: {
+    fontSize: 15,
+    fontFamily: 'PoppinsRegular',
+    color: '#2a3340ff',
+    lineHeight: 24,
   },
 });
 

@@ -35,7 +35,7 @@ function parseInlineBold(text, baseStyle) {
             {parts.map((part, index) => {
                 if (part.startsWith('**') && part.endsWith('**')) {
                     return (
-                        <Text key={index} style={{ fontFamily: 'TextBold' }}>
+                        <Text key={index} style={{ fontFamily: 'PoppinsBold' }}>
                             {part.substring(2, part.length - 2)}
                         </Text>
                     );
@@ -604,7 +604,7 @@ const StartRecipe = ({ route, navigation }) => {
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity
-                    style={[styles.closeButton, { backgroundColor: isDarkMode ? theme.card : '#f1f5f9' }]}
+                    style={[styles.closeButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee' }]}
                     onPress={() => navigation.goBack()}
                 >
                     <FontAwesome5 name="times" size={20} color={theme.text} />
@@ -615,7 +615,7 @@ const StartRecipe = ({ route, navigation }) => {
 
                 {/* Müzik Butonu */}
                 <TouchableOpacity
-                    style={[styles.musicButton, isPlaying && styles.musicButtonActive, !isPlaying && { backgroundColor: isDarkMode ? theme.card : '#f1f5f9' }]}
+                    style={[styles.musicButton, isPlaying && styles.musicButtonActive, !isPlaying && { backgroundColor: isDarkMode ? theme.card : '#eeeeee' }]}
                     onPress={togglePlay}
                 >
                     <Animated.View style={{ transform: [{ rotate: isPlaying ? spin : '0deg' }] }}>
@@ -628,7 +628,7 @@ const StartRecipe = ({ route, navigation }) => {
             </View>
 
             {/* Progress Bar */}
-            <View style={[styles.progressContainer, { backgroundColor: isDarkMode ? '#1e293b' : '#f1f5f9' }]}>
+            <View style={[styles.progressContainer, { backgroundColor: isDarkMode ? '#262626' : '#eeeeee' }]}>
                 <Animated.View
 
                     style={[
@@ -645,14 +645,14 @@ const StartRecipe = ({ route, navigation }) => {
 
             {/* Sensor Info Trigger */}
             <TouchableOpacity
-                style={[styles.sensorInfoButton, { backgroundColor: isDarkMode ? theme.card : '#f8fafc', borderColor: theme.border }, !gestureEnabled && { borderColor: '#ef444430' }]}
+                style={[styles.sensorInfoButton, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: theme.border }, !gestureEnabled && { borderColor: '#ef444430' }]}
                 onPress={() => setInfoModalVisible(true)}
                 activeOpacity={0.7}
             >
                 <MaterialCommunityIcons
                     name={gestureEnabled ? "cellphone-nfc" : "cellphone-off"}
                     size={16}
-                    color={gestureEnabled ? "#94a3b8" : "#ef4444"}
+                    color={gestureEnabled ? "#a3a3a3" : "#ef4444"}
                     style={{ marginRight: 6 }}
                 />
                 <Text style={[styles.sensorInfoText, { color: gestureEnabled ? theme.secondaryText : "#ef4444" }]} numberOfLines={1}>
@@ -772,11 +772,11 @@ const StartRecipe = ({ route, navigation }) => {
             {/* Controls */}
             <View style={[styles.controls, { borderTopColor: theme.border, backgroundColor: theme.card }]}>
                 <TouchableOpacity
-                    style={[styles.controlButton, styles.prevButton, { backgroundColor: isDarkMode ? theme.background : '#f1f5f9' }, currentStep === 0 && styles.disabledButton]}
+                    style={[styles.controlButton, styles.prevButton, { backgroundColor: isDarkMode ? theme.background : '#eeeeee' }, currentStep === 0 && styles.disabledButton]}
                     onPress={handlePrevStep}
                     disabled={currentStep === 0}
                 >
-                    <FontAwesome5 name="arrow-left" size={20} color={currentStep === 0 ? (isDarkMode ? '#334155' : "#cbd5e1") : theme.text} />
+                    <FontAwesome5 name="arrow-left" size={20} color={currentStep === 0 ? (isDarkMode ? '#383838' : "#d4d4d4") : theme.text} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -822,7 +822,7 @@ const StartRecipe = ({ route, navigation }) => {
                                 <View style={[styles.infoIconBox, { backgroundColor: '#ef444415', marginBottom: 20, marginRight: 0 }]}>
                                     <MaterialCommunityIcons name="cellphone-off" size={48} color="#ef4444" />
                                 </View>
-                                <Text style={{ color: theme.text, textAlign: 'center', marginBottom: 32, fontSize: 16, fontFamily: 'TextNormal', lineHeight: 24 }}>
+                                <Text style={{ color: theme.text, textAlign: 'center', marginBottom: 32, fontSize: 16, fontFamily: 'PoppinsRegular', lineHeight: 24 }}>
                                     Sensör ve sallama hareketleri ile adım geçişi yapmak için ayarlardan bu özelliği aktifleştirebilirsiniz.
                                 </Text>
                                 <TouchableOpacity
@@ -891,7 +891,7 @@ const StartRecipe = ({ route, navigation }) => {
                                 <Text style={styles.musicModalSubtitle}>Moduna göre müzik seç</Text>
                             </View>
                             <TouchableOpacity style={styles.modalCloseButtonSmall} onPress={() => setMusicModalVisible(false)}>
-                                <FontAwesome5 name="times" size={16} color="#64748b" />
+                                <FontAwesome5 name="times" size={16} color="#737373" />
                             </TouchableOpacity>
                         </View>
 
@@ -921,7 +921,7 @@ const StartRecipe = ({ route, navigation }) => {
                                         {isSelected && (
                                             <View style={styles.playingBadge}>
                                                 <FontAwesome5 name="volume-up" size={12} color={item.color} />
-                                                <Text style={{ fontSize: 10, fontFamily: 'TextBold', color: item.color, marginLeft: 4 }}>Çaliyor</Text>
+                                                <Text style={{ fontSize: 10, fontFamily: 'PoppinsBold', color: item.color, marginLeft: 4 }}>Çaliyor</Text>
                                             </View>
                                         )}
 
@@ -938,7 +938,7 @@ const StartRecipe = ({ route, navigation }) => {
                         {isPlaying && (
                             <TouchableOpacity style={styles.stopMusicCheckButton} onPress={stopSound}>
                                 <FontAwesome5 name="stop" size={14} color="#ef4444" style={{ marginRight: 8 }} />
-                                <Text style={{ fontFamily: 'TextBold', color: '#ef4444' }}>Müziği Durdur</Text>
+                                <Text style={{ fontFamily: 'PoppinsBold', color: '#ef4444' }}>Müziği Durdur</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -951,7 +951,7 @@ const StartRecipe = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8fafc',
+        backgroundColor: '#f5f5f5',
     },
     header: {
         flexDirection: 'row',
@@ -967,16 +967,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 20,
-        backgroundColor: '#f1f5f9',
+        backgroundColor: '#eeeeee',
     },
     headerTitle: {
         fontSize: 16,
-        fontFamily: 'TextBold',
-        color: '#334155',
+        fontFamily: 'PoppinsBold',
+        color: '#383838',
     },
     progressContainer: {
         height: 6,
-        backgroundColor: '#e2e8f0',
+        backgroundColor: '#e5e5e5',
         marginHorizontal: 24,
         borderRadius: 3,
         overflow: 'hidden',
@@ -998,8 +998,8 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         padding: 24,
         // Less shadow, border style
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
+        borderWidth: 0,
+        borderColor: '#e5e5e5',
         alignItems: 'flex-start', // Left align
         justifyContent: 'flex-start',
     },
@@ -1024,18 +1024,18 @@ const styles = StyleSheet.create({
     },
     stepBadgeText: {
         color: '#fff',
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         fontSize: 18,
     },
     stepLabel: {
         fontSize: 14,
-        fontFamily: 'TextBold',
-        color: '#94a3b8',
+        fontFamily: 'PoppinsBold',
+        color: '#a3a3a3',
         letterSpacing: 1.5,
     },
     stepTextContent: {
         fontSize: 22,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#2a3340ff',
         textAlign: 'left',
         lineHeight: 34,
@@ -1055,8 +1055,8 @@ const styles = StyleSheet.create({
     prevButton: {
         width: 64,
         backgroundColor: '#fff',
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
+        borderWidth: 0,
+        borderColor: '#e5e5e5',
     },
     nextButton: {
         flex: 1,
@@ -1070,7 +1070,7 @@ const styles = StyleSheet.create({
     },
     nextButtonText: {
         fontSize: 18,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#fff',
     },
     disabledButton: {
@@ -1089,15 +1089,15 @@ const styles = StyleSheet.create({
     },
     congratsTitle: {
         fontSize: 32,
-        fontFamily: 'TextExtraBold',
-        color: '#1e293b',
+        fontFamily: 'PoppinsExtraBold',
+        color: '#262626',
         marginBottom: 12,
         textAlign: 'center',
     },
     congratsSubtitle: {
         fontSize: 18,
-        color: '#64748b',
-        fontFamily: 'TextNormal',
+        color: '#737373',
+        fontFamily: 'PoppinsRegular',
         textAlign: 'center',
         marginBottom: 40,
         lineHeight: 28,
@@ -1112,8 +1112,8 @@ const styles = StyleSheet.create({
     },
     tipsTitle: {
         fontSize: 18,
-        fontFamily: 'TextBold',
-        color: '#1e293b',
+        fontFamily: 'PoppinsBold',
+        color: '#262626',
         marginBottom: 16,
     },
     tipsList: {
@@ -1134,7 +1134,7 @@ const styles = StyleSheet.create({
     tipText: {
         fontSize: 15,
         color: '#2a3340ff',
-        fontFamily: 'TextNormal',
+        fontFamily: 'PoppinsRegular',
         lineHeight: 22,
         flex: 1,
     },
@@ -1153,7 +1153,7 @@ const styles = StyleSheet.create({
     },
     finishButtonText: {
         fontSize: 18,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#fff',
     },
     bottomGradient: {
@@ -1180,12 +1180,12 @@ const styles = StyleSheet.create({
     },
     chefTipTitle: {
         fontSize: 15,
-        fontFamily: 'TextBold',
-        color: '#1e293b',
+        fontFamily: 'PoppinsBold',
+        color: '#262626',
     },
     chefTipText: {
         fontSize: 15,
-        fontFamily: 'TextNormal',
+        fontFamily: 'PoppinsRegular',
         color: '#2a3340ff',
         lineHeight: 24,
     },
@@ -1198,27 +1198,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24,
         marginTop: 12,
-        borderWidth: 1,
+        borderWidth: 0,
         borderColor: '#fed7aa',
     },
     preparedFoodLabel: {
         fontSize: 12,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#f97316',
         marginBottom: 8,
         letterSpacing: 1.5,
     },
     preparedFoodName: {
         fontSize: 24,
-        fontFamily: 'TextExtraBold',
+        fontFamily: 'PoppinsExtraBold',
         color: '#c2410c',
         textAlign: 'center',
         lineHeight: 32,
     },
     cheerText: {
         fontSize: 18,
-        fontFamily: 'TextNormal',
-        color: '#475569',
+        fontFamily: 'PoppinsRegular',
+        color: '#525252',
         marginTop: 8,
         textAlign: 'center',
     },
@@ -1235,13 +1235,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 2,
+        borderWidth: 0,
         borderColor: '#ff7043',
         gap: 12,
     },
     saveButtonText: {
         fontSize: 16,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#ff7043',
     },
     homeActionButton: {
@@ -1267,7 +1267,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         backgroundColor: '#fff',
         borderRadius: 25,
-        borderWidth: 1.5,
+        borderWidth: 0,
         borderColor: '#ff7043',
         gap: 8,
         shadowColor: '#ff7043',
@@ -1282,7 +1282,7 @@ const styles = StyleSheet.create({
     },
     musicButtonText: {
         fontSize: 14,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#ff7043',
     },
     musicModalContent: {
@@ -1306,20 +1306,20 @@ const styles = StyleSheet.create({
     },
     musicModalTitle: {
         fontSize: 24,
-        fontFamily: 'TextExtraBold',
-        color: '#1e293b',
+        fontFamily: 'PoppinsExtraBold',
+        color: '#262626',
         marginBottom: 4,
     },
     musicModalSubtitle: {
         fontSize: 15,
-        fontFamily: 'TextMedium',
-        color: '#64748b',
+        fontFamily: 'PoppinsMedium',
+        color: '#737373',
     },
     modalCloseButtonSmall: {
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#f1f5f9',
+        backgroundColor: '#eeeeee',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -1336,7 +1336,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     musicCardSelected: {
-        borderWidth: 3,
+        borderWidth: 0,
         borderColor: '#000',
     },
     musicIconCircle: {
@@ -1349,7 +1349,7 @@ const styles = StyleSheet.create({
     },
     musicCardTitle: {
         fontSize: 18,
-        fontFamily: 'TextExtraBold',
+        fontFamily: 'PoppinsExtraBold',
         color: '#fff',
         marginLeft: 16,
         flex: 1,
@@ -1378,13 +1378,13 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderRadius: 20,
         marginTop: 12,
-        borderWidth: 1,
+        borderWidth: 0,
         borderColor: '#fecaca',
     },
 
     homeActionButtonText: {
         fontSize: 16,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#fff',
     },
     speakButton: {
@@ -1406,7 +1406,7 @@ const styles = StyleSheet.create({
     },
     speakButtonText: {
         fontSize: 12,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#fff',
     },
     // Sensor Info & Modal Styles
@@ -1416,24 +1416,24 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginHorizontal: 24,
         marginBottom: 20,
-        backgroundColor: '#f8fafc',
+        backgroundColor: '#f5f5f5',
         paddingVertical: 10,
         paddingHorizontal: 16,
         borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
+        borderWidth: 0,
+        borderColor: '#e5e5e5',
     },
     sensorInfoText: {
         fontSize: 11,
-        fontFamily: 'TextMedium',
-        color: '#94a3b8',
+        fontFamily: 'PoppinsMedium',
+        color: '#a3a3a3',
         marginRight: 6,
     },
     infoBadge: {
         width: 14,
         height: 14,
         borderRadius: 7,
-        backgroundColor: '#cbd5e1',
+        backgroundColor: '#d4d4d4',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -1460,19 +1460,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
-        backgroundColor: '#f1f5f9',
+        backgroundColor: '#eeeeee',
     },
     modalTitle: {
         fontSize: 22,
-        fontFamily: 'TextBold',
-        color: '#1e293b',
+        fontFamily: 'PoppinsBold',
+        color: '#262626',
         marginBottom: 8,
         marginTop: 10,
     },
     modalSubtitle: {
         fontSize: 14,
-        fontFamily: 'TextMedium',
-        color: '#64748b',
+        fontFamily: 'PoppinsMedium',
+        color: '#737373',
         marginBottom: 32,
         textAlign: 'center',
     },
@@ -1495,20 +1495,20 @@ const styles = StyleSheet.create({
     },
     infoTopic: {
         fontSize: 16,
-        fontFamily: 'TextBold',
-        color: '#1e293b',
+        fontFamily: 'PoppinsBold',
+        color: '#262626',
         marginBottom: 4,
     },
     infoDesc: {
         fontSize: 14,
-        fontFamily: 'TextRegular',
-        color: '#64748b',
+        fontFamily: 'PoppinsRegular',
+        color: '#737373',
         lineHeight: 20,
     },
     divider: {
         width: '100%',
         height: 1,
-        backgroundColor: '#e2e8f0',
+        backgroundColor: '#e5e5e5',
         marginVertical: 20,
     },
     gotItButton: {
@@ -1521,7 +1521,7 @@ const styles = StyleSheet.create({
     },
     gotItButtonText: {
         fontSize: 16,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#fff',
     },
     termBox: {
@@ -1532,7 +1532,7 @@ const styles = StyleSheet.create({
     },
     termTitle: {
         fontSize: 12,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#0369a1',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
@@ -1540,7 +1540,7 @@ const styles = StyleSheet.create({
     termText: {
         fontSize: 14,
         color: '#075985',
-        fontFamily: 'TextNormal',
+        fontFamily: 'PoppinsRegular',
         lineHeight: 20,
     },
     savedInfoBadge: {
@@ -1551,13 +1551,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
+        borderWidth: 0,
         borderColor: '#10b981',
         gap: 12,
     },
     savedInfoText: {
         fontSize: 16,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#10b981',
     },
     toastContainer: {
@@ -1583,7 +1583,7 @@ const styles = StyleSheet.create({
     },
     toastText: {
         color: '#fff',
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         fontSize: 15,
     },
 });

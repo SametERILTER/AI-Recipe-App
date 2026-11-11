@@ -1,5 +1,12 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, RefreshControl } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  interpolate,
+  Extrapolation,
+} from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -15,6 +22,48 @@ const SavedRecipes = () => {
   const [inputFocused, setInputFocused] = useState(false);
   const [activeCategory, setActiveCategory] = useState('Tümü');
   const navigation = useNavigation();
+
+  const flatListRef = useRef(null);
+  const inputRef = useRef(null);
+  const scrollY = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const searchBtnAnimatedStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollY.value,
+      [40, 85],
+      [0, 1],
+      Extrapolation.CLAMP
+    );
+    const scale = interpolate(
+      scrollY.value,
+      [40, 85],
+      [0.85, 1],
+      Extrapolation.CLAMP
+    );
+    const translateY = interpolate(
+      scrollY.value,
+      [40, 85],
+      [6, 0],
+      Extrapolation.CLAMP
+    );
+    return {
+      opacity,
+      transform: [{ translateY }, { scale }],
+    };
+  });
+
+  const handleHeaderSearchPress = () => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 250);
+  };
 
   const categories = [
     { id: 'all', name: 'Tümü', icon: 'th-large' },
@@ -110,7 +159,7 @@ const SavedRecipes = () => {
           <Text style={[styles.recipeListSub, { color: theme.secondaryText }]} numberOfLines={1}>{(item.malzemeler || []).join(', ')}</Text>
         </View>
         <View style={styles.chevronBox}>
-          <FontAwesome5 name="chevron-right" size={12} color="#cbd5e1" />
+          <FontAwesome5 name="chevron-right" size={12} color="#d4d4d4" />
         </View>
       </TouchableOpacity>
     );
@@ -135,46 +184,69 @@ const SavedRecipes = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.pageTitle, { color: theme.text }]}>Kaydedilen Tariflerim</Text>
-
-      <View style={[styles.inputWrapper, { margin: 16, marginBottom: 8, backgroundColor: theme.card, borderColor: inputFocused ? '#ff7043' : theme.border }]}>
-        <FontAwesome5 name="search" size={16} color={inputFocused ? '#ff7043' : theme.secondaryText} style={{ marginLeft: 16 }} />
-        <TextInput
-          style={[styles.textInput, { color: theme.text }]}
-          placeholder="Tarif veya malzeme ara..."
-          value={search}
-          onChangeText={setSearch}
-          placeholderTextColor={theme.secondaryText}
-          onFocus={() => setInputFocused(true)}
-          onBlur={() => setInputFocused(false)}
-        />
+      <View style={styles.headerRow}>
+        <Text style={[styles.pageTitle, { color: theme.text }]}>Kaydedilen Tariflerim</Text>
+        <Animated.View style={searchBtnAnimatedStyle}>
+          <TouchableOpacity
+            style={[styles.headerSearchBtn, { backgroundColor: theme.card }]}
+            onPress={handleHeaderSearchPress}
+            activeOpacity={0.75}
+          >
+            <FontAwesome5 name="search" size={16} color={theme.text} />
+          </TouchableOpacity>
+        </Animated.View>
       </View>
 
-      <View style={styles.categoryBar}>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={categories}
-          renderItem={renderCategory}
-          keyExtractor={item => item.id}
-          contentContainerStyle={{ paddingHorizontal: 16 }}
-        />
-      </View>
+      <Animated.FlatList
+        ref={flatListRef}
+        data={filtered}
+        keyExtractor={(_, idx) => idx.toString()}
+        renderItem={renderRecipeItem}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        ListHeaderComponent={
+          <View style={styles.listHeader}>
+            <View style={[styles.inputWrapper, { backgroundColor: theme.card, borderColor: inputFocused ? '#ff7043' : theme.border }]}>
+              <FontAwesome5 name="search" size={16} color={inputFocused ? '#ff7043' : theme.secondaryText} style={{ marginLeft: 16 }} />
+              <TextInput
+                ref={inputRef}
+                style={[styles.textInput, { color: theme.text }]}
+                placeholder="Tarif veya malzeme ara..."
+                value={search}
+                onChangeText={setSearch}
+                placeholderTextColor={theme.secondaryText}
+                onFocus={() => setInputFocused(true)}
+                onBlur={() => setInputFocused(false)}
+              />
+              {search.length > 0 && (
+                <TouchableOpacity onPress={() => setSearch('')} style={{ paddingHorizontal: 14, paddingVertical: 8 }}>
+                  <FontAwesome5 name="times-circle" size={16} color={theme.secondaryText} />
+                </TouchableOpacity>
+              )}
+            </View>
 
-      {filtered.length === 0 ? (
-        <View style={styles.emptyState}>
-          <FontAwesome5 name="bookmark" size={48} color={isDarkMode ? theme.border : "#d1d5db"} />
-          <Text style={[styles.emptyText, { color: theme.secondaryText }]}>Kaydedilmiş tarif bulunamadı</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={(_, idx) => idx.toString()}
-          renderItem={renderRecipeItem}
-          contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        />
-      )}
+            <View style={styles.categoryBar}>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={categories}
+                renderItem={renderCategory}
+                keyExtractor={item => item.id}
+                contentContainerStyle={{ paddingHorizontal: 16 }}
+              />
+            </View>
+          </View>
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <FontAwesome5 name="bookmark" size={48} color={isDarkMode ? '#333333' : "#d4d4d4"} />
+            <Text style={[styles.emptyText, { color: theme.secondaryText }]}>Kaydedilmiş tarif bulunamadı</Text>
+          </View>
+        }
+      />
     </View>
   );
 };
@@ -182,27 +254,50 @@ const SavedRecipes = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 56,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingBottom: 10,
   },
   pageTitle: {
     fontSize: 26,
-    fontFamily: 'TextExtraBold',
-    marginLeft: 20,
+    fontFamily: 'PoppinsExtraBold',
+    letterSpacing: 0.3,
+  },
+  headerSearchBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  listHeader: {
+    marginHorizontal: -16,
     marginBottom: 8,
-    letterSpacing: 0.5,
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingTop: 6,
+    paddingBottom: 40,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 16,
     height: 52,
-    borderWidth: 1,
+    marginHorizontal: 16,
+    marginBottom: 4,
+    borderWidth: 0,
   },
   textInput: {
     flex: 1,
     paddingHorizontal: 12,
     fontSize: 16,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
   },
   categoryBar: {
     marginVertical: 12,
@@ -214,7 +309,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
     marginRight: 10,
-    borderWidth: 1,
+    borderWidth: 0,
   },
   categoryChipActive: {
     backgroundColor: '#ff7043',
@@ -222,7 +317,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 14,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   categoryTextActive: {
     color: '#fff',
@@ -233,7 +328,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     padding: 12,
     marginBottom: 12,
-    borderWidth: 1,
+    borderWidth: 0,
   },
   recipeListIconBox: {
     width: 52,
@@ -245,12 +340,12 @@ const styles = StyleSheet.create({
   },
   recipeListTitle: {
     fontSize: 16,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginBottom: 3,
   },
   recipeListSub: {
     fontSize: 12,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 16,
   },
   chevronBox: {
@@ -267,7 +362,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 18,
     textAlign: 'center',
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
 });
 

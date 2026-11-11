@@ -140,7 +140,7 @@ const AddRecipeScreen = () => {
         >
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { backgroundColor: isDarkMode ? theme.card : '#f1f5f9', borderRadius: 20 }]}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderRadius: 20 }]}>
               <FontAwesome5 name="arrow-left" size={20} color={theme.text} />
             </TouchableOpacity>
             <Text style={[styles.pageTitle, { color: theme.text }]}>Yeni Tarif Yaz</Text>
@@ -162,7 +162,7 @@ const AddRecipeScreen = () => {
                 placeholder="Örn: Anne Köftesi"
                 value={title}
                 onChangeText={setTitle}
-                placeholderTextColor={isDarkMode ? '#475569' : "#cbd5e1"}
+                placeholderTextColor={isDarkMode ? '#525252' : "#d4d4d4"}
               />
             </View>
 
@@ -213,7 +213,7 @@ const AddRecipeScreen = () => {
                   value={ingredientInput}
                   onChangeText={setIngredientInput}
                   onSubmitEditing={addIngredient}
-                  placeholderTextColor={isDarkMode ? '#475569' : "#cbd5e1"}
+                  placeholderTextColor={isDarkMode ? '#525252' : "#d4d4d4"}
                 />
                 <TouchableOpacity style={styles.addBtn} onPress={addIngredient}>
                   <FontAwesome5 name="plus" size={14} color="#fff" />
@@ -249,7 +249,7 @@ const AddRecipeScreen = () => {
                 placeholder="Tarifi buraya yazmaya başla..."
                 value={instructions}
                 onChangeText={setInstructions}
-                placeholderTextColor={isDarkMode ? '#475569' : "#cbd5e1"}
+                placeholderTextColor={isDarkMode ? '#525252' : "#d4d4d4"}
                 multiline
                 textAlignVertical="top"
               />
@@ -295,8 +295,8 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: 24,
-    fontFamily: 'TextExtraBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsExtraBold',
+    color: '#262626',
   },
   paperBody: {
     paddingHorizontal: 4,
@@ -305,19 +305,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderWidth: 0,
+    borderBottomColor: '#e5e5e5',
     paddingBottom: 8,
   },
   dateLabel: {
-    fontFamily: 'TextBold',
-    color: '#64748b',
+    fontFamily: 'PoppinsBold',
+    color: '#737373',
     marginRight: 8,
     fontSize: 14,
   },
   dateValue: {
-    fontFamily: 'TextNormal',
-    color: '#334155',
+    fontFamily: 'PoppinsRegular',
+    color: '#383838',
     fontSize: 14,
   },
   inputGroup: {
@@ -325,31 +325,31 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    fontFamily: 'TextBold',
-    color: '#334155',
+    fontFamily: 'PoppinsBold',
+    color: '#383838',
     marginBottom: 8,
   },
   titleInput: {
     fontSize: 22,
-    fontFamily: 'TextNormal',
-    color: '#0f172a',
-    borderBottomWidth: 1,
-    borderBottomColor: '#94a3b8',
+    fontFamily: 'PoppinsRegular',
+    color: '#181818',
+    borderWidth: 0,
+    borderBottomColor: '#a3a3a3',
     paddingVertical: 8,
   },
   ingredientRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#94a3b8',
+    borderWidth: 0,
+    borderBottomColor: '#a3a3a3',
     paddingBottom: 8,
     marginBottom: 16,
   },
   ingredientInput: {
     flex: 1,
     fontSize: 16,
-    fontFamily: 'TextNormal',
-    color: '#0f172a',
+    fontFamily: 'PoppinsRegular',
+    color: '#181818',
   },
   addBtn: {
     backgroundColor: '#ff7043',
@@ -372,8 +372,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 12,
     marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderWidth: 0,
+    borderColor: '#e5e5e5',
     shadowColor: '#000',
     shadowOpacity: 0.02,
     shadowRadius: 4,
@@ -389,8 +389,8 @@ const styles = StyleSheet.create({
   ingredientText: {
     flex: 1,
     fontSize: 16,
-    color: '#334155',
-    fontFamily: 'TextNormal',
+    color: '#383838',
+    fontFamily: 'PoppinsRegular',
   },
   removeBtn: {
     padding: 4,
@@ -409,24 +409,24 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: '#ffcc80',
   },
   aiBtnText: {
     color: '#ff7043',
     fontSize: 13,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginLeft: 6,
   },
   instructionsInput: {
     fontSize: 16, // Handwriting size
-    fontFamily: 'TextNormal',
-    color: '#0f172a',
+    fontFamily: 'PoppinsRegular',
+    color: '#181818',
     lineHeight: 28, // Line height
     minHeight: 200,
     paddingTop: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderWidth: 0,
+    borderBottomColor: '#e5e5e5',
   },
 
   saveButtonContainer: {
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginLeft: 10,
   },
   catChip: {
@@ -462,8 +462,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 14,
     marginRight: 10,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderWidth: 0,
+    borderColor: '#e5e5e5',
   },
   catChipActive: {
     backgroundColor: '#ff7043',
@@ -471,8 +471,8 @@ const styles = StyleSheet.create({
   },
   catChipText: {
     fontSize: 14,
-    fontFamily: 'TextBold',
-    color: '#64748b',
+    fontFamily: 'PoppinsBold',
+    color: '#737373',
   },
   catChipTextActive: {
     color: '#fff',

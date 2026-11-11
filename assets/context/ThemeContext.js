@@ -34,12 +34,12 @@ export const ThemeProvider = ({ children }) => {
     };
 
     const theme = {
-        background: isDarkMode ? '#020617' : '#ffffff',
-        card: isDarkMode ? '#0f172a' : '#f8fafc',
-        text: isDarkMode ? '#f8fafc' : '#1e293b',
-        secondaryText: isDarkMode ? '#64748b' : '#64748b',
-        border: isDarkMode ? '#1e293b' : '#f1f5f9',
-        divider: isDarkMode ? '#0f172a' : '#f1f5f9',
+        background: isDarkMode ? '#121212' : '#ffffff',
+        card: isDarkMode ? '#1e1e1e' : '#f3f3f3',
+        text: isDarkMode ? '#f5f5f5' : '#171717',
+        secondaryText: isDarkMode ? '#a3a3a3' : '#737373',
+        border: 'transparent',
+        divider: 'transparent',
         isDarkMode
     };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
-  Animated,
   ScrollView,
   Modal,
   Pressable,
@@ -14,18 +13,30 @@ import {
   ImageBackground,
   Keyboard
 } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedScrollHandler,
+  interpolate,
+  Extrapolation,
+  withTiming,
+  Easing,
+  runOnJS,
+} from 'react-native-reanimated';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const HomeScreen = () => {
   const { isDarkMode, theme } = useTheme();
   const [input, setInput] = useState('');
   const [malzemeler, setMalzemeler] = useState([]);
-  const [slideAnim] = useState(new Animated.Value(100));
+  const slideAnim = useSharedValue(100);
+  const scrollY = useSharedValue(0);
   const [inputFocused, setInputFocused] = useState(false);
   const [greeting, setGreeting] = useState('Merhaba');
 
@@ -33,30 +44,32 @@ const HomeScreen = () => {
 
   // Rastgele tarif modal state'leri
   const [randomModalVisible, setRandomModalVisible] = useState(false);
-  const [randomModalAnim] = useState(new Animated.Value(0));
+  const randomSheetY = useSharedValue(SCREEN_HEIGHT);
   const [randomStep, setRandomStep] = useState(1); // 1: yemek zamanı, 2: tarz
   const [selectedMealTime, setSelectedMealTime] = useState(null);
   const [selectedStyle, setSelectedStyle] = useState(null);
-  const [continueAnim] = useState(new Animated.Value(0));
-  const [generateAnim] = useState(new Animated.Value(0));
+  const continueAnim = useSharedValue(0);
+  const generateAnim = useSharedValue(0);
 
   // Yapay Zeka Şef Ayarları state'leri
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
-  const [settingsModalAnim] = useState(new Animated.Value(0));
+  const settingsSheetY = useSharedValue(SCREEN_HEIGHT);
   const [cookingLevel, setCookingLevel] = useState('intermediate'); // varsayılan orta
 
   // Ayarları yükle
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const savedLevel = await AsyncStorage.getItem('chef_cooking_level');
-        if (savedLevel) setCookingLevel(savedLevel);
-      } catch (e) {
-        console.log('Ayarlar yüklenemedi:', e);
-      }
-    };
-    loadSettings();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const loadSettings = async () => {
+        try {
+          const savedLevel = await AsyncStorage.getItem('chef_cooking_level');
+          if (savedLevel) setCookingLevel(savedLevel);
+        } catch (e) {
+          console.log('Ayarlar yüklenemedi:', e);
+        }
+      };
+      loadSettings();
+    }, [])
+  );
 
   const saveCookingLevel = async (level) => {
     try {
@@ -68,22 +81,34 @@ const HomeScreen = () => {
   };
 
   const openSettingsModal = () => {
+    settingsSheetY.value = SCREEN_HEIGHT;
     setSettingsModalVisible(true);
-    Animated.spring(settingsModalAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      tension: 65,
-      friction: 8,
-    }).start();
   };
 
+  useEffect(() => {
+    if (settingsModalVisible) {
+      requestAnimationFrame(() => {
+        settingsSheetY.value = withTiming(0, {
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+        });
+      });
+    }
+  }, [settingsModalVisible]);
+
   const closeSettingsModal = () => {
-    Animated.spring(settingsModalAnim, {
-      toValue: 0,
-      useNativeDriver: true,
-      tension: 65,
-      friction: 8,
-    }).start(() => setSettingsModalVisible(false));
+    settingsSheetY.value = withTiming(
+      SCREEN_HEIGHT,
+      {
+        duration: 220,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(setSettingsModalVisible)(false);
+        }
+      }
+    );
   };
 
   useEffect(() => {
@@ -177,65 +202,57 @@ const HomeScreen = () => {
     {
       title: 'Ekstralar',
       data: [
-        { name: 'Kakao', image: require('../images/ingredients/sugar.jpg') }, // Placeholder
-        { name: 'Vanilya', image: require('../images/ingredients/sugar.jpg') }, // Placeholder
-        { name: 'Çikolata', image: require('../images/ingredients/sugar.jpg') }, // Placeholder
+        { name: 'Kakao', image: null },
+        { name: 'Vanilya', image: null },
+        { name: 'Çikolata', image: null },
       ]
     }
   ];
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalAnim] = useState(new Animated.Value(0));
-  const [confirmAnim] = useState(new Animated.Value(0));
+  const modalSheetY = useSharedValue(SCREEN_HEIGHT);
+  const confirmAnim = useSharedValue(0);
   const [modalSelected, setModalSelected] = useState([]);
 
   const openModal = () => {
+    modalSheetY.value = SCREEN_HEIGHT;
+    confirmAnim.value = 0;
     setModalVisible(true);
-    Animated.spring(modalAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      tension: 65,
-      friction: 8,
-    }).start();
-    Animated.timing(confirmAnim, {
-      toValue: 0,
-      duration: 0,
-      useNativeDriver: true,
-    }).start();
   };
 
   const closeModal = () => {
-    Animated.spring(modalAnim, {
-      toValue: 0,
-      useNativeDriver: true,
-      tension: 65,
-      friction: 8,
-    }).start(() => setModalVisible(false));
+    modalSheetY.value = withTiming(
+      SCREEN_HEIGHT,
+      {
+        duration: 220,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(setModalVisible)(false);
+        }
+      }
+    );
   };
 
   useEffect(() => {
     if (modalVisible) {
       setModalSelected(malzemeler);
+      requestAnimationFrame(() => {
+        modalSheetY.value = withTiming(0, {
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+        });
+      });
     }
   }, [modalVisible]);
 
   useEffect(() => {
     if (modalVisible) {
-      if (modalSelected.length > 0) {
-        Animated.spring(confirmAnim, {
-          toValue: 1,
-          useNativeDriver: true,
-          tension: 100,
-          friction: 8,
-        }).start();
-      } else {
-        Animated.spring(confirmAnim, {
-          toValue: 0,
-          useNativeDriver: true,
-          tension: 100,
-          friction: 8,
-        }).start();
-      }
+      confirmAnim.value = withTiming(modalSelected.length > 0 ? 1 : 0, {
+        duration: 200,
+        easing: Easing.out(Easing.cubic),
+      });
     }
   }, [modalSelected, modalVisible]);
 
@@ -245,49 +262,61 @@ const HomeScreen = () => {
   };
 
   const openRandomModal = () => {
-    setRandomModalVisible(true);
+    randomSheetY.value = SCREEN_HEIGHT;
+    continueAnim.value = 0;
+    generateAnim.value = 0;
     setRandomStep(1);
     setSelectedMealTime(null);
     setSelectedStyle(null);
-    Animated.spring(randomModalAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      tension: 65,
-      friction: 8,
-    }).start();
+    setRandomModalVisible(true);
   };
 
+  useEffect(() => {
+    if (randomModalVisible) {
+      requestAnimationFrame(() => {
+        randomSheetY.value = withTiming(0, {
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+        });
+      });
+    }
+  }, [randomModalVisible]);
+
   const closeRandomModal = () => {
-    Animated.spring(randomModalAnim, {
-      toValue: 0,
-      useNativeDriver: true,
-      tension: 65,
-      friction: 8,
-    }).start(() => setRandomModalVisible(false));
+    randomSheetY.value = withTiming(
+      SCREEN_HEIGHT,
+      {
+        duration: 220,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(setRandomModalVisible)(false);
+        }
+      }
+    );
   };
 
   const handleMealTimeSelect = (mealTime) => {
     setSelectedMealTime(mealTime);
-    if (mealTime) {
-      Animated.spring(continueAnim, { toValue: 1, useNativeDriver: true, tension: 100, friction: 8 }).start();
-    } else {
-      Animated.spring(continueAnim, { toValue: 0, useNativeDriver: true, tension: 100, friction: 8 }).start();
-    }
+    continueAnim.value = withTiming(mealTime ? 1 : 0, {
+      duration: 200,
+      easing: Easing.out(Easing.cubic),
+    });
   };
 
   const handleStyleSelect = (style) => {
     setSelectedStyle(style);
-    if (style) {
-      Animated.spring(generateAnim, { toValue: 1, useNativeDriver: true, tension: 100, friction: 8 }).start();
-    } else {
-      Animated.spring(generateAnim, { toValue: 0, useNativeDriver: true, tension: 100, friction: 8 }).start();
-    }
+    generateAnim.value = withTiming(style ? 1 : 0, {
+      duration: 200,
+      easing: Easing.out(Easing.cubic),
+    });
   };
 
   const handleContinue = () => {
     setRandomStep(2);
-    continueAnim.setValue(0);
-    generateAnim.setValue(0);
+    continueAnim.value = 0;
+    generateAnim.value = 0;
   };
 
   const handleGenerateRecipe = () => {
@@ -317,266 +346,377 @@ const HomeScreen = () => {
     setMalzemeler([]); // Malzemeleri temizle
   };
 
-  // Malzeme listesi değiştiğinde animasyon
+  // Malzeme listesi değiştiğinde animasyon (yaylanma olmadan akıcı geçiş)
   useEffect(() => {
-    if (malzemeler.length > 0) {
-      Animated.spring(slideAnim, { toValue: 0, useNativeDriver: true, tension: 100, friction: 8 }).start();
-    } else {
-      Animated.spring(slideAnim, { toValue: 100, useNativeDriver: true, tension: 100, friction: 8 }).start();
-    }
+    slideAnim.value = withTiming(malzemeler.length > 0 ? 0 : 100, {
+      duration: 240,
+      easing: Easing.out(Easing.cubic),
+    });
   }, [malzemeler.length]);
+
+  const fabAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: slideAnim.value }],
+  }));
+
+  const modalSheetStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: modalSheetY.value }],
+  }));
+
+  const confirmButtonStyle = useAnimatedStyle(() => ({
+    opacity: confirmAnim.value,
+    transform: [{ translateY: (1 - confirmAnim.value) * 20 }],
+  }));
+
+  const randomSheetStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: randomSheetY.value }],
+  }));
+
+  const continueButtonStyle = useAnimatedStyle(() => ({
+    opacity: continueAnim.value,
+  }));
+
+  const generateButtonStyle = useAnimatedStyle(() => ({
+    opacity: generateAnim.value,
+  }));
+
+  const settingsSheetStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: settingsSheetY.value }],
+  }));
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    paddingTop: interpolate(scrollY.value, [0, 70], [56, 46], Extrapolation.CLAMP),
+    paddingBottom: interpolate(scrollY.value, [0, 70], [14, 8], Extrapolation.CLAMP),
+  }));
+
+  const greetingAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollY.value, [0, 35], [1, 0], Extrapolation.CLAMP),
+    transform: [
+      { translateY: interpolate(scrollY.value, [0, 35], [0, -6], Extrapolation.CLAMP) },
+    ],
+  }));
+
+  const compactTitleAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollY.value, [25, 65], [0, 1], Extrapolation.CLAMP),
+    transform: [
+      { translateY: interpolate(scrollY.value, [25, 65], [6, 0], Extrapolation.CLAMP) },
+    ],
+  }));
+
+  const bigTitleAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollY.value, [0, 45], [1, 0], Extrapolation.CLAMP),
+    height: interpolate(scrollY.value, [0, 70], [38, 0], Extrapolation.CLAMP),
+    transform: [
+      { translateY: interpolate(scrollY.value, [0, 55], [0, -10], Extrapolation.CLAMP) },
+    ],
+  }));
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={isDarkMode ? theme.background : "#f8fafc"} />
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.background} />
 
       {/* Header */}
-      <View style={[styles.header, activeTab === 'dessert' && styles.headerDessert]}>
-        <View>
-          <Text style={styles.greeting}>{greeting} Şef! 👋</Text>
-          <Text style={styles.headerTitle}>Bugün ne pişirelim?</Text>
+      <Animated.View style={[styles.header, { backgroundColor: theme.background }, headerAnimatedStyle]}>
+        <View style={styles.headerTextCol}>
+          <View style={styles.greetingSlot}>
+            <Animated.Text style={[styles.greeting, greetingAnimatedStyle]}>
+              {greeting}, Şef
+            </Animated.Text>
+            <Animated.Text style={[styles.compactHeaderTitle, { color: theme.text }, compactTitleAnimatedStyle]}>
+              Bugün ne pişirelim?
+            </Animated.Text>
+          </View>
+          <Animated.View style={[styles.bigTitleSlot, bigTitleAnimatedStyle]}>
+            <Text style={[styles.headerTitle, { color: theme.text }]} numberOfLines={1}>
+              Bugün ne pişirelim?
+            </Text>
+          </Animated.View>
         </View>
         <TouchableOpacity
           style={styles.settingsHeaderBtn}
           onPress={openSettingsModal}
           activeOpacity={0.7}
         >
-          <LinearGradient
-            colors={isDarkMode ? ['#1e293b', '#0f172a'] : ['#fff', '#f1f5f9']}
-            style={[styles.settingsIconCircle, { borderColor: isDarkMode ? '#334155' : '#ffd8c4' }]}
+          <View
+            style={[
+              styles.settingsIconCircle,
+              { backgroundColor: theme.card, borderColor: theme.border }
+            ]}
           >
-            <FontAwesome5 name="robot" size={18} color="#ff7043" />
-            <View style={[styles.settingsBadge, { borderColor: isDarkMode ? '#1e293b' : '#fff' }]} />
-          </LinearGradient>
+            <FontAwesome5 name="sliders-h" size={18} color={theme.text} />
+          </View>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
 
-        {/* Günün Menüsü Banner */}
-        <TouchableOpacity
-          style={{ marginBottom: 24 }}
-          onPress={() => navigation.navigate('RecipeOfDay')}
-          activeOpacity={0.95}
-        >
-          <LinearGradient
-            colors={['#fb923c', '#ea580c']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{
-              paddingHorizontal: 24,
-              paddingVertical: 22,
-              borderRadius: 24,
-              // overflow: 'hidden', // GÖRÜNMEZLİK SORUNU İÇİN KALDIRILDI
-              position: 'relative',
-              zIndex: 10, // Üstte görünsün
-              minHeight: 110, // Garanti yükseklik
-            }}
-          >
-            {/* Dekoratif Arka Plan İkonu */}
-            <View style={{ position: 'absolute', right: -20, bottom: -25, overflow: 'hidden', borderRadius: 24 }}>
-              {/* Bu View wrapper'ı overflow için kullanılabilir ama şimdilik direkt render edelim */}
-            </View>
-            <FontAwesome5
-              name="utensils"
-              size={90}
-              color="#fff"
-              style={{
-                position: 'absolute',
-                right: 10, // Ekranda görünsün diye içeri aldım
-                bottom: 10,
-                opacity: 0.15,
-                transform: [{ rotate: '-15deg' }]
-              }}
-            />
-
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <View style={{ flex: 1, paddingRight: 16 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                  <Text style={{ fontFamily: 'TextBold', fontSize: 20, color: '#fff' }}>Günün Menüsü</Text>
-                </View>
-                <Text style={{ fontFamily: 'TextMedium', fontSize: 13, color: 'rgba(255,255,255,0.95)' }}>
-                  Şefin bugün sizin için hazırladığı 3 öğünlük özel plan.
-                </Text>
-              </View>
-
-              <View style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: '#fff',
-                justifyContent: 'center',
-                alignItems: 'center',
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 2
-              }}>
-                <FontAwesome5 name="arrow-right" size={16} color="#ea580c" />
-              </View>
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        {/* Ingredient Input Section */}
-        <View style={styles.card}>
-          <View style={[styles.toggleContainer, { backgroundColor: theme.card }]}>
-            <TouchableOpacity style={[styles.toggleButton, activeTab === 'meal' && styles.toggleButtonActive]} onPress={() => setActiveTab('meal')}>
-              <Text style={[styles.toggleText, { color: activeTab === 'meal' ? '#fff' : theme.secondaryText }]}>Yemek</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.toggleButton, activeTab === 'dessert' && styles.toggleButtonActive]} onPress={() => setActiveTab('dessert')}>
-              <Text style={[styles.toggleText, { color: activeTab === 'dessert' ? '#fff' : theme.secondaryText }]}>Tatlı</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <View style={[styles.inputWrapper, { backgroundColor: theme.card, borderColor: inputFocused ? '#ff7043' : theme.border }]}>
-              <FontAwesome5 name="search" size={16} color={theme.secondaryText} style={{ marginLeft: 16 }} />
-              <TextInput
-                style={[styles.textInput, { color: theme.text }]}
-                placeholder="Malzeme ekle..."
-                value={input}
-                onChangeText={setInput}
-                onSubmitEditing={malzemeEkle}
-                onFocus={() => setInputFocused(true)}
-                onBlur={() => setInputFocused(false)}
-                placeholderTextColor={theme.secondaryText}
-              />
-              {input.length > 0 && (
-                <TouchableOpacity onPress={malzemeEkle} style={styles.addButton}>
-                  <FontAwesome5 name="plus" size={16} color="#fff" />
-                </TouchableOpacity>
-              )}
-            </View>
-
-            {/* Serving Size Selection */}
-            <View style={styles.servingContainer}>
-              <View style={styles.servingRow}>
-                {[
-                  { label: '1 Kişilik', value: 1 },
-                  { label: '2 Kişilik', value: 2 },
-                  { label: '4 Kişilik', value: 4 },
-                  { label: '4+ Kişilik', value: '4+' },
-                ].map((option) => {
-                  const isSelected = servingSize === option.value;
-                  return (
-                    <TouchableOpacity
-                      key={option.value}
-                      style={[
-                        styles.servingButton,
-                        { backgroundColor: isSelected ? '#ff7043' : theme.card },
-                        isSelected && styles.servingButtonSelected
-                      ]}
-                      onPress={() => setServingSize(option.value)}
-                      activeOpacity={0.8}
-                    >
-                      <View style={styles.servingIconWrapper}>
-                        {option.value === 1 && (
-                          <FontAwesome5 name="user-alt" size={12} color={isSelected ? '#fff' : '#64748b'} />
-                        )}
-                        {option.value === 2 && (
-                          <View style={{ flexDirection: 'row' }}>
-                            <FontAwesome5 name="user-alt" size={12} color={isSelected ? '#fff' : '#64748b'} />
-                            <FontAwesome5 name="user-alt" size={12} color={isSelected ? '#fff' : '#64748b'} style={{ marginLeft: -5 }} />
-                          </View>
-                        )}
-                        {(option.value === 4 || option.value === '4+') && (
-                          <FontAwesome5 name="users" size={14} color={isSelected ? '#fff' : '#64748b'} />
-                        )}
-                      </View>
-                      <Text style={[styles.servingButtonText, { color: isSelected ? '#fff' : theme.secondaryText }]}>
-                        {option.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-          </View>
-
-          <TouchableOpacity style={styles.listButton} onPress={openModal}>
-            <FontAwesome5 name="list-ul" size={16} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.listButtonText}>Hazır Listeden Seç</Text>
-          </TouchableOpacity>
-
-          {/* Vertical List Display */}
-          <View style={styles.listContainer}>
-            {malzemeler.length > 0 ? (
-              malzemeler.map((item, index) => (
-                <View key={index} style={styles.listItem}>
-                  <View style={styles.listItemContent}>
-                    <View style={[styles.bulletPoint, { backgroundColor: theme.isDarkMode ? '#ff7043' : '#ff7043' }]} />
-                    <Text style={[styles.listItemText, { color: theme.text }]}>{item}</Text>
-                  </View>
-                  <TouchableOpacity onPress={() => malzemeSil(item)} style={styles.deleteBtn}>
-                    <FontAwesome5 name="trash-alt" size={16} color="#ef4444" />
-                  </TouchableOpacity>
-                </View>
-              ))
-            ) : (
-              <View style={styles.emptyStateContainer}>
-                <FontAwesome5 name="shopping-basket" size={24} color={theme.border} style={{ marginBottom: 8 }} />
-                <Text style={[styles.emptyStateText, { color: theme.secondaryText }]}>Dolabınızda neler var? Eklemeye başlayın.</Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        {/* Meal Type Section */}
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: theme.text }]}>Tarz Seçimi</Text>
-          {selectedMealType && (
-            <TouchableOpacity onPress={() => setSelectedMealType(null)}>
-              <Text style={{ color: '#ef4444', fontSize: 13, fontFamily: 'TextBold' }}>Temizle</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.mealTypesContainer}>
-          {mealTypes.map((type) => (
+        {/* 1. ÜST KART: YEMEK VEYA TATLI MODU & HIZLI ARAMA */}
+        <View style={[styles.mainCard, { backgroundColor: theme.card }]}>
+          {/* Yemek / Tatlı Switch */}
+          <View style={[styles.modeSelector, { backgroundColor: isDarkMode ? '#141414' : '#ebebeb' }]}>
             <TouchableOpacity
-              key={type.key}
               style={[
-                styles.mealTypeCard,
-                { backgroundColor: theme.card, borderColor: theme.border },
-                selectedMealType === type.key && styles.mealTypeCardSelected
+                styles.modeBtn,
+                activeTab === 'meal' && [styles.modeBtnActive, { backgroundColor: isDarkMode ? '#222222' : '#ffffff' }]
               ]}
-              onPress={() => setSelectedMealType(type.key === selectedMealType ? null : type.key)}
-              activeOpacity={0.8}
+              onPress={() => setActiveTab('meal')}
+              activeOpacity={0.85}
             >
-              <View style={[styles.iconCircle, { backgroundColor: isDarkMode ? '#0f172a' : '#f1f5f9' }, selectedMealType === type.key && styles.iconCircleSelected]}>
-                <FontAwesome5 name={type.icon} size={16} color={selectedMealType === type.key ? '#fff' : theme.secondaryText} />
-              </View>
-              <Text style={[styles.mealTypeLabel, { color: selectedMealType === type.key ? (isDarkMode ? '#ff7043' : '#c2410c') : theme.secondaryText }]}>
-                {type.label}
+              <FontAwesome5
+                name="utensils"
+                size={13}
+                color={activeTab === 'meal' ? '#ff7043' : theme.secondaryText}
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={[
+                  styles.modeBtnText,
+                  { color: activeTab === 'meal' ? theme.text : theme.secondaryText },
+                  activeTab === 'meal' && styles.modeBtnTextActive
+                ]}
+              >
+                Yemek Tarifi
               </Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
 
-        {/* Random Recipe Card */}
-        <TouchableOpacity style={[styles.randomCard, { backgroundColor: '#3b82f6' }]} onPress={openRandomModal} activeOpacity={0.95}>
-          <View style={styles.randomContent}>
-            <View style={styles.randomIconContainer}>
-              <FontAwesome5 name="dice" size={24} color="#fff" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.randomTitle}>Kararsız mı kaldın?</Text>
-              <Text style={styles.randomSubtitle}>Sana özel rastgele bir tarif önerelim!</Text>
-            </View>
-            <View style={styles.arrowCircle}>
-              <FontAwesome5 name="arrow-right" size={14} color="#3b82f6" />
-            </View>
+            <TouchableOpacity
+              style={[
+                styles.modeBtn,
+                activeTab === 'dessert' && [styles.modeBtnActive, { backgroundColor: isDarkMode ? '#222222' : '#ffffff' }]
+              ]}
+              onPress={() => setActiveTab('dessert')}
+              activeOpacity={0.85}
+            >
+              <FontAwesome5
+                name="cookie-bite"
+                size={13}
+                color={activeTab === 'dessert' ? '#ff7043' : theme.secondaryText}
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={[
+                  styles.modeBtnText,
+                  { color: activeTab === 'dessert' ? theme.text : theme.secondaryText },
+                  activeTab === 'dessert' && styles.modeBtnTextActive
+                ]}
+              >
+                Tatlı Tarifi
+              </Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+
+          {/* Malzeme Giriş Çubuğu + Sağ Ekle Butonu */}
+          <View style={[styles.searchBarBox, { backgroundColor: isDarkMode ? '#141414' : '#ffffff' }]}>
+            <FontAwesome5
+              name="carrot"
+              size={15}
+              color={inputFocused ? '#ff7043' : theme.secondaryText}
+              style={{ marginLeft: 16 }}
+            />
+            <TextInput
+              style={[styles.searchInput, { color: theme.text }]}
+              placeholder={activeTab === 'meal' ? 'Elindeki malzemeyi yaz (örn. domates)' : 'Tatlı malzemesi yaz (örn. çikolata)'}
+              value={input}
+              onChangeText={setInput}
+              onSubmitEditing={malzemeEkle}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => setInputFocused(false)}
+              placeholderTextColor={theme.secondaryText}
+              returnKeyType="done"
+            />
+            {input.trim().length > 0 ? (
+              <TouchableOpacity onPress={malzemeEkle} style={styles.addIngredientBtn} activeOpacity={0.85}>
+                <FontAwesome5 name="plus" size={12} color="#fff" />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+
+          {/* Hızlı Malzeme Ekleme Butonu (Görsel Liste Açma) */}
+          <TouchableOpacity
+            style={[styles.catalogTriggerBtn, { backgroundColor: isDarkMode ? '#181818' : '#fafafa' }]}
+            onPress={openModal}
+            activeOpacity={0.8}
+          >
+            <View style={styles.catalogTriggerLeft}>
+              <View style={styles.catalogIconCircle}>
+                <FontAwesome5 name="th-large" size={13} color="#ff7043" />
+              </View>
+              <View>
+                <Text style={[styles.catalogTriggerTitle, { color: theme.text }]}>Hazır Malzeme Dolabı</Text>
+                <Text style={[styles.catalogTriggerSub, { color: theme.secondaryText }]}>
+                  {activeTab === 'meal' ? 'Sebze, et, bakliyat ve temel gıdalar' : 'Un, süt, şeker ve pasta malzemeleri'}
+                </Text>
+              </View>
+            </View>
+            <FontAwesome5 name="chevron-right" size={12} color={theme.secondaryText} />
+          </TouchableOpacity>
+
+          {/* Eklenen Malzemeler (Tag Alanı) */}
+          {malzemeler.length > 0 ? (
+            <View style={styles.activeIngredientsArea}>
+              <View style={styles.activeIngredientsHeader}>
+                <Text style={[styles.activeIngredientsCount, { color: theme.secondaryText }]}>
+                  Mutfaktaki Malzemeler ({malzemeler.length})
+                </Text>
+                <TouchableOpacity onPress={() => setMalzemeler([])} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Text style={styles.clearAllBtnText}>Temizle</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.ingredientsChipsRow}>
+                {malzemeler.map((item, index) => (
+                  <View key={index} style={[styles.myIngredientChip, { backgroundColor: isDarkMode ? '#222222' : '#ffffff' }]}>
+                    <Text style={[styles.myIngredientChipText, { color: theme.text }]}>{item}</Text>
+                    <TouchableOpacity
+                      onPress={() => malzemeSil(item)}
+                      style={[styles.myIngredientRemoveBtn, { backgroundColor: isDarkMode ? '#333333' : '#f0f0f0' }]}
+                      hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                    >
+                      <FontAwesome5 name="times" size={9} color={theme.text} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : null}
+        </View>
+
+        {/* 2. PORSİYON VE TARZ TEK ŞIK KARTTA */}
+        <View style={[styles.setupCard, { backgroundColor: theme.card }]}>
+          <Text style={[styles.cardHeaderTitle, { color: theme.text }]}>Tarif Tercihleri</Text>
+
+          {/* Porsiyon Seçici */}
+          <Text style={[styles.miniHeader, { color: theme.secondaryText }]}>Porsiyon</Text>
+          <View style={styles.portionsBar}>
+            {[
+              { label: '1 Kişi', value: 1 },
+              { label: '2 Kişi', value: 2 },
+              { label: '4 Kişi', value: 4 },
+              { label: '4+ Kişi', value: '4+' },
+            ].map((option) => {
+              const isSelected = servingSize === option.value;
+              return (
+                <TouchableOpacity
+                  key={option.value}
+                  style={[
+                    styles.portionItem,
+                    {
+                      backgroundColor: isSelected ? '#ff7043' : (isDarkMode ? '#141414' : '#ffffff')
+                    }
+                  ]}
+                  onPress={() => setServingSize(option.value)}
+                  activeOpacity={0.8}
+                >
+                  <Text
+                    style={[
+                      styles.portionItemText,
+                      { color: isSelected ? '#ffffff' : theme.text },
+                      isSelected && styles.portionItemTextActive
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* Tarz Seçici (Hafif, Pratik, Misafir vb.) */}
+          <View style={styles.styleHeaderRow}>
+            <Text style={[styles.miniHeader, { color: theme.secondaryText, marginBottom: 0 }]}>Yemek Tarzı</Text>
+            {selectedMealType ? (
+              <TouchableOpacity onPress={() => setSelectedMealType(null)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Text style={styles.clearAllBtnText}>Sıfırla</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.stylesScroll}>
+            {mealTypes.map((type) => {
+              const isSelected = selectedMealType === type.key;
+              return (
+                <TouchableOpacity
+                  key={type.key}
+                  style={[
+                    styles.styleChip,
+                    {
+                      backgroundColor: isSelected ? '#ff7043' : (isDarkMode ? '#141414' : '#ffffff')
+                    }
+                  ]}
+                  onPress={() => setSelectedMealType(isSelected ? null : type.key)}
+                  activeOpacity={0.8}
+                >
+                  <FontAwesome5
+                    name={type.icon}
+                    size={11}
+                    color={isSelected ? '#ffffff' : '#ff7043'}
+                    style={{ marginRight: 7 }}
+                  />
+                  <Text
+                    style={[
+                      styles.styleChipText,
+                      { color: isSelected ? '#ffffff' : theme.text },
+                      isSelected && styles.styleChipTextActive
+                    ]}
+                  >
+                    {type.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {/* 3. HIZLI SEÇENEKLER (Günün Menüsü & Rastgele Tarif) */}
+        <View style={styles.quickCardsRow}>
+          <TouchableOpacity
+            style={styles.quickCardWrapper}
+            onPress={() => navigation.navigate('RecipeOfDay')}
+            activeOpacity={0.9}
+          >
+            <LinearGradient
+              colors={['#ff7043', '#ea580c']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.gradientCard}
+            >
+              <View style={styles.cardIconBadge}>
+                <FontAwesome5 name="concierge-bell" size={16} color="#fff" />
+              </View>
+              <Text style={styles.gradientCardTitle}>Günün Menüsü</Text>
+              <Text style={styles.gradientCardDesc}>3 öğünlük dengeli lezzetler</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickCardWrapper}
+            onPress={openRandomModal}
+            activeOpacity={0.9}
+          >
+            <View style={[styles.plainCard, { backgroundColor: theme.card }]}>
+              <View style={[styles.cardIconBadge, { backgroundColor: 'rgba(255, 112, 67, 0.14)' }]}>
+                <FontAwesome5 name="dice" size={16} color="#ff7043" />
+              </View>
+              <Text style={[styles.plainCardTitle, { color: theme.text }]}>Rastgele Tarif</Text>
+              <Text style={[styles.plainCardDesc, { color: theme.secondaryText }]}>Kararsız kaldığında tıkla</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
 
         <View style={{ height: 120 }} />
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Floating Generate Button */}
       {malzemeler.length > 0 && (
-        <Animated.View style={[styles.fabContainer, { transform: [{ translateY: slideAnim }] }]}>
+        <Animated.View style={[styles.fabContainer, fabAnimatedStyle]}>
           <TouchableOpacity style={styles.fabButton} onPress={tarifUret} activeOpacity={0.9}>
             <FontAwesome5 name="magic" size={20} color="#fff" style={{ marginRight: 10 }} />
             <Text style={styles.fabText}>Tarif Üret</Text>
@@ -587,19 +727,18 @@ const HomeScreen = () => {
         </Animated.View>
       )}
 
-      {/* Modals from previous implementation */}
       {/* 1. Malzeme Seçme Modalı */}
-      <Modal visible={modalVisible} animationType="none" transparent onRequestClose={closeModal}>
-        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-          <Pressable style={styles.modalBackdrop} onPress={closeModal} />
-          <Animated.View style={[styles.modalContainer, { backgroundColor: theme.background, transform: [{ translateY: modalAnim.interpolate({ inputRange: [0, 1], outputRange: [Dimensions.get('window').height, 0] }) }] }]}>
+      <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent onRequestClose={closeModal}>
+        <View style={styles.modalOverlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={closeModal} />
+          <Animated.View style={[styles.modalContainer, { backgroundColor: theme.background }, modalSheetStyle]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: theme.text }]}>Hazır Malzemeler</Text>
               <TouchableOpacity onPress={closeModal} style={styles.closeModalBtn}>
                 <FontAwesome5 name="times" size={20} color={theme.secondaryText} />
               </TouchableOpacity>
             </View>
-            <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+            <ScrollView contentContainerStyle={{ paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
               {(activeTab === 'meal' ? readyIngredients : dessertIngredients).map((category, index) => (
                 <View key={index} style={{ marginBottom: 40 }}>
                   <Text style={[styles.categoryTitle, { color: theme.text }]}>{category.title}</Text>
@@ -609,16 +748,28 @@ const HomeScreen = () => {
                       return (
                         <TouchableOpacity
                           key={item.name}
-                          style={[styles.gridItem, { backgroundColor: theme.card, borderColor: isSelected ? '#10b981' : theme.border }, isSelected && styles.gridItemSelected]}
+                          style={[
+                            styles.gridItem,
+                            { backgroundColor: isSelected ? '#ff7043' : theme.card },
+                            isSelected && styles.gridItemSelected,
+                          ]}
                           onPress={() => isSelected ? setModalSelected(modalSelected.filter(m => m !== item.name)) : setModalSelected([...modalSelected, item.name])}
+                          activeOpacity={0.85}
                         >
-                          {isSelected && <View style={styles.checkBadge}><FontAwesome5 name="check" size={10} color="#fff" /></View>}
+                          {isSelected && (
+                            <View style={styles.checkBadge}>
+                              <FontAwesome5 name="check" size={12} color="#ff7043" />
+                            </View>
+                          )}
                           {item.image ? (
                             <ImageBackground source={item.image} style={styles.gridImage} imageStyle={{ borderRadius: 16 }}>
-                              <View style={styles.gridImageOverlay}><Text style={styles.gridImageText}>{item.name}</Text></View>
+                              {isSelected && <View style={styles.gridImageSelectedTint} />}
+                              <View style={[styles.gridImageOverlay, isSelected && styles.gridImageOverlaySelected]}>
+                                <Text style={styles.gridImageText}>{item.name}</Text>
+                              </View>
                             </ImageBackground>
                           ) : (
-                            <Text style={[styles.gridText, { color: isSelected ? '#10b981' : theme.text }, isSelected && styles.gridTextSelected]}>{item.name}</Text>
+                            <Text style={[styles.gridText, { color: isSelected ? '#fff' : theme.text }]}>{item.name}</Text>
                           )}
                         </TouchableOpacity>
                       )
@@ -627,7 +778,7 @@ const HomeScreen = () => {
                 </View>
               ))}
             </ScrollView>
-            <Animated.View style={[styles.confirmContainer, { opacity: confirmAnim, transform: [{ translateY: confirmAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }]} pointerEvents={modalSelected.length > 0 ? 'auto' : 'none'}>
+            <Animated.View style={[styles.confirmContainer, confirmButtonStyle]} pointerEvents={modalSelected.length > 0 ? 'auto' : 'none'}>
               <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
                 <Text style={styles.confirmBtnText}>Seçilenleri Ekle ({modalSelected.length})</Text>
               </TouchableOpacity>
@@ -637,16 +788,18 @@ const HomeScreen = () => {
       </Modal>
 
       {/* 2. Rastgele Tarif Modalı */}
-      <Modal visible={randomModalVisible} animationType="none" transparent onRequestClose={closeRandomModal}>
-        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-          <Pressable style={styles.modalBackdrop} onPress={closeRandomModal} />
-          <Animated.View style={[styles.modalContainer, { backgroundColor: theme.background, transform: [{ translateY: randomModalAnim.interpolate({ inputRange: [0, 1], outputRange: [Dimensions.get('window').height, 0] }) }] }]}>
+      <Modal visible={randomModalVisible} animationType="none" transparent statusBarTranslucent onRequestClose={closeRandomModal}>
+        <View style={styles.modalOverlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={closeRandomModal} />
+          <Animated.View style={[styles.modalContainer, styles.randomModalContainer, { backgroundColor: theme.background }, randomSheetStyle]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: theme.text }]}>Rastgele Tarif</Text>
-              <TouchableOpacity onPress={closeRandomModal}><FontAwesome5 name="times" size={20} color={theme.secondaryText} /></TouchableOpacity>
+              <TouchableOpacity onPress={closeRandomModal} style={styles.closeModalBtn}>
+                <FontAwesome5 name="times" size={20} color={theme.secondaryText} />
+              </TouchableOpacity>
             </View>
             {randomStep === 1 ? (
-              <View>
+              <View style={styles.randomStepBody}>
                 <Text style={[styles.stepTitle, { color: theme.text }]}>Ne zaman yiyeceksiniz?</Text>
                 <View style={styles.optionsGrid}>
                   {mealTimes.map(item => (
@@ -658,8 +811,7 @@ const HomeScreen = () => {
                     </TouchableOpacity>
                   ))}
                 </View>
-                <View style={{ height: 80 }} />
-                <Animated.View style={[styles.bottomAction, { opacity: continueAnim }]}>
+                <Animated.View style={[styles.bottomAction, continueButtonStyle]}>
                   <TouchableOpacity
                     style={[styles.primaryBtn, { opacity: selectedMealTime ? 1 : 0.6 }]}
                     onPress={handleContinue}
@@ -671,7 +823,7 @@ const HomeScreen = () => {
                 </Animated.View>
               </View>
             ) : (
-              <View>
+              <View style={styles.randomStepBody}>
                 <Text style={[styles.stepTitle, { color: theme.text }]}>Nasıl bir tarif olsun?</Text>
                 <View style={styles.optionsGrid}>
                   {recipeStyles.map(item => (
@@ -683,8 +835,7 @@ const HomeScreen = () => {
                     </TouchableOpacity>
                   ))}
                 </View>
-                <View style={{ height: 80 }} />
-                <Animated.View style={[styles.bottomAction, { opacity: generateAnim }]}>
+                <Animated.View style={[styles.bottomAction, generateButtonStyle]}>
                   <TouchableOpacity
                     style={[styles.primaryBtn, { opacity: selectedStyle ? 1 : 0.6 }]}
                     onPress={handleGenerateRecipe}
@@ -701,14 +852,14 @@ const HomeScreen = () => {
       </Modal>
 
       {/* 3. Yapay Zeka Şef Ayarları Modalı */}
-      <Modal visible={settingsModalVisible} animationType="none" transparent onRequestClose={closeSettingsModal}>
-        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-          <Pressable style={styles.modalBackdrop} onPress={closeSettingsModal} />
-          <Animated.View style={[styles.modalContainer, { backgroundColor: theme.background, transform: [{ translateY: settingsModalAnim.interpolate({ inputRange: [0, 1], outputRange: [Dimensions.get('window').height, 0] }) }] }]}>
+      <Modal visible={settingsModalVisible} animationType="none" transparent statusBarTranslucent onRequestClose={closeSettingsModal}>
+        <View style={styles.modalOverlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={closeSettingsModal} />
+          <Animated.View style={[styles.modalContainer, { backgroundColor: theme.background }, settingsSheetStyle]}>
             <View style={styles.modalHeader}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={styles.aiModalIcon}>
-                  <FontAwesome5 name="robot" size={16} color="#fff" />
+                  <FontAwesome5 name="sliders-h" size={15} color="#fff" />
                 </View>
                 <Text style={[styles.modalTitle, { color: theme.text }]}>Yapay Zeka Şef Ayarları</Text>
               </View>
@@ -734,7 +885,7 @@ const HomeScreen = () => {
                       onPress={() => saveCookingLevel(item.id)}
                       activeOpacity={0.8}
                     >
-                      <View style={[styles.levelIconBox, { backgroundColor: isDarkMode ? '#0f172a' : '#f1f5f9' }, cookingLevel === item.id && styles.levelIconBoxActive]}>
+                      <View style={[styles.levelIconBox, { backgroundColor: isDarkMode ? '#181818' : '#eeeeee' }, cookingLevel === item.id && styles.levelIconBoxActive]}>
                         <FontAwesome5 name={item.icon} size={18} color={cookingLevel === item.id ? '#fff' : theme.secondaryText} />
                       </View>
                       <View style={{ flex: 1 }}>
@@ -748,13 +899,6 @@ const HomeScreen = () => {
                       )}
                     </TouchableOpacity>
                   ))}
-                </View>
-              </View>
-
-              <View style={[styles.settingsSection, { opacity: 0.5 }]}>
-                <Text style={[styles.settingsLabel, { color: theme.text }]}>Mutfak Tercihleri (Yakında)</Text>
-                <View style={{ height: 100, backgroundColor: theme.card, borderRadius: 16, borderStyle: 'dashed', borderWidth: 2, borderColor: theme.border, justifyContent: 'center', alignItems: 'center' }}>
-                  <Text style={{ color: theme.secondaryText, fontFamily: 'TextMedium' }}>Yeni ayarlar çok yakında eklenecek...</Text>
                 </View>
               </View>
             </ScrollView>
@@ -777,190 +921,336 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingTop: 60,
-    paddingBottom: 20,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 20,
+    paddingTop: 56,
+    paddingBottom: 14,
     paddingHorizontal: 24,
-    backgroundColor: '#ff7043',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  headerTextCol: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  greetingSlot: {
+    height: 26,
+    justifyContent: 'center',
+  },
   greeting: {
-    fontSize: 14,
-    fontFamily: 'TextBold',
-    color: '#fff',
+    fontSize: 13,
+    fontFamily: 'PoppinsBold',
+    color: '#ff7043',
+    letterSpacing: 0.3,
+  },
+  compactHeaderTitle: {
+    position: 'absolute',
+    left: 0,
+    fontSize: 18,
+    fontFamily: 'PoppinsExtraBold',
+  },
+  bigTitleSlot: {
+    height: 38,
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
   headerTitle: {
-    fontSize: 24,
-    fontFamily: 'TextExtraBold',
-    color: '#fff',
+    fontSize: 26,
+    fontFamily: 'PoppinsExtraBold',
   },
   scrollContent: {
-    padding: 24,
+    paddingTop: 136,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
   },
-  card: {
-    marginBottom: 24,
+  mainCard: {
+    borderRadius: 24,
+    padding: 16,
+    marginBottom: 20,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontFamily: 'TextBold',
-    marginBottom: 16,
+  modeSelector: {
+    flexDirection: 'row',
+    borderRadius: 14,
+    padding: 4,
+    marginBottom: 14,
   },
-  inputContainer: {
-    marginBottom: 16,
+  modeBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 11,
   },
-  inputWrapper: {
+  modeBtnActive: {
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  modeBtnText: {
+    fontSize: 13,
+    fontFamily: 'PoppinsMedium',
+  },
+  modeBtnTextActive: {
+    fontFamily: 'PoppinsBold',
+  },
+  searchBarBox: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 16,
-    height: 52,
-    borderWidth: 1,
+    height: 50,
+    marginBottom: 10,
   },
-  textInput: {
+  searchInput: {
     flex: 1,
     paddingHorizontal: 12,
-    fontSize: 16,
+    fontSize: 14,
+    fontFamily: 'PoppinsRegular',
   },
-  addButton: {
-    width: 36,
-    height: 36,
+  addIngredientBtn: {
+    width: 34,
+    height: 34,
     backgroundColor: '#ff7043',
-    borderRadius: 12,
+    borderRadius: 11,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 8,
   },
-  listButton: {
+  catalogTriggerBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#10b981',
-    borderRadius: 16,
+    justifyContent: 'space-between',
     paddingVertical: 12,
-    marginBottom: 20,
+    paddingHorizontal: 14,
+    borderRadius: 16,
   },
-  listButtonText: {
-    color: '#fff',
-    fontFamily: 'TextBold',
-    fontSize: 15,
+  catalogTriggerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
   },
-  listContainer: {
+  catalogIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 112, 67, 0.12)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  catalogTriggerTitle: {
+    fontSize: 14,
+    fontFamily: 'PoppinsBold',
+  },
+  catalogTriggerSub: {
+    fontSize: 11,
+    fontFamily: 'PoppinsRegular',
+    marginTop: 1,
+  },
+  activeIngredientsArea: {
+    marginTop: 14,
+    paddingTop: 12,
+  },
+  activeIngredientsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 2,
+  },
+  activeIngredientsCount: {
+    fontSize: 12,
+    fontFamily: 'PoppinsMedium',
+  },
+  clearAllBtnText: {
+    fontSize: 12,
+    fontFamily: 'PoppinsBold',
+    color: '#ff7043',
+  },
+  ingredientsChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
-  listItem: {
+  myIngredientChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 12,
+    paddingVertical: 7,
+    paddingLeft: 12,
+    paddingRight: 8,
     borderRadius: 12,
-    borderWidth: 1,
+    gap: 6,
   },
-  listItemContent: {
+  myIngredientChipText: {
+    fontSize: 13,
+    fontFamily: 'PoppinsMedium',
+  },
+  myIngredientRemoveBtn: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  setupCard: {
+    borderRadius: 24,
+    padding: 18,
+    marginBottom: 20,
+  },
+  cardHeaderTitle: {
+    fontSize: 17,
+    fontFamily: 'PoppinsBold',
+    marginBottom: 14,
+    letterSpacing: 0,
+  },
+  miniHeader: {
+    fontSize: 12,
+    fontFamily: 'PoppinsBold',
+    letterSpacing: 0.5,
+    marginBottom: 10,
+  },
+  portionsBar: {
     flexDirection: 'row',
+    gap: 8,
+    marginBottom: 18,
+  },
+  portionItem: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 12,
   },
-  bulletPoint: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginRight: 10,
+  portionItemText: {
+    fontSize: 13,
+    fontFamily: 'PoppinsMedium',
   },
-  listItemText: {
-    fontSize: 15,
-    fontFamily: 'TextBold',
+  portionItemTextActive: {
+    fontFamily: 'PoppinsBold',
   },
-  deleteBtn: {
-    padding: 8,
-  },
-  emptyStateContainer: {
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  emptyStateText: {
-    fontStyle: 'italic',
-    fontSize: 14,
-  },
-  sectionHeader: {
+  styleHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 10,
+  },
+  stylesScroll: {
+    gap: 8,
+  },
+  styleChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+  },
+  styleChipText: {
+    fontSize: 13,
+    fontFamily: 'PoppinsMedium',
+  },
+  styleChipTextActive: {
+    fontFamily: 'PoppinsBold',
+  },
+  quickCardsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+    alignItems: 'stretch',
+  },
+  quickCardWrapper: {
+    flex: 1,
+  },
+  gradientCard: {
+    flex: 1,
+    borderRadius: 22,
+    padding: 16,
+    height: 126,
+    justifyContent: 'space-between',
+  },
+  plainCard: {
+    flex: 1,
+    borderRadius: 22,
+    padding: 16,
+    height: 126,
+    justifyContent: 'space-between',
+  },
+  cardIconBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.22)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  gradientCardTitle: {
+    fontSize: 15,
+    fontFamily: 'PoppinsBold',
+    color: '#ffffff',
+    marginTop: 10,
+    marginBottom: 2,
+  },
+  gradientCardDesc: {
+    fontSize: 11,
+    fontFamily: 'PoppinsRegular',
+    color: 'rgba(255, 255, 255, 0.85)',
+  },
+  plainCardTitle: {
+    fontSize: 15,
+    fontFamily: 'PoppinsBold',
+    marginTop: 10,
+    marginBottom: 2,
+  },
+  plainCardDesc: {
+    fontSize: 11,
+    fontFamily: 'PoppinsRegular',
+  },
+  quickActionHalf: {
+    flex: 1,
+  },
+  quickCard: {
+    borderRadius: 18,
+    padding: 15,
+    minHeight: 104,
+    justifyContent: 'space-between',
+  },
+  quickCardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 12,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontFamily: 'TextBold',
-  },
-  mealTypesContainer: {
-    gap: 12,
-    marginBottom: 32,
-  },
-  mealTypeCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-  },
-  mealTypeCardSelected: {
-    borderColor: '#ff7043',
-  },
-  iconCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  iconCircleSelected: {
-    backgroundColor: '#ff7043',
-  },
-  mealTypeLabel: {
-    fontSize: 14,
-    fontFamily: 'TextBold',
-  },
-  randomCard: {
-    borderRadius: 24,
-    overflow: 'hidden',
-    marginBottom: 24,
-    height: 100,
-    paddingHorizontal: 20,
-    justifyContent: 'center',
-  },
-  randomContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  randomIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  randomTitle: {
-    fontSize: 18,
-    fontFamily: 'TextBold',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  randomSubtitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
-    fontFamily: 'TextNormal',
-  },
-  arrowCircle: {
+  quickIconBoxLight: {
     width: 32,
     height: 32,
-    borderRadius: 16,
-    backgroundColor: '#fff',
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.22)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 12,
+  },
+  quickIconBoxAccent: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 112, 67, 0.14)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quickCardTitle: {
+    fontFamily: 'PoppinsBold',
+    fontSize: 15,
+    color: '#fff',
+    marginBottom: 2,
+  },
+  quickCardSub: {
+    fontFamily: 'PoppinsRegular',
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.88)',
   },
   fabContainer: {
     position: 'absolute',
@@ -985,7 +1275,7 @@ const styles = StyleSheet.create({
   },
   fabText: {
     fontSize: 18,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     color: '#fff',
   },
   badge: {
@@ -997,12 +1287,13 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontFamily: 'PoppinsBold',
     fontSize: 12,
   },
-  modalBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+  modalOverlay: {
+    flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
   },
   modalContainer: {
     borderTopLeftRadius: 32,
@@ -1028,14 +1319,14 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 22,
-    fontFamily: 'TextExtraBold',
+    fontFamily: 'PoppinsExtraBold',
   },
   closeModalBtn: {
     padding: 4,
   },
   categoryTitle: {
     fontSize: 18,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginBottom: 12,
     marginLeft: 4,
   },
@@ -1050,60 +1341,70 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 0,
     overflow: 'hidden',
   },
   gridItemSelected: {
-    borderColor: '#10b981',
+    transform: [{ scale: 0.96 }],
   },
   gridText: {
     fontSize: 14,
-    fontFamily: 'TextBold',
-  },
-  gridTextSelected: {
-    color: '#059669',
+    fontFamily: 'PoppinsBold',
   },
   gridImage: {
     width: '100%',
     height: '100%',
     justifyContent: 'flex-end',
   },
+  gridImageSelectedTint: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 112, 67, 0.42)',
+  },
   gridImageOverlay: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.45)',
     width: '100%',
     paddingVertical: 6,
     alignItems: 'center',
   },
+  gridImageOverlaySelected: {
+    backgroundColor: '#ff7043',
+    paddingVertical: 7,
+  },
   gridImageText: {
     color: '#fff',
     fontSize: 12,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   checkBadge: {
     position: 'absolute',
-    top: 6,
-    right: 6,
-    backgroundColor: '#10b981',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    top: 8,
+    right: 8,
+    backgroundColor: '#fff',
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 4,
   },
   confirmContainer: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 54,
     left: 24,
     right: 24,
   },
   confirmBtn: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#ff7043',
     paddingVertical: 16,
     borderRadius: 20,
     alignItems: 'center',
-    shadowColor: '#10b981',
-    shadowOpacity: 0.4,
+    shadowColor: '#ff7043',
+    shadowOpacity: 0.35,
     shadowOffset: { width: 0, height: 8 },
     shadowRadius: 16,
     elevation: 8,
@@ -1111,11 +1412,17 @@ const styles = StyleSheet.create({
   confirmBtnText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
+  },
+  randomModalContainer: {
+    height: '82%',
+  },
+  randomStepBody: {
+    flex: 1,
   },
   stepTitle: {
     fontSize: 20,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -1132,11 +1439,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingTop: 24,
     alignItems: 'center',
-    borderWidth: 1,
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    elevation: 5,
+    borderWidth: 0,
   },
   optionCardSelected: {
     borderColor: '#ff7043',
@@ -1145,7 +1448,7 @@ const styles = StyleSheet.create({
   optionText: {
     marginTop: 10,
     fontSize: 15,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     textAlign: 'center',
   },
   optionIconContainer: {
@@ -1180,92 +1483,28 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'TextBold',
-  },
-  toggleContainer: {
-    flexDirection: 'row',
-    alignSelf: 'center',
-    borderRadius: 20,
-    padding: 4,
-    marginBottom: 20,
-  },
-  toggleButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 32,
-    borderRadius: 16,
-  },
-  toggleButtonActive: {
-    backgroundColor: '#ff7043',
-  },
-  toggleText: {
-    fontSize: 16,
-    fontFamily: 'TextBold',
-  },
-  toggleTextActive: {
-    color: '#fff',
-  },
-  headerDessert: {
-    backgroundColor: '#a855f7',
-  },
-  servingContainer: {
-    marginBottom: 20,
-    marginTop: 16,
-    paddingHorizontal: 4,
-  },
-  servingRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  servingButton: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 14,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  servingButtonSelected: {
-    backgroundColor: '#ff7043',
-  },
-  servingIconWrapper: {
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  servingButtonText: {
-    fontSize: 12,
-    fontFamily: 'TextBold',
-  },
-  servingButtonTextSelected: {
-    color: '#fff',
+    fontFamily: 'PoppinsBold',
   },
   settingsHeaderBtn: {
     padding: 2,
   },
   settingsIconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    borderWidth: 0,
   },
   settingsBadge: {
     position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 10,
-    height: 10,
+    top: 9,
+    right: 9,
+    width: 9,
+    height: 9,
     borderRadius: 5,
     backgroundColor: '#ff7043',
-    borderWidth: 2,
+    borderWidth: 0,
     borderColor: '#fff',
   },
   aiModalIcon: {
@@ -1282,12 +1521,12 @@ const styles = StyleSheet.create({
   },
   settingsLabel: {
     fontSize: 18,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginBottom: 4,
   },
   settingsSubLabel: {
     fontSize: 14,
-    fontFamily: 'TextRegular',
+    fontFamily: 'PoppinsRegular',
     marginBottom: 20,
   },
   levelOptions: {
@@ -1298,7 +1537,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderRadius: 20,
-    borderWidth: 1,
+    borderWidth: 0,
   },
   levelCardActive: {
     borderColor: '#ffd8c4',
@@ -1317,14 +1556,14 @@ const styles = StyleSheet.create({
   },
   levelTitle: {
     fontSize: 15,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   levelTitleActive: {
-    color: '#1e293b',
+    color: '#262626',
   },
   levelSub: {
     fontSize: 12,
-    fontFamily: 'TextRegular',
+    fontFamily: 'PoppinsRegular',
     marginTop: 2,
   },
   levelCheck: {
@@ -1333,15 +1572,15 @@ const styles = StyleSheet.create({
   settingsFooter: {
     padding: 24,
     paddingTop: 16,
-    borderTopWidth: 1,
+    borderWidth: 0,
   },
   settingsConfirmBtn: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#ff7043',
     height: 56,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#10b981',
+    shadowColor: '#ff7043',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
@@ -1350,7 +1589,7 @@ const styles = StyleSheet.create({
   settingsConfirmText: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
 });
 

@@ -112,3 +112,33 @@ for (const relPath of targets) {
   }
   fs.writeFileSync(fullPath, content, 'utf8');
 }
+
+// Reanimated / Worklets eklendikten sonra eski Metro önbelleğinin kullanılmasını engelle
+const workerPath = path.join(
+  __dirname,
+  '..',
+  'node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js'
+);
+if (fs.existsSync(workerPath)) {
+  let workerContent = fs.readFileSync(workerPath, 'utf8');
+  workerContent = workerContent.replace(
+    /const CACHE_VERSION = ['"][^'"]+['"];/,
+    "const CACHE_VERSION = '5-worklets';"
+  );
+  fs.writeFileSync(workerPath, workerContent, 'utf8');
+}
+
+const resolveModulePath = path.join(
+  __dirname,
+  '..',
+  'node_modules/babel-preset-expo/build/utils/resolveModule.js'
+);
+if (fs.existsSync(resolveModulePath)) {
+  let rmContent = fs.readFileSync(resolveModulePath, 'utf8');
+  rmContent = rmContent.replace(
+    '_cache[id] = resolved;',
+    'if (resolved != null) _cache[id] = resolved;'
+  );
+  fs.writeFileSync(resolveModulePath, rmContent, 'utf8');
+}
+

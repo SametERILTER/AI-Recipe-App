@@ -34,6 +34,7 @@ const CategoryRecipes = () => {
 
 **Hazırlama Süresi:** ${recipe.sure}
 **Zorluk Seviyesi:** ${recipe.zorluk}
+**Kalori:** ${recipe.kalori || '350 kcal'}
 
 **Malzemeler:**
 ${recipe.malzemeler.map(malzeme => `- ${malzeme}`).join('\n')}
@@ -45,6 +46,7 @@ ${recipe.hazirlanis.map((adim, index) => `${index + 1}. ${adim}`).join('\n')}
 - ${recipe.sure} sürede hazırlanır
 - ${recipe.kisi} kişilik tarif
 - Zorluk seviyesi: ${recipe.zorluk}
+- Kalori: ${recipe.kalori || '350 kcal'}
 - Kategori: ${recipe.kategori}`;
 
         return {
@@ -66,7 +68,7 @@ ${recipe.hazirlanis.map((adim, index) => `${index + 1}. ${adim}`).join('\n')}
                 <Text style={[styles.difficultyLabelText, { color: theme.secondaryText }]}>Zorluk: </Text>
                 <View style={styles.starContainer}>
                     {[...Array(starCount)].map((_, i) => (
-                        <FontAwesome5 key={i} name="star" size={10} color={isDarkMode ? '#ffcc80' : "#64748b"} solid style={{ marginRight: 2 }} />
+                        <FontAwesome5 key={i} name="star" size={10} color={isDarkMode ? '#ffcc80' : "#737373"} solid style={{ marginRight: 2 }} />
                     ))}
                 </View>
             </View>
@@ -190,21 +192,21 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16,
-        borderWidth: 1,
-        borderColor: '#f1f5f9',
+        borderWidth: 0,
+        borderColor: '#eeeeee',
     },
     title: {
         fontSize: 32,
-        fontFamily: 'TextExtraBold',
-        color: '#1e293b',
+        fontFamily: 'PoppinsExtraBold',
+        color: '#262626',
     },
     badge: {
         marginTop: 4,
     },
     countText: {
         fontSize: 15,
-        color: '#64748b',
-        fontFamily: 'TextNormal',
+        color: '#737373',
+        fontFamily: 'PoppinsRegular',
     },
     listContainer: {
         paddingHorizontal: 24,
@@ -212,7 +214,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100,
     },
     recipeCard: {
-        backgroundColor: '#f8fafc',
+        backgroundColor: '#f5f5f5',
         padding: 16,
         borderRadius: 16,
         flexDirection: 'row',
@@ -224,8 +226,8 @@ const styles = StyleSheet.create({
     },
     recipeName: {
         fontSize: 18,
-        fontFamily: 'TextBold',
-        color: '#1e293b',
+        fontFamily: 'PoppinsBold',
+        color: '#262626',
         marginBottom: 8,
     },
     starContainer: {
@@ -244,8 +246,8 @@ const styles = StyleSheet.create({
     },
     metaText: {
         fontSize: 13,
-        color: '#64748b',
-        fontFamily: 'TextNormal',
+        color: '#737373',
+        fontFamily: 'PoppinsRegular',
     },
     difficultyContainer: {
         flexDirection: 'row',
@@ -254,8 +256,8 @@ const styles = StyleSheet.create({
     },
     difficultyLabelText: {
         fontSize: 12,
-        color: '#94a3b8',
-        fontFamily: 'TextNormal',
+        color: '#a3a3a3',
+        fontFamily: 'PoppinsRegular',
     },
     actionArea: {
         marginLeft: 15,
@@ -267,8 +269,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#f1f5f9',
+        borderWidth: 0,
+        borderColor: '#eeeeee',
     },
     aiCardContainer: {
         marginTop: 10,
@@ -306,14 +308,14 @@ const styles = StyleSheet.create({
     },
     aiTitle: {
         fontSize: 18,
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         color: '#fff',
         marginBottom: 4,
     },
     aiSubtitle: {
         fontSize: 13,
         color: 'rgba(255,255,255,0.9)',
-        fontFamily: 'TextNormal',
+        fontFamily: 'PoppinsRegular',
         marginBottom: 12,
         lineHeight: 18,
     },
@@ -329,7 +331,7 @@ const styles = StyleSheet.create({
     },
     aiButtonText: {
         color: '#ff7043',
-        fontFamily: 'TextBold',
+        fontFamily: 'PoppinsBold',
         fontSize: 13,
     },
     aiDecorIcon: {

@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 
 
@@ -49,19 +50,48 @@ const RecipeDetailBookScreen = ({ route }) => {
   const { recipe } = route.params;
   const navigation = useNavigation();
 
+  const handleDeleteBookRecipe = () => {
+    Alert.alert(
+      'Tarifi Sil',
+      'Bu tarifi tarif defterinizden silmek istiyor musunuz?',
+      [
+        { text: 'İptal', style: 'cancel' },
+        {
+          text: 'Sil',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const data = await AsyncStorage.getItem('recipeBooks');
+              let list = data ? JSON.parse(data) : [];
+              list = list.filter(
+                r => (r.id && recipe.id ? r.id !== recipe.id : r.createdAt !== recipe.createdAt && r.title !== recipe.title)
+              );
+              await AsyncStorage.setItem('recipeBooks', JSON.stringify(list));
+              navigation.goBack();
+            } catch (e) {
+              Alert.alert('Hata', 'Tarif silinemedi.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <View style={[styles.mainContainer, { backgroundColor: theme.background }]}>
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { backgroundColor: isDarkMode ? theme.card : '#f1f5f9', borderRadius: 20 }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderRadius: 20 }]}>
           <FontAwesome5 name="arrow-left" size={20} color={theme.text} />
         </TouchableOpacity>
         <View style={{ flex: 1 }} />
-        <Text style={[styles.dateText, { color: theme.secondaryText }]}>
+        <Text style={[styles.dateText, { color: theme.secondaryText, marginRight: 12 }]}>
           {recipe.createdAt ? new Date(recipe.createdAt).toLocaleDateString('tr-TR') : ''}
         </Text>
+        <TouchableOpacity onPress={handleDeleteBookRecipe} style={[styles.backBtn, { backgroundColor: '#fee2e2', borderRadius: 20 }]}>
+          <FontAwesome5 name="trash-alt" size={16} color="#ef4444" />
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -83,7 +113,7 @@ const RecipeDetailBookScreen = ({ route }) => {
 
 
           <View style={[styles.ingredientList, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            {recipe.ingredients.map((item, idx) => (
+            {(recipe.ingredients || []).map((item, idx) => (
               <View key={item + idx} style={[styles.ingredientItem, { borderBottomColor: theme.border }]}>
                 <FontAwesome5 name="check" size={12} color="#ff7043" style={{ marginRight: 12 }} />
                 <Text style={[styles.ingredientText, { color: theme.text }]}>{item}</Text>
@@ -128,8 +158,8 @@ const styles = StyleSheet.create({
     marginLeft: -8,
   },
   dateText: {
-    fontFamily: 'TextBold',
-    color: '#94a3b8',
+    fontFamily: 'PoppinsBold',
+    color: '#a3a3a3',
     fontSize: 14,
   },
   container: {
@@ -141,14 +171,14 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: 28,
-    fontFamily: 'TextExtraBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsExtraBold',
+    color: '#262626',
     marginBottom: 16,
     lineHeight: 34,
   },
   divider: {
     height: 1,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: '#e5e5e5',
     marginBottom: 24,
   },
   sectionContainer: {
@@ -161,15 +191,15 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'TextBold',
-    color: '#334155',
+    fontFamily: 'PoppinsBold',
+    color: '#383838',
   },
   ingredientList: {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderWidth: 0,
+    borderColor: '#eeeeee',
     shadowColor: '#000',
     shadowOpacity: 0.02,
     shadowRadius: 8,
@@ -180,13 +210,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
     paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f8fafc',
+    borderWidth: 0,
+    borderBottomColor: '#f5f5f5',
   },
   ingredientText: {
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     flex: 1,
   },
   instructionsContainer: {
@@ -194,8 +224,8 @@ const styles = StyleSheet.create({
   },
   instructionHeader: {
     fontSize: 18,
-    fontFamily: 'TextBold',
-    color: '#0f172a',
+    fontFamily: 'PoppinsBold',
+    color: '#181818',
     marginTop: 16,
     marginBottom: 8,
   },
@@ -215,7 +245,7 @@ const styles = StyleSheet.create({
   instructionText: {
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 26,
     flex: 1,
     marginBottom: 8,

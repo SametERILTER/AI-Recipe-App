@@ -18,7 +18,7 @@ const RecipeBookScreen = () => {
   const navigation = useNavigation();
 
   const themes = [
-    { id: 'gold', name: 'Klasik Altın', primary: '#bfa100', bg: isDarkMode ? '#1e293b' : '#fffbe6', base: isDarkMode ? '#0f172a' : '#f6f1e7', cardBg: isDarkMode ? '#1e293b' : '#fff', border: isDarkMode ? '#334155' : '#f3e7b4' },
+    { id: 'gold', name: 'Klasik Altın', primary: '#bfa100', bg: isDarkMode ? '#262626' : '#fffbe6', base: isDarkMode ? '#181818' : '#f6f1e7', cardBg: isDarkMode ? '#262626' : '#fff', border: isDarkMode ? '#383838' : '#f3e7b4' },
     { id: 'green', name: 'Doğal Yeşil', primary: '#10b981', bg: isDarkMode ? '#064e3b' : '#ecfdf5', base: isDarkMode ? '#022c22' : '#f0fdf4', cardBg: isDarkMode ? '#064e3b' : '#fff', border: isDarkMode ? '#065f46' : '#d1fae5' },
     { id: 'purple', name: 'Zarif Mor', primary: '#8b5cf6', bg: isDarkMode ? '#4c1d95' : '#f5f3ff', base: isDarkMode ? '#2e1065' : '#fafaff', cardBg: isDarkMode ? '#4c1d95' : '#fff', border: isDarkMode ? '#5b21b6' : '#ede9fe' },
     { id: 'blue', name: 'Okyanus Mavisi', primary: '#3b82f6', bg: isDarkMode ? '#1e3a8a' : '#eff6ff', base: isDarkMode ? '#172554' : '#f8faff', cardBg: isDarkMode ? '#1e3a8a' : '#fff', border: isDarkMode ? '#1e40af' : '#dbeafe' },
@@ -104,7 +104,7 @@ const RecipeBookScreen = () => {
 
   const ThemePreview = ({ theme, isSelected, onSelect }) => (
     <TouchableOpacity
-      style={[styles.themeOption, isSelected && { borderColor: theme.primary, borderWidth: 2 }]}
+      style={[styles.themeOption, isSelected && { borderColor: theme.primary, borderWidth: 0 }]}
       onPress={() => onSelect(theme.id)}
     >
       <View style={[styles.miniPhone, { backgroundColor: theme.base, borderColor: theme.primary }]}>
@@ -118,7 +118,7 @@ const RecipeBookScreen = () => {
           <View style={styles.miniTab} />
         </View>
       </View>
-      <Text style={[styles.themeName, { color: isDarkMode ? '#fff' : '#64748b' }, isSelected && { color: theme.primary, fontFamily: 'TextBold' }]}>{theme.name}</Text>
+      <Text style={[styles.themeName, { color: isDarkMode ? '#fff' : '#737373' }, isSelected && { color: theme.primary, fontFamily: 'PoppinsBold' }]}>{theme.name}</Text>
     </TouchableOpacity>
   );
 
@@ -135,14 +135,14 @@ const RecipeBookScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.searchBar, { backgroundColor: isDarkMode ? '#0f172a' : '#fff', borderColor: isDarkMode ? currentTheme.border : '#e2e8f0' }]}>
-          <FontAwesome5 name="search" size={14} color={isDarkMode ? '#64748b' : '#94a3b8'} style={{ marginLeft: 14 }} />
+        <View style={[styles.searchBar, { backgroundColor: isDarkMode ? '#181818' : '#fff', borderColor: isDarkMode ? currentTheme.border : '#e5e5e5' }]}>
+          <FontAwesome5 name="search" size={14} color={isDarkMode ? '#737373' : '#a3a3a3'} style={{ marginLeft: 14 }} />
           <TextInput
             placeholder="Ara..."
-            style={[styles.searchInput, { color: isDarkMode ? '#fff' : '#334155' }]}
+            style={[styles.searchInput, { color: isDarkMode ? '#fff' : '#383838' }]}
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholderTextColor={isDarkMode ? '#64748b' : '#94a3b8'}
+            placeholderTextColor={isDarkMode ? '#737373' : '#a3a3a3'}
           />
         </View>
       </View>
@@ -192,10 +192,10 @@ const RecipeBookScreen = () => {
               <FontAwesome5 name={getCategoryIcon(item.category)} size={18} color={currentTheme.primary} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.recipeTitle, { color: isDarkMode ? '#fff' : '#1e293b' }]}>{item.title}</Text>
+              <Text style={[styles.recipeTitle, { color: isDarkMode ? '#fff' : '#262626' }]}>{item.title}</Text>
               <Text style={[styles.recipeCategory, { color: currentTheme.primary }]}>{item.category || 'Genel'}</Text>
             </View>
-            <FontAwesome5 name="chevron-right" size={14} color={isDarkMode ? currentTheme.primary : "#e2e8f0"} />
+            <FontAwesome5 name="chevron-right" size={14} color={isDarkMode ? currentTheme.primary : "#e5e5e5"} />
           </TouchableOpacity>
         )}
         ListEmptyComponent={renderEmpty}
@@ -255,43 +255,43 @@ const RecipeBookScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20, borderBottomWidth: 1 },
+  header: { paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20, borderWidth: 0 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   headerTitle: { fontSize: 28, fontFamily: 'Handwriting' },
   settingsBtn: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, height: 46, borderWidth: 1, borderColor: '#e2e8f0' },
-  searchInput: { flex: 1, paddingHorizontal: 12, fontFamily: 'TextNormal', fontSize: 14 },
-  categoryBar: { paddingVertical: 12, borderBottomWidth: 1 },
-  categoryChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10, marginRight: 8, borderWidth: 1 },
-  categoryText: { fontSize: 13, fontFamily: 'TextBold' },
-  recipeCard: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 15, flexDirection: 'row', alignItems: 'center', borderWidth: 1 },
-  recipeCardIcon: { width: 42, height: 42, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 15, borderWidth: 1 },
-  recipeTitle: { fontSize: 17, fontFamily: 'TextBold', color: '#1e293b', marginBottom: 2 },
-  recipeCategory: { fontSize: 12, fontFamily: 'TextBold' },
+  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, height: 46, borderWidth: 0, borderColor: '#e5e5e5' },
+  searchInput: { flex: 1, paddingHorizontal: 12, fontFamily: 'PoppinsRegular', fontSize: 14 },
+  categoryBar: { paddingVertical: 12, borderWidth: 0 },
+  categoryChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10, marginRight: 8, borderWidth: 0 },
+  categoryText: { fontSize: 13, fontFamily: 'PoppinsBold' },
+  recipeCard: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 15, flexDirection: 'row', alignItems: 'center', borderWidth: 0 },
+  recipeCardIcon: { width: 42, height: 42, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 15, borderWidth: 0 },
+  recipeTitle: { fontSize: 17, fontFamily: 'PoppinsBold', color: '#262626', marginBottom: 2 },
+  recipeCategory: { fontSize: 12, fontFamily: 'PoppinsBold' },
   addButtonContainer: { position: 'absolute', left: 20, right: 20, bottom: 24, zIndex: 10 },
   addButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ff7043', borderRadius: 16, paddingVertical: 16, elevation: 5 },
-  addButtonText: { fontSize: 16, fontFamily: 'TextBold', color: '#fff' },
+  addButtonText: { fontSize: 16, fontFamily: 'PoppinsBold', color: '#fff' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContainer: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, height: 600 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  modalHeading: { fontSize: 20, fontFamily: 'TextExtraBold', color: '#1e293b' },
+  modalHeading: { fontSize: 20, fontFamily: 'PoppinsExtraBold', color: '#262626' },
   settingSection: { marginBottom: 20 },
-  settingLabel: { fontSize: 15, fontFamily: 'TextBold', color: '#64748b', marginBottom: 10 },
-  nameInputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f8fafc', borderRadius: 12, paddingHorizontal: 15, height: 50, borderWidth: 1, borderColor: '#e2e8f0' },
-  nameInput: { flex: 1, fontSize: 15, fontFamily: 'TextNormal', color: '#1e293b' },
-  themeOption: { width: 90, marginRight: 12, alignItems: 'center', padding: 4, borderRadius: 12, borderWidth: 2, borderColor: 'transparent' },
-  miniPhone: { width: 70, height: 100, borderRadius: 10, borderWidth: 1.5, overflow: 'hidden', marginBottom: 5 },
-  miniHeader: { height: 20, borderBottomWidth: 1 },
+  settingLabel: { fontSize: 15, fontFamily: 'PoppinsBold', color: '#737373', marginBottom: 10 },
+  nameInputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 12, paddingHorizontal: 15, height: 50, borderWidth: 0, borderColor: '#e5e5e5' },
+  nameInput: { flex: 1, fontSize: 15, fontFamily: 'PoppinsRegular', color: '#262626' },
+  themeOption: { width: 90, marginRight: 12, alignItems: 'center', padding: 4, borderRadius: 12, borderWidth: 0, borderColor: 'transparent' },
+  miniPhone: { width: 70, height: 100, borderRadius: 10, borderWidth: 0, overflow: 'hidden', marginBottom: 5 },
+  miniHeader: { height: 20, borderWidth: 0 },
   miniContent: { padding: 4, gap: 3 },
-  miniCard: { height: 10, borderRadius: 3, backgroundColor: '#fff', borderWidth: 1 },
-  miniTabbar: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 12, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#eee' },
+  miniCard: { height: 10, borderRadius: 3, backgroundColor: '#fff', borderWidth: 0 },
+  miniTabbar: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 12, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', borderWidth: 0, borderTopColor: '#eee' },
   miniTab: { width: 8, height: 2, backgroundColor: '#eee' },
-  themeName: { fontSize: 11, fontFamily: 'TextNormal' },
+  themeName: { fontSize: 11, fontFamily: 'PoppinsRegular' },
   doneBtn: { height: 50, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
-  doneBtnText: { color: '#fff', fontSize: 15, fontFamily: 'TextBold' },
+  doneBtnText: { color: '#fff', fontSize: 15, fontFamily: 'PoppinsBold' },
   emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 40 },
-  emptyTitle: { fontSize: 18, fontFamily: 'TextBold', color: '#64748b', marginBottom: 5 },
-  emptySubtitle: { fontSize: 14, color: '#94a3b8', textAlign: 'center' },
+  emptyTitle: { fontSize: 18, fontFamily: 'PoppinsBold', color: '#737373', marginBottom: 5 },
+  emptySubtitle: { fontSize: 14, color: '#a3a3a3', textAlign: 'center' },
 });
 
 export default RecipeBookScreen;

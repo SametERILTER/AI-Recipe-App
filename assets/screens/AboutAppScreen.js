@@ -112,8 +112,7 @@ const AboutAppScreen = ({ navigation }) => {
                 </View>
 
                 <View style={styles.footer}>
-                    <Text style={[styles.footerText, { color: theme.secondaryText }]}>Afiyetle kalın!</Text>
-                    <Text style={[styles.versionText, { color: theme.secondaryText }]}>v1.2.0 • 2024</Text>
+                    <Text style={[styles.versionText, { color: theme.secondaryText }]}>1.2.0 • 2024</Text>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -124,43 +123,43 @@ const styles = StyleSheet.create({
     container: { flex: 1, paddingBottom: 100 },
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 15, paddingTop: 50 },
     backButton: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 5, elevation: 1 },
-    headerTitle: { fontSize: 22, fontFamily: 'TextExtraBold', marginLeft: 15 },
+    headerTitle: { fontSize: 22, fontFamily: 'PoppinsExtraBold', marginLeft: 15 },
     content: { paddingBottom: 40 },
     heroSection: { alignItems: 'center', marginVertical: 20 },
     logoBadge: { width: 64, height: 64, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-    appName: { fontSize: 24, fontFamily: 'TextExtraBold' },
-    appTagline: { fontSize: 13, fontFamily: 'TextNormal' },
+    appName: { fontSize: 24, fontFamily: 'PoppinsExtraBold' },
+    appTagline: { fontSize: 13, fontFamily: 'PoppinsRegular' },
 
     featuredSection: { paddingHorizontal: 20, marginBottom: 25 },
     aiCardSimple: {
         padding: 24,
         borderRadius: 28,
-        borderWidth: 1,
+        borderWidth: 0,
         flexDirection: 'row',
         alignItems: 'flex-start'
     },
     aiIconBox: { width: 56, height: 56, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
     aiContent: { flex: 1, marginLeft: 16 },
     aiHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
-    aiTitleSimple: { fontSize: 19, fontFamily: 'TextExtraBold' },
-    aiDescSimple: { fontSize: 14, fontFamily: 'TextNormal', lineHeight: 22 },
+    aiTitleSimple: { fontSize: 19, fontFamily: 'PoppinsExtraBold' },
+    aiDescSimple: { fontSize: 14, fontFamily: 'PoppinsRegular', lineHeight: 22 },
 
-    sectionTitle: { fontSize: 17, fontFamily: 'TextExtraBold', marginBottom: 15, marginLeft: 20 },
+    sectionTitle: { fontSize: 17, fontFamily: 'PoppinsExtraBold', marginBottom: 15, marginLeft: 20 },
     featuresList: { paddingHorizontal: 20, gap: 10 },
-    featureRow: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 24, borderWidth: 1 },
+    featureRow: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 24, borderWidth: 0 },
     rowIconBox: { width: 44, height: 44, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
     rowTextContainer: { marginLeft: 14, flex: 1 },
-    rowTitle: { fontSize: 15, fontFamily: 'TextExtraBold', marginBottom: 2 },
-    rowDesc: { fontSize: 12, fontFamily: 'TextNormal' },
+    rowTitle: { fontSize: 15, fontFamily: 'PoppinsExtraBold', marginBottom: 2 },
+    rowDesc: { fontSize: 12, fontFamily: 'PoppinsRegular' },
 
-    infoBox: { margin: 20, padding: 20, borderRadius: 24, borderWidth: 1 },
+    infoBox: { margin: 20, padding: 20, borderRadius: 24, borderWidth: 0 },
     infoRow: { flexDirection: 'row', alignItems: 'center' },
     infoTextContainer: { marginLeft: 15, flex: 1 },
-    infoHeading: { fontSize: 16, fontFamily: 'TextBold' },
-    infoSubText: { fontSize: 13, fontFamily: 'TextNormal', marginTop: 2 },
+    infoHeading: { fontSize: 16, fontFamily: 'PoppinsBold' },
+    infoSubText: { fontSize: 13, fontFamily: 'PoppinsRegular', marginTop: 2 },
 
     footer: { marginTop: 20, alignItems: 'center' },
-    footerText: { fontSize: 15, fontFamily: 'TextExtraBold' },
+    footerText: { fontSize: 15, fontFamily: 'PoppinsExtraBold' },
     versionText: { fontSize: 11, marginTop: 4 }
 });
 

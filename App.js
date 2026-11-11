@@ -39,11 +39,11 @@ function MainTabs() {
       screenOptions={{
         tabBarShowLabel: false,
         tabBarActiveTintColor: '#ff7043',
-        tabBarInactiveTintColor: theme.isDarkMode ? '#64748b' : '#bdbdbd',
+        tabBarInactiveTintColor: theme.isDarkMode ? '#737373' : '#bdbdbd',
         tabBarStyle: {
           backgroundColor: theme.background,
           height: 105,
-          borderTopWidth: 1,
+          borderWidth: 0,
           borderTopColor: theme.border,
           paddingBottom: 45,
           paddingTop: 6,
@@ -64,6 +64,7 @@ function MainTabs() {
         name="Ara"
         component={SearchRecipeScreen}
         options={{
+          lazy: false,
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="search" color={color} size={22} />
           ),
@@ -157,11 +158,32 @@ function AppContent() {
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    'TextRegular': require('./assets/fonts/Nunito-Medium.ttf'),
-    'TextNormal': require('./assets/fonts/Nunito-Medium.ttf'),
-    'TextMedium': require('./assets/fonts/Nunito-Medium.ttf'),
-    'TextBold': require('./assets/fonts/Nunito-Bold.ttf'),
-    'TextExtraBold': require('./assets/fonts/Nunito-ExtraBold.ttf'),
+    'PoppinsRegular': require('./assets/fonts/Poppins_400Regular.ttf'),
+    'PoppinsMedium': require('./assets/fonts/Poppins_500Medium.ttf'),
+    'PoppinsSemiBold': require('./assets/fonts/Poppins_600SemiBold.ttf'),
+    'PoppinsBold': require('./assets/fonts/Poppins_700Bold.ttf'),
+    'PoppinsExtraBold': require('./assets/fonts/Poppins_800ExtraBold.ttf'),
+    'ManropeRegular': require('./assets/fonts/Poppins_400Regular.ttf'),
+    'ManropeMedium': require('./assets/fonts/Poppins_500Medium.ttf'),
+    'ManropeSemiBold': require('./assets/fonts/Poppins_600SemiBold.ttf'),
+    'ManropeBold': require('./assets/fonts/Poppins_700Bold.ttf'),
+    'ManropeExtraBold': require('./assets/fonts/Poppins_800ExtraBold.ttf'),
+    'RubikRegular': require('./assets/fonts/Poppins_400Regular.ttf'),
+    'RubikMedium': require('./assets/fonts/Poppins_500Medium.ttf'),
+    'RubikSemiBold': require('./assets/fonts/Poppins_600SemiBold.ttf'),
+    'RubikBold': require('./assets/fonts/Poppins_700Bold.ttf'),
+    'RubikExtraBold': require('./assets/fonts/Poppins_800ExtraBold.ttf'),
+    'OutfitRegular': require('./assets/fonts/Poppins_400Regular.ttf'),
+    'OutfitMedium': require('./assets/fonts/Poppins_500Medium.ttf'),
+    'OutfitSemiBold': require('./assets/fonts/Poppins_600SemiBold.ttf'),
+    'OutfitBold': require('./assets/fonts/Poppins_700Bold.ttf'),
+    'OutfitExtraBold': require('./assets/fonts/Poppins_800ExtraBold.ttf'),
+    'TextRegular': require('./assets/fonts/Poppins_400Regular.ttf'),
+    'TextNormal': require('./assets/fonts/Poppins_400Regular.ttf'),
+    'TextMedium': require('./assets/fonts/Poppins_500Medium.ttf'),
+    'TextSemiBold': require('./assets/fonts/Poppins_600SemiBold.ttf'),
+    'TextBold': require('./assets/fonts/Poppins_700Bold.ttf'),
+    'TextExtraBold': require('./assets/fonts/Poppins_800ExtraBold.ttf'),
     'Handwriting': require('./assets/fonts/Parisienne-Regular.ttf')
   });
 

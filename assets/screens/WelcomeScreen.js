@@ -140,7 +140,7 @@ const WelcomeScreen = ({ navigation }) => {
                     onPress={() => setCookingLevel(item.id)}
                     activeOpacity={0.8}
                   >
-                    <View style={[styles.levelIconBox, { backgroundColor: isDarkMode ? '#1e293b' : '#fff' }, cookingLevel === item.id && styles.levelIconBoxActive]}>
+                    <View style={[styles.levelIconBox, { backgroundColor: isDarkMode ? '#262626' : '#fff' }, cookingLevel === item.id && styles.levelIconBoxActive]}>
                       <FontAwesome5 name={item.icon} size={18} color={cookingLevel === item.id ? '#fff' : theme.secondaryText} />
                     </View>
                     <View style={{ flex: 1 }}>
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 34,
-    fontFamily: 'TextExtraBold',
+    fontFamily: 'PoppinsExtraBold',
     textAlign: 'center',
     lineHeight: 42,
   },
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     textAlign: 'center',
     marginTop: 16,
     lineHeight: 24,
@@ -259,14 +259,14 @@ const styles = StyleSheet.create({
   },
   levelTitleMain: {
     fontSize: 28,
-    fontFamily: 'TextExtraBold',
+    fontFamily: 'PoppinsExtraBold',
     textAlign: 'center',
     lineHeight: 34,
     marginBottom: 12,
   },
   levelSubtitleMain: {
     fontSize: 15,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     textAlign: 'center',
     marginBottom: 32,
     paddingHorizontal: 10,
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderRadius: 20,
-    borderWidth: 2,
+    borderWidth: 0,
     borderColor: 'transparent',
   },
   levelCardActive: {
@@ -303,14 +303,14 @@ const styles = StyleSheet.create({
   },
   levelTitle: {
     fontSize: 16,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   levelTitleActive: {
     color: '#ff7043',
   },
   levelSub: {
     fontSize: 12,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     marginTop: 2,
   },
   buttonSection: {
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   arrowCircle: {
     width: 36,

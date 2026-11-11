@@ -14,7 +14,7 @@ import {
   Modal
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FontAwesome5, Octicons } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import LottieView from 'lottie-react-native';
 
@@ -365,88 +365,122 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
   };
 
   return (
-    <View style={[styles.loadingContainer, { flex: 1, paddingVertical: 40, backgroundColor: theme.background }]}>
+    <View style={[styles.loadingContainer, { flex: 1, paddingVertical: 36, backgroundColor: theme.background }]}>
 
-      {/* 1. Üst Kısım: Beyin ve Başlık */}
-      <View style={{ alignItems: 'center', marginTop: -20, marginBottom: 30 }}>
+      {/* 1. Üst Kısım: Animasyon ve Başlık */}
+      <View style={{ alignItems: 'center', marginTop: -10, marginBottom: 24 }}>
         <LottieView
           autoPlay
           loop
           style={{
-            width: 280,
-            height: 280,
-            marginBottom: 0,
+            width: 240,
+            height: 240,
+            marginBottom: -8,
           }}
           source={require('../animations/Cooking.json')}
         />
         <Text style={[styles.loadingTitle, { color: theme.text }]}>Tarif Hazırlanıyor...</Text>
-        <Text style={{ textAlign: 'center', color: theme.secondaryText, fontSize: 13, marginTop: 8, maxWidth: 250 }}>
+        <Text style={{ textAlign: 'center', color: theme.secondaryText, fontFamily: 'PoppinsRegular', fontSize: 14, marginTop: 4, maxWidth: 260 }}>
           Yapay zeka şefimiz sizin için özel bir tarif oluşturuyor.
         </Text>
       </View>
 
-      {/* 2. İlerleme Kutusu (Gölgesiz) */}
+      {/* 2. İlerleme Kutusu */}
       <View style={{
         width: '100%',
-        backgroundColor: isDarkMode ? theme.card : '#fff7ed',
-        padding: 20,
-        borderRadius: 16,
-        marginBottom: 30, // Biraz kısalttım listeye yer kalsın
-        borderWidth: 0.5,
-        borderColor: isDarkMode ? theme.border : '#ffd89dff',
+        backgroundColor: theme.card,
+        padding: 18,
+        borderRadius: 20,
+        marginBottom: 16,
       }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ fontSize: 14, color: theme.secondaryText, fontWeight: '500', flex: 1 }}>
+          <Text style={{ fontSize: 14, color: theme.secondaryText, fontFamily: 'PoppinsMedium', flex: 1 }}>
             {loadingSteps[currentStep]}
           </Text>
-          <Text style={{ fontSize: 18, color: '#ff7043', fontFamily: 'TextExtraBold' }}>
+          <Text style={{ fontSize: 18, color: '#ff7043', fontFamily: 'PoppinsExtraBold' }}>
             %{percent}
           </Text>
         </View>
 
-        <View style={{ width: '100%', height: 12, backgroundColor: '#ffedd5', borderRadius: 6, overflow: 'hidden' }}>
+        <View style={{ width: '100%', height: 10, backgroundColor: isDarkMode ? '#2a2a2a' : '#e5e5e5', borderRadius: 5, overflow: 'hidden' }}>
           <Animated.View
             style={{
               height: '100%',
               backgroundColor: '#ff7043',
               width: widthInterpolate,
-              borderRadius: 6
+              borderRadius: 5
             }}
           />
         </View>
       </View>
 
-      {/* 3. Malzemeler (Liste Görünümü) */}
-      <View style={{ width: '100%', alignItems: 'center', flex: 1, maxHeight: 300 }}>
+      {/* 3. Malzemeler Kartı */}
+      <View style={{ width: '100%', flex: 1 }}>
         {isRandom ? (
-          <View style={{ alignItems: 'center', marginTop: 20 }}>
+          <View style={{
+            width: '100%',
+            backgroundColor: theme.card,
+            borderRadius: 20,
+            padding: 24,
+            alignItems: 'center',
+          }}>
             <View style={{
-              width: 80,
-              height: 80,
-              borderRadius: 40,
-              backgroundColor: '#fff7ed',
+              width: 64,
+              height: 64,
+              borderRadius: 20,
+              backgroundColor: 'rgba(255, 112, 67, 0.14)',
               justifyContent: 'center',
               alignItems: 'center',
-              marginBottom: 16,
-              borderWidth: 1,
-              borderColor: '#ffd89dff'
+              marginBottom: 14,
             }}>
-              <FontAwesome5 name="dice" size={32} color="#ff7043" />
+              <FontAwesome5 name="dice" size={28} color="#ff7043" />
             </View>
-            <Text style={styles.loadingHighlightText}>{getRandomRecipeText().toUpperCase()}</Text>
-            <Text style={{ color: theme.secondaryText, fontSize: 13, textAlign: 'center' }}>Sizin için en uygun lezzeti seçiyoruz...</Text>
+            <Text style={[styles.loadingHighlightText, { color: theme.text }]}>{getRandomRecipeText().toUpperCase()}</Text>
+            <Text style={{ color: theme.secondaryText, fontFamily: 'PoppinsRegular', fontSize: 13, textAlign: 'center' }}>
+              Sizin için en uygun lezzeti seçiyoruz...
+            </Text>
           </View>
         ) : (
-          <View style={{ width: '100%', flex: 1 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-              <FontAwesome5 name="shopping-basket" size={16} color={theme.text} style={{ marginRight: 8 }} />
-              <Text style={[styles.loadingListTitle, { color: theme.text, marginLeft: 0 }]}>Seçilen Malzemeler ({malzemeler?.length || 0})</Text>
+          <View style={{
+            width: '100%',
+            backgroundColor: theme.card,
+            borderRadius: 20,
+            padding: 18,
+            maxHeight: 230,
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 10,
+                  backgroundColor: 'rgba(255, 112, 67, 0.14)',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginRight: 10,
+                }}>
+                  <FontAwesome5 name="shopping-basket" size={13} color="#ff7043" />
+                </View>
+                <Text style={{ fontSize: 15, fontFamily: 'PoppinsBold', color: theme.text }}>
+                  Seçilen Malzemeler
+                </Text>
+              </View>
+              <View style={{
+                backgroundColor: 'rgba(255, 112, 67, 0.14)',
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+                borderRadius: 10,
+              }}>
+                <Text style={{ fontSize: 12, fontFamily: 'PoppinsBold', color: '#ff7043' }}>
+                  {malzemeler?.length || 0} Malzeme
+                </Text>
+              </View>
             </View>
 
             <ScrollView
               style={{ width: '100%' }}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 20 }}
+              contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingBottom: 4 }}
             >
               {malzemeler && malzemeler.map((malzeme, index) => (
                 <View
@@ -454,36 +488,42 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    backgroundColor: theme.card,
-                    paddingHorizontal: 20,
-                    paddingVertical: 14,
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: theme.border,
-                    marginBottom: 10,
-                    width: '100%'
+                    backgroundColor: isDarkMode ? '#262626' : '#ffffff',
+                    paddingHorizontal: 13,
+                    paddingVertical: 9,
+                    borderRadius: 13,
                   }}
                 >
                   <View style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: 12,
-                    backgroundColor: '#f0fdf4',
+                    width: 18,
+                    height: 18,
+                    borderRadius: 9,
+                    backgroundColor: 'rgba(255, 112, 67, 0.15)',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    marginRight: 12
+                    marginRight: 8,
                   }}>
-                    <FontAwesome5 name="check" size={10} color="#10b981" />
+                    <FontAwesome5 name="check" size={9} color="#ff7043" />
                   </View>
-                  <Text style={{ color: theme.text, fontSize: 15, fontFamily: 'TextBold', flex: 1 }}>{malzeme}</Text>
+                  <Text style={{ color: theme.text, fontSize: 14, fontFamily: 'PoppinsSemiBold' }}>{malzeme}</Text>
                 </View>
               ))}
             </ScrollView>
 
             {mealTypeText ? (
-              <View style={[styles.loadingPreferenceBox, { marginTop: 10, backgroundColor: '#f0f9ff', borderColor: '#bae6fd', borderWidth: 1 }]}>
-                <FontAwesome5 name="info-circle" size={14} color="#0ea5e9" style={{ marginRight: 8 }} />
-                <Text style={[styles.loadingPreferenceText, { color: '#0369a1' }]}>{mealTypeText}</Text>
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: isDarkMode ? '#262626' : '#ffffff',
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                borderRadius: 12,
+                marginTop: 12,
+              }}>
+                <FontAwesome5 name="sliders-h" size={12} color="#ff7043" style={{ marginRight: 8 }} />
+                <Text style={{ color: theme.secondaryText, fontFamily: 'PoppinsMedium', fontSize: 12, flex: 1 }}>
+                  {mealTypeText}
+                </Text>
               </View>
             ) : null}
           </View>
@@ -491,12 +531,12 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
       </View>
 
       {/* 4. Footer ve Tahmini Süre (En Altta) */}
-      <View style={{ alignItems: 'center', width: '100%', marginTop: 'auto', marginBottom: 30 }}>
-        <View style={[styles.timeBadge, { marginBottom: 16, backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border, paddingHorizontal: 26, paddingVertical: 12 }]}>
-          <FontAwesome5 name="hourglass-half" size={14} color={theme.secondaryText} />
-          <Text style={[styles.timeText, { fontSize: 14, color: theme.secondaryText }]}>Bu işlem yaklaşık 10 saniye sürer</Text>
+      <View style={{ alignItems: 'center', width: '100%', marginTop: 'auto', marginBottom: 16 }}>
+        <View style={[styles.timeBadge, { marginBottom: 12, backgroundColor: theme.card, borderWidth: 0, paddingHorizontal: 22, paddingVertical: 11 }]}>
+          <FontAwesome5 name="hourglass-half" size={13} color={theme.secondaryText} />
+          <Text style={[styles.timeText, { fontSize: 13, color: theme.secondaryText }]}>Bu işlem yaklaşık 10 saniye sürer</Text>
         </View>
-        <Text style={[styles.aiFooterText, { color: theme.secondaryText, opacity: 0.7, marginBottom: 10 }]}>Gemini AI ile güçlendirilmiştir</Text>
+        <Text style={[styles.aiFooterText, { color: theme.secondaryText, fontFamily: 'PoppinsRegular', opacity: 0.7, marginBottom: 4 }]}>Gemini AI ile güçlendirilmiştir</Text>
       </View>
 
     </View>
@@ -511,7 +551,7 @@ function parseInlineBold(text, baseStyle) {
       {parts.map((part, index) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           return (
-            <Text key={index} style={{ fontFamily: 'TextBold' }}>
+            <Text key={index} style={{ fontFamily: 'PoppinsBold' }}>
               {part.substring(2, part.length - 2)}
             </Text>
           );
@@ -595,7 +635,21 @@ function renderFormattedText(text, theme, isDarkMode) {
           </View>
           <View style={{ flex: 1 }}>
             {(() => {
-              const stepTextRaw = line.replace(/^\d+\.\s*/, '').replace(/\[Şefin Tavsiyesi:.*?\]/, '').trim();
+              const stepBody = line.replace(/^\d+\.\s*/, '');
+              let tip = null;
+              let stepTextRaw = stepBody;
+
+              const markerRegex = /(\[|\*\*)?\s*Şefin Tavsiyesi:/i;
+              const match = stepBody.match(markerRegex);
+              if (match) {
+                const markerIndex = match.index;
+                stepTextRaw = stepBody.substring(0, markerIndex).trim();
+                const rawTip = stepBody.substring(markerIndex);
+                tip = rawTip
+                  .replace(/^(\[|\*\*)?\s*Şefin Tavsiyesi:?\s*(\*\*)?\s*/i, '')
+                  .replace(/(\]|\*\*)\s*$/, '')
+                  .trim();
+              }
 
               // Daha kapsamlı regex: Parantezli veya yıldızlı kullanımları yakalar
               const termRegex = /(\(?\*\*Temel Mutfak Terimi:?\s*(.*?)\*\*\)?|\(Temel Mutfak Terimi:?\s*(.*?)\)|Temel Mutfak Terimi:?\s*(.*))/i;
@@ -625,25 +679,19 @@ function renderFormattedText(text, theme, isDarkMode) {
                       <Text style={[styles.termText, { color: isDarkMode ? '#7dd3fc' : '#075985' }]}>{termContent}</Text>
                     </View>
                   )}
+                  {tip && (
+                    <View style={[styles.chefTipContainer, { backgroundColor: isDarkMode ? '#f59e0b15' : '#fff7ed' }]}>
+                      <View style={styles.chefTipHeader}>
+                        <MaterialCommunityIcons name="chef-hat" size={14} color="#f59e0b" style={{ marginRight: 8 }} />
+                        <Text style={[styles.chefTipTitle, { color: isDarkMode ? '#fbbf24' : '#9a3412' }]}>Şefin Notu</Text>
+                      </View>
+                      <Text style={[styles.chefTipText, { color: isDarkMode ? '#fcd34d' : '#9a3412' }]}>
+                        {tip}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               );
-            })()}
-            {(() => {
-              const match = line.match(/\[Şefin Tavsiyesi:\s*(.*?)\]/);
-              if (match) {
-                return (
-                  <View style={{ marginTop: 10, backgroundColor: isDarkMode ? '#f59e0b15' : '#fffbeb', padding: 12, borderRadius: 12, borderWidth: 1, borderColor: isDarkMode ? '#f59e0b40' : '#fef3c7' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                      <FontAwesome5 name="lightbulb" size={14} color="#f59e0b" style={{ marginRight: 8 }} />
-                      <Text style={{ color: isDarkMode ? '#fbbf24' : '#92400e', fontFamily: 'TextBold', fontSize: 13 }}>Şefin Notu</Text>
-                    </View>
-                    <Text style={{ color: isDarkMode ? '#fcd34d' : '#b45309', fontFamily: 'TextRegular', fontSize: 13, lineHeight: 20 }}>
-                      {match[1]}
-                    </Text>
-                  </View>
-                );
-              }
-              return null;
             })()}
           </View>
         </View>
@@ -652,10 +700,8 @@ function renderFormattedText(text, theme, isDarkMode) {
 
     // Tire ile başlayan liste öğeleri
     if (/^-/.test(line.trim())) {
-      bulletCounter++;
-      const isAlt = bulletCounter % 2 !== 0;
       return (
-        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: theme.card, borderBottomColor: theme.border }, isAlt && [styles.ingredientRowAlt, { backgroundColor: isDarkMode ? theme.background : '#f3f5f7ff' }]]}>
+        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
           <View style={styles.ingredientIconContainer}>
             <FontAwesome5 name="check" size={10} color="#ff7043" />
           </View>
@@ -1013,7 +1059,7 @@ const RecipeDetail = ({ route, navigation }) => {
                 </View>
               </View>
             ) : (
-              <View style={[styles.recipeImage, { backgroundColor: isDarkMode ? theme.card : '#f1f5f9', justifyContent: 'center', alignItems: 'center' }]}>
+              <View style={[styles.recipeImage, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', justifyContent: 'center', alignItems: 'center' }]}>
                 {imageLoading && <ActivityIndicator color="#ff7043" size="large" />}
               </View>
             )}
@@ -1036,20 +1082,20 @@ const RecipeDetail = ({ route, navigation }) => {
           /* Resim Yoksa Gözükecek Basit Header */
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 60, marginBottom: 10 }}>
             <TouchableOpacity
-              style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f1f5f9', borderColor: theme.border, borderWidth: 1 }]}
+              style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: theme.border, borderWidth: 0 }]}
               onPress={() => navigation.goBack()}
             >
               <FontAwesome5 name="arrow-left" size={18} color={theme.text} />
             </TouchableOpacity>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <TouchableOpacity
-                style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f1f5f9', borderColor: theme.border, borderWidth: 1 }]}
+                style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: theme.border, borderWidth: 0 }]}
                 onPress={shareRecipe}
               >
                 <Octicons name="share" size={18} color={theme.text} />
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f1f5f9', borderColor: theme.border, borderWidth: 1 }]}
+                style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: theme.border, borderWidth: 0 }]}
                 onPress={toggleSaveRecipe}
               >
                 <FontAwesome5 name="bookmark" size={18} color={isSaved ? "#ff7043" : theme.text} solid={isSaved} />
@@ -1086,17 +1132,17 @@ const RecipeDetail = ({ route, navigation }) => {
                   const meta = extractMetadata(tarif.description);
                   return (
                     <View style={styles.metaRow}>
-                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f8fafc', borderColor: isDarkMode ? theme.border : '#e2e8f0' }]}>
+                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
                         <FontAwesome5 name="clock" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
                         <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Süre</Text>
                         <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.time}</Text>
                       </View>
-                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f8fafc', borderColor: isDarkMode ? theme.border : '#e2e8f0' }]}>
+                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
                         <FontAwesome5 name="chart-bar" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
                         <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Zorluk</Text>
                         <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.difficulty}</Text>
                       </View>
-                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f8fafc', borderColor: isDarkMode ? theme.border : '#e2e8f0' }]}>
+                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
                         <FontAwesome5 name="fire-alt" size={20} color="#ff7043" style={{ marginBottom: 6 }} />
                         <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Kalori</Text>
                         <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.calories}</Text>
@@ -1147,14 +1193,14 @@ const styles = StyleSheet.create({
   },
   loadingTitle: {
     fontSize: 24,
-    fontFamily: 'TextBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsBold',
+    color: '#262626',
     marginBottom: 8,
     textAlign: 'center',
   },
   loadingSubtitle: {
     fontSize: 16,
-    color: '#64748b',
+    color: '#737373',
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 20,
@@ -1179,8 +1225,8 @@ const styles = StyleSheet.create({
   },
   loadingListTitle: {
     fontSize: 16,
-    fontFamily: 'TextBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsBold',
+    color: '#262626',
     marginLeft: 8,
   },
   loadingIngredientsList: {
@@ -1203,20 +1249,20 @@ const styles = StyleSheet.create({
   },
   loadingIngredientText: {
     fontSize: 16,
-    color: '#334155',
-    fontFamily: 'TextNormal',
+    color: '#383838',
+    fontFamily: 'PoppinsRegular',
   },
   aiFooter: {
     marginTop: 24,
     alignItems: 'center',
     paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
+    borderWidth: 0,
+    borderTopColor: '#eeeeee',
     width: '100%',
   },
   aiFooterText: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: '#a3a3a3',
     fontStyle: 'italic',
     marginBottom: 8,
   },
@@ -1227,26 +1273,26 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: '#fed7aa',
   },
   timeText: {
     fontSize: 13,
     color: '#c2410c',
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginLeft: 6,
   },
   loadingPreferenceBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#f5f5f5',
     padding: 10,
     borderRadius: 10,
     width: '100%',
   },
   loadingPreferenceText: {
     fontSize: 13,
-    color: '#64748b',
+    color: '#737373',
     flex: 1,
   },
   noImageHeader: {
@@ -1264,20 +1310,20 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#eeeeee',
     justifyContent: 'center',
     alignItems: 'center',
   },
   loadingHighlightText: {
     fontSize: 18,
-    fontFamily: 'TextExtraBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsExtraBold',
+    color: '#262626',
     textAlign: 'center',
     marginBottom: 8,
   },
   loadingNote: {
     fontSize: 14,
-    color: '#94a3b8',
+    color: '#a3a3a3',
     fontStyle: 'italic',
     textAlign: 'center',
   },
@@ -1313,8 +1359,8 @@ const styles = StyleSheet.create({
   },
   recipeName: {
     fontSize: 28,
-    fontFamily: 'TextExtraBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsExtraBold',
+    color: '#262626',
     marginBottom: 12,
   },
   rightSideContainer: {
@@ -1346,7 +1392,7 @@ const styles = StyleSheet.create({
   ingredientsText: {
     fontSize: 14,
     color: '#ff7043',
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginLeft: 6,
   },
   recipeCard: {
@@ -1361,7 +1407,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 16,
     paddingBottom: 8,
-    borderBottomWidth: 2,
+    borderWidth: 0,
     borderBottomColor: 'rgba(255, 112, 67, 0.2)',
   },
 
@@ -1380,14 +1426,14 @@ const styles = StyleSheet.create({
   imageCaption: {
     color: '#fff',
     fontSize: 10,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     textAlign: 'center',
     opacity: 0.7,
   },
   imageCredit: {
     color: '#fff',
     fontSize: 10,
-    fontFamily: 'TextRegular',
+    fontFamily: 'PoppinsRegular',
     textAlign: 'center',
   },
 
@@ -1396,8 +1442,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'TextBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsBold',
+    color: '#262626',
   },
   stepContainer: {
     flexDirection: 'row',
@@ -1430,14 +1476,14 @@ const styles = StyleSheet.create({
   },
   stepNumberText: {
     fontSize: 14,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     color: '#fff',
   },
   stepText: {
     flex: 1,
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 24,
     paddingTop: 2,
   },
@@ -1447,8 +1493,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderWidth: 0,
+    borderBottomColor: '#eeeeee',
   },
   ingredientRowAlt: {
     backgroundColor: '#f3f5f7ff',
@@ -1466,7 +1512,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2a3340',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 22,
   },
   bulletContainer: {
@@ -1487,13 +1533,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 24,
   },
   normalText: {
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 24,
     marginBottom: 8,
   },
@@ -1510,7 +1556,7 @@ const styles = StyleSheet.create({
   refreshButtonText: {
     color: '#ff7043',
     fontSize: 16,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
 
   // Resim Stilleri
@@ -1542,14 +1588,14 @@ const styles = StyleSheet.create({
   imageCaption: {
     color: '#fff',
     fontSize: 10,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     textAlign: 'center',
     opacity: 0.7,
   },
   imageCredit: {
     color: '#fff',
     fontSize: 10,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     textAlign: 'center',
   },
   topGradient: {
@@ -1575,7 +1621,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   startButton: {
@@ -1614,8 +1660,8 @@ const styles = StyleSheet.create({
     zIndex: 100,
     justifyContent: 'flex-end',
     paddingBottom: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#e2e8f0',
+    borderWidth: 0,
+    borderBottomColor: '#e5e5e5',
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
@@ -1636,15 +1682,15 @@ const styles = StyleSheet.create({
   },
   stickyHeaderTitle: {
     fontSize: 18,
-    fontFamily: 'TextBold',
-    color: '#1e293b',
+    fontFamily: 'PoppinsBold',
+    color: '#262626',
     flex: 1,
     textAlign: 'center',
   },
   startButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   voiceButton: {
     flexDirection: 'row',
@@ -1661,20 +1707,20 @@ const styles = StyleSheet.create({
   voiceButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   ingredientChip: {
     backgroundColor: 'rgba(255, 112, 67, 0.15)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: 'rgba(255, 112, 67, 0.2)',
   },
   ingredientChipText: {
     color: '#d84315',
     fontSize: 14,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   termBox: {
     marginTop: 12,
@@ -1684,7 +1730,7 @@ const styles = StyleSheet.create({
   },
   termTitle: {
     fontSize: 12,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     color: '#0369a1',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -1692,8 +1738,30 @@ const styles = StyleSheet.create({
   termText: {
     fontSize: 13,
     color: '#075985',
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     lineHeight: 18,
+  },
+  chefTipContainer: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: '#fff7ed',
+    borderRadius: 16,
+  },
+  chefTipHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  chefTipTitle: {
+    fontSize: 15,
+    fontFamily: 'PoppinsBold',
+    color: '#262626',
+  },
+  chefTipText: {
+    fontSize: 15,
+    fontFamily: 'PoppinsRegular',
+    color: '#2a3340ff',
+    lineHeight: 24,
   },
   toastContainer: {
     position: 'absolute',
@@ -1729,7 +1797,7 @@ const styles = StyleSheet.create({
   toastText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'TextExtraBold',
+    fontFamily: 'PoppinsExtraBold',
   },
   metaContainer: {
     marginBottom: 24,
@@ -1746,18 +1814,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 4,
-    borderWidth: 0.5,
+    borderWidth: 0,
   },
   metaLabel: {
     fontSize: 12,
-    fontFamily: 'TextRegular',
+    fontFamily: 'PoppinsRegular',
     textAlign: 'center',
   },
   metaValue: {
     fontSize: 13,
     textAlign: 'center',
     marginTop: 2,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
 });
 

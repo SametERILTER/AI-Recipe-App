@@ -67,18 +67,18 @@ const styles = StyleSheet.create({
     container: { flex: 1, paddingBottom: 100 },
     header: { flexDirection: 'row', alignItems: 'center', padding: 20, paddingTop: 50 },
     backButton: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 5, elevation: 1 },
-    headerTitle: { fontSize: 22, fontFamily: 'TextExtraBold', marginLeft: 15 },
+    headerTitle: { fontSize: 22, fontFamily: 'PoppinsExtraBold', marginLeft: 15 },
     content: { padding: 20 },
     contactCard: { padding: 30, borderRadius: 24, alignItems: 'center', marginBottom: 30 },
-    contactTitle: { fontSize: 20, fontFamily: 'TextExtraBold', color: '#fff', marginTop: 15 },
+    contactTitle: { fontSize: 20, fontFamily: 'PoppinsExtraBold', color: '#fff', marginTop: 15 },
     contactSubtitle: { fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: 5, textAlign: 'center' },
     emailButton: { marginTop: 20, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12 },
-    emailText: { fontFamily: 'TextBold' },
-    faqHeader: { fontSize: 18, fontFamily: 'TextExtraBold', marginBottom: 15 },
-    faqCard: { padding: 20, borderRadius: 20, marginBottom: 15, borderWidth: 1 },
+    emailText: { fontFamily: 'PoppinsBold' },
+    faqHeader: { fontSize: 18, fontFamily: 'PoppinsExtraBold', marginBottom: 15 },
+    faqCard: { padding: 20, borderRadius: 20, marginBottom: 15, borderWidth: 0 },
     questionRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-    questionText: { fontSize: 15, fontFamily: 'TextBold', marginLeft: 10, flex: 1 },
-    answerText: { fontSize: 14, fontFamily: 'TextNormal', lineHeight: 22 }
+    questionText: { fontSize: 15, fontFamily: 'PoppinsBold', marginLeft: 10, flex: 1 },
+    answerText: { fontSize: 14, fontFamily: 'PoppinsRegular', lineHeight: 22 }
 });
 
 export default HelpCenterScreen;

@@ -20,6 +20,55 @@ import { useTheme } from '../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
+const categoriesData = (() => {
+  if (!recipesData.tarifler) return [];
+  const counts = {};
+  recipesData.tarifler.forEach(r => {
+    counts[r.kategori] = (counts[r.kategori] || 0) + 1;
+  });
+  return Object.keys(counts).sort().map(name => ({
+    name,
+    count: counts[name]
+  }));
+})();
+
+const recipesByCategory = (() => {
+  const map = {};
+  if (recipesData.tarifler) {
+    recipesData.tarifler.forEach(r => {
+      if (!map[r.kategori]) map[r.kategori] = [];
+      map[r.kategori].push(r);
+    });
+  }
+  return map;
+})();
+
+const getCategoryIcon = (category) => {
+  switch (category.toLocaleLowerCase('tr-TR')) {
+    case 'ana yemek': return { lib: 'FontAwesome5', name: 'utensils' };
+    case 'börek': return { lib: 'FontAwesome5', name: 'bread-slice' };
+    case 'kahvaltı': return { lib: 'MaterialCommunityIcons', name: 'egg-fried' };
+    case 'çorba': return { lib: 'FontAwesome5', name: 'mug-hot' };
+    case 'tatlı': return { lib: 'MaterialCommunityIcons', name: 'ice-cream' };
+    case 'pilav': return { lib: 'FontAwesome6', name: 'bowl-rice' };
+    case 'ara sıcak': return { lib: 'FontAwesome5', name: 'fire-alt' };
+    case 'meze': return { lib: 'FontAwesome5', name: 'leaf' };
+    case 'zeytinyağlı': return { lib: 'FontAwesome5', name: 'seedling' };
+    default: return { lib: 'FontAwesome5', name: 'utensil-spoon' };
+  }
+};
+
+const renderIcon = (cat) => {
+  const icon = getCategoryIcon(cat);
+  if (icon.lib === 'FontAwesome5') {
+    return <FontAwesome5 name={icon.name} size={24} color="#ff7043" />;
+  }
+  if (icon.lib === 'FontAwesome6') {
+    return <FontAwesome6 name={icon.name} size={24} color="#ff7043" />;
+  }
+  return <MaterialCommunityIcons name={icon.name} size={26} color="#ff7043" />;
+};
+
 const SearchRecipeScreen = () => {
   const { isDarkMode, theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,43 +78,7 @@ const SearchRecipeScreen = () => {
   const [dailyRecipe, setDailyRecipe] = useState(null);
   const navigation = useNavigation();
 
-  const getCategoryIcon = (category) => {
-    switch (category.toLocaleLowerCase('tr-TR')) {
-      case 'ana yemek': return { lib: 'FontAwesome5', name: 'utensils' };
-      case 'börek': return { lib: 'FontAwesome5', name: 'bread-slice' };
-      case 'kahvaltı': return { lib: 'MaterialCommunityIcons', name: 'egg-fried' };
-      case 'çorba': return { lib: 'FontAwesome5', name: 'mug-hot' };
-      case 'tatlı': return { lib: 'MaterialCommunityIcons', name: 'ice-cream' };
-      case 'pilav': return { lib: 'FontAwesome6', name: 'bowl-rice' };
-      case 'ara sıcak': return { lib: 'FontAwesome5', name: 'fire-alt' };
-      case 'meze': return { lib: 'FontAwesome5', name: 'leaf' };
-      case 'zeytinyağlı': return { lib: 'FontAwesome5', name: 'seedling' };
-      default: return { lib: 'FontAwesome5', name: 'utensil-spoon' };
-    }
-  };
-
-  const renderIcon = (cat) => {
-    const icon = getCategoryIcon(cat);
-    if (icon.lib === 'FontAwesome5') {
-      return <FontAwesome5 name={icon.name} size={24} color="#ff7043" />;
-    }
-    if (icon.lib === 'FontAwesome6') {
-      return <FontAwesome6 name={icon.name} size={24} color="#ff7043" />;
-    }
-    return <MaterialCommunityIcons name={icon.name} size={26} color="#ff7043" />;
-  };
-
-  const categories = React.useMemo(() => {
-    if (!recipesData.tarifler) return [];
-    const counts = {};
-    recipesData.tarifler.forEach(r => {
-      counts[r.kategori] = (counts[r.kategori] || 0) + 1;
-    });
-    return Object.keys(counts).sort().map(name => ({
-      name,
-      count: counts[name]
-    }));
-  }, []);
+  const categories = categoriesData;
 
   const getDifficultyStars = (difficulty) => {
     let starCount = 1;
@@ -77,7 +90,7 @@ const SearchRecipeScreen = () => {
         <Text style={styles.difficultyLabelText}>Zorluk: </Text>
         <View style={styles.starContainer}>
           {[...Array(starCount)].map((_, i) => (
-            <FontAwesome5 key={i} name="star" size={10} color="#64748b" solid style={{ marginRight: 2 }} />
+            <FontAwesome5 key={i} name="star" size={10} color="#737373" solid style={{ marginRight: 2 }} />
           ))}
         </View>
       </View>
@@ -129,6 +142,7 @@ const SearchRecipeScreen = () => {
 
 **Hazırlama Süresi:** ${recipe.sure}
 **Zorluk Seviyesi:** ${recipe.zorluk}
+**Kalori:** ${recipe.kalori || '350 kcal'}
 
 **Malzemeler:**
 ${recipe.malzemeler.map(malzeme => `- ${malzeme}`).join('\n')}
@@ -140,6 +154,7 @@ ${recipe.hazirlanis.map((adim, index) => `${index + 1}. ${adim}`).join('\n')}
 - ${recipe.sure} sürede hazırlanır
 - ${recipe.kisi} kişilik tarif
 - Zorluk seviyesi: ${recipe.zorluk}
+- Kalori: ${recipe.kalori || '350 kcal'}
 - Kategori: ${recipe.kategori}`;
 
     return {
@@ -214,7 +229,7 @@ ${recipe.hazirlanis.map((adim, index) => `${index + 1}. ${adim}`).join('\n')}
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={isDarkMode ? theme.background : "#f8fafc"} />
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={isDarkMode ? theme.background : "#f5f5f5"} />
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: isDarkMode ? theme.background : "#fff" }]}>
@@ -357,7 +372,7 @@ ${recipe.hazirlanis.map((adim, index) => `${index + 1}. ${adim}`).join('\n')}
                   <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    data={recipesData.tarifler.filter(r => r.kategori === cat.name)}
+                    data={recipesByCategory[cat.name] || []}
                     renderItem={({ item }) => renderCategoryCard(item)}
                     keyExtractor={item => item.id.toString()}
                     contentContainerStyle={{ paddingHorizontal: 24 }}
@@ -376,7 +391,7 @@ ${recipe.hazirlanis.map((adim, index) => `${index + 1}. ${adim}`).join('\n')}
 
             {searchResults.length === 0 && !isSearching ? (
               <View style={styles.emptyState}>
-                <FontAwesome5 name="search" size={40} color="#e2e8f0" />
+                <FontAwesome5 name="search" size={40} color="#e5e5e5" />
                 <Text style={styles.emptyText}>Maalesef tarif bulunamadı.</Text>
               </View>
             ) : (
@@ -406,11 +421,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'TextExtraBold',
+    fontFamily: 'PoppinsExtraBold',
   },
   subtitle: {
     fontSize: 14,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
     marginTop: 4,
   },
   scrollContainer: {
@@ -425,7 +440,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 16,
     height: 52,
-    borderWidth: 1,
+    borderWidth: 0,
   },
   inputWrapperFocused: {
     borderColor: '#ff7043',
@@ -435,7 +450,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 12,
     fontSize: 16,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
   },
   clearBtn: {
     padding: 4,
@@ -451,7 +466,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   dailyCard: {
     height: 220,
@@ -485,7 +500,7 @@ const styles = StyleSheet.create({
   dailyBadgeText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'PoppinsBold',
   },
   difficultyBadge: {
     flexDirection: 'row',
@@ -498,11 +513,11 @@ const styles = StyleSheet.create({
   difficultyText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'PoppinsBold',
   },
   dailyTitle: {
     fontSize: 26,
-    fontFamily: 'TextExtraBold',
+    fontFamily: 'PoppinsExtraBold',
     color: '#fff',
     marginBottom: 16,
     lineHeight: 32,
@@ -523,7 +538,7 @@ const styles = StyleSheet.create({
   dailyMetaText: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: 'PoppinsSemiBold',
   },
   dailyButton: {
     flexDirection: 'row',
@@ -537,7 +552,7 @@ const styles = StyleSheet.create({
   },
   dailyButtonText: {
     color: '#ff7043',
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     fontSize: 14,
   },
   dailyDecorIcon: {
@@ -553,7 +568,7 @@ const styles = StyleSheet.create({
   resultsTitle: {
     fontSize: 16,
     marginBottom: 16,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
   },
   recipeCard: {
     padding: 16,
@@ -567,7 +582,7 @@ const styles = StyleSheet.create({
   },
   recipeName: {
     fontSize: 18,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginBottom: 8,
   },
   metaContainer: {
@@ -582,7 +597,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 13,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
   },
   difficultyContainer: {
     flexDirection: 'row',
@@ -591,7 +606,7 @@ const styles = StyleSheet.create({
   },
   difficultyLabelText: {
     fontSize: 12,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
   },
   starContainer: {
     flexDirection: 'row',
@@ -606,7 +621,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 0,
   },
   emptyState: {
     alignItems: 'center',
@@ -622,14 +637,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 16,
     justifyContent: 'space-between',
-    borderWidth: 1,
+    borderWidth: 0,
   },
   catCardTop: {
     flex: 1,
   },
   catCardTitle: {
     fontSize: 15,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     lineHeight: 20,
   },
   catCardBottom: {
@@ -637,7 +652,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: 8,
-    borderTopWidth: 1,
+    borderWidth: 0,
   },
   catMetaRow: {
     flexDirection: 'row',
@@ -646,7 +661,7 @@ const styles = StyleSheet.create({
   },
   catMetaText: {
     fontSize: 11,
-    fontFamily: 'TextNormal'
+    fontFamily: 'PoppinsRegular'
   },
   quickCatSection: {
     marginTop: 24,
@@ -661,7 +676,7 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 24,
     paddingHorizontal: 16,
-    borderWidth: 1,
+    borderWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -683,12 +698,12 @@ const styles = StyleSheet.create({
   },
   quickCatText: {
     fontSize: 14,
-    fontFamily: 'TextBold',
+    fontFamily: 'PoppinsBold',
     marginBottom: 2,
   },
   quickCatCount: {
     fontSize: 11,
-    fontFamily: 'TextNormal',
+    fontFamily: 'PoppinsRegular',
   },
   quickCatArrow: {
     opacity: 0.5,
