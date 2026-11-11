@@ -146,16 +146,26 @@ const SettingsScreen = () => {
         },
     });
 
+    const fixedHeaderStyle = useAnimatedStyle(() => {
+        const opacity = interpolate(
+            scrollY.value,
+            [12, 42],
+            [0, 1],
+            Extrapolation.CLAMP
+        );
+        return { opacity };
+    });
+
     const centeredHeaderTitleStyle = useAnimatedStyle(() => {
         const opacity = interpolate(
             scrollY.value,
-            [30, 65],
+            [20, 50],
             [0, 1],
             Extrapolation.CLAMP
         );
         const translateY = interpolate(
             scrollY.value,
-            [30, 65],
+            [20, 50],
             [6, 0],
             Extrapolation.CLAMP
         );
@@ -168,13 +178,13 @@ const SettingsScreen = () => {
     const bigTitleStyle = useAnimatedStyle(() => {
         const opacity = interpolate(
             scrollY.value,
-            [0, 40],
+            [0, 32],
             [1, 0],
             Extrapolation.CLAMP
         );
         const translateY = interpolate(
             scrollY.value,
-            [0, 40],
+            [0, 32],
             [0, -10],
             Extrapolation.CLAMP
         );
@@ -189,14 +199,14 @@ const SettingsScreen = () => {
             <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
 
             {/* Sabit Header */}
-            <View style={[styles.fixedHeader, { backgroundColor: theme.background }]} pointerEvents="box-none">
+            <Animated.View style={[styles.fixedHeader, { backgroundColor: theme.background }, fixedHeaderStyle]} pointerEvents="none">
                 <Animated.Text
                     style={[styles.centeredHeaderTitle, { color: theme.text }, centeredHeaderTitleStyle]}
                     numberOfLines={1}
                 >
                     Ayarlar
                 </Animated.Text>
-            </View>
+            </Animated.View>
 
             <Animated.ScrollView
                 showsVerticalScrollIndicator={false}
@@ -351,7 +361,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingTop: 104,
+        paddingTop: 56,
         paddingBottom: 40,
     },
     fixedHeader: {
@@ -359,8 +369,8 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
         right: 0,
-        paddingTop: 50,
-        height: 98,
+        paddingTop: 44,
+        height: 90,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 24,
@@ -372,12 +382,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     bigTitleContainer: {
-        paddingTop: 4,
-        paddingBottom: 20,
+        paddingTop: 0,
+        paddingBottom: 14,
         paddingHorizontal: 4,
     },
     headerTitle: {
-        fontSize: 32,
+        fontSize: 28,
         fontFamily: 'PoppinsExtraBold',
     },
     section: {

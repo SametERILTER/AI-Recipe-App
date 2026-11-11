@@ -1,53 +1,36 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
+    SafeAreaView,
+    TouchableOpacity,
+    Linking,
+    Alert,
+} from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-
-const { width } = Dimensions.get('window');
 
 import { useTheme } from '../context/ThemeContext';
 
+const GITHUB_URL = 'https://github.com/SametERILTER';
+
 const AboutAppScreen = ({ navigation }) => {
     const { isDarkMode, theme } = useTheme();
-    const aiChef = {
-        icon: "robot",
-        title: "Yapay Zeka Şefi",
-        desc: "Elinizdeki malzemeleri seçin, yapay zeka size en uygun tarifi anında hazırlasın. Mutfaktaki en zeki yardımcınız!",
-        color: "#8b5cf6"
-    };
 
-    const features = [
-        {
-            icon: "calendar-day",
-            title: "Günün Menüsü",
-            desc: "Hergün özenle seçilmiş dengeli menüler.",
-            color: "#ff7043"
-        },
-        {
-            icon: "hand-paper",
-            title: "Temassız Pişirme",
-            desc: "Sensör teknolojisi ile eller kirlenmeden yönetim.",
-            color: "#6366f1"
-        },
-        {
-            icon: "music",
-            title: "Mutfak Radyosu",
-            desc: "Pişirme esnasında tematik müzik keyfi.",
-            color: "#f59e0b"
-        },
-        {
-            icon: "utensils",
-            title: "Binlerce Tarif",
-            desc: "Gelenekselden moderne dev şef arşivi.",
-            color: "#ec4899"
-        },
-        {
-            icon: "bookmark",
-            title: "Kendi Defterin",
-            desc: "Sevdiğin tariflerle kendi kitabını oluştur.",
-            color: "#10b981"
+    const handleOpenGithub = async () => {
+        try {
+            const supported = await Linking.canOpenURL(GITHUB_URL);
+            if (supported) {
+                await Linking.openURL(GITHUB_URL);
+            } else {
+                Alert.alert('Bağlantı Açılamadı', GITHUB_URL);
+            }
+        } catch (error) {
+            Alert.alert('Hata', 'Bağlantı açılırken bir sorun oluştu.');
         }
-    ];
+    };
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
@@ -56,63 +39,53 @@ const AboutAppScreen = ({ navigation }) => {
                     onPress={() => navigation.goBack()}
                     style={[styles.backButton, { backgroundColor: theme.card }]}
                 >
-                    <FontAwesome5 name="arrow-left" size={20} color={theme.text} />
+                    <FontAwesome5 name="arrow-left" size={18} color={theme.text} />
                 </TouchableOpacity>
-                <Text style={[styles.headerTitle, { color: theme.text }]}>Hakkımızda</Text>
+                <Text style={[styles.headerTitle, { color: theme.text }]}>Uygulama Hakkında</Text>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
                 <View style={styles.heroSection}>
                     <LinearGradient colors={['#ff7043', '#ff8a65']} style={styles.logoBadge}>
-                        <FontAwesome5 name="concierge-bell" size={35} color="#fff" />
+                        <FontAwesome5 name="utensils" size={28} color="#fff" />
                     </LinearGradient>
-                    <Text style={[styles.appName, { color: theme.text }]}>Mutfak Asistanı</Text>
-                    <Text style={[styles.appTagline, { color: theme.secondaryText }]}>Mutfaktaki teknolojik yardımcın</Text>
+                    <Text style={[styles.appName, { color: theme.text }]}>YemekTarif</Text>
+                    <Text style={[styles.appVersion, { color: theme.secondaryText }]}>Sürüm 1.0.0</Text>
                 </View>
 
-                {/* Simplified Featured AI Chef Section */}
-                <View style={styles.featuredSection}>
-                    <View style={[styles.aiCardSimple, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                        <View style={[styles.aiIconBox, { backgroundColor: aiChef.color + '15' }]}>
-                            <FontAwesome5 name="robot" size={28} color={aiChef.color} />
-                        </View>
-                        <View style={styles.aiContent}>
-                            <View style={styles.aiHeaderRow}>
-                                <Text style={[styles.aiTitleSimple, { color: theme.text }]}>{aiChef.title}</Text>
-                            </View>
-                            <Text style={[styles.aiDescSimple, { color: theme.text }]}>{aiChef.desc}</Text>
-                        </View>
-                    </View>
-                </View>
+                <Text style={[styles.sectionLabel, { color: isDarkMode ? '#ff7043' : '#525252' }]}>
+                    Geliştirici
+                </Text>
 
-                <Text style={[styles.sectionTitle, { color: theme.text }]}>Diğer Özellikler</Text>
-
-                <View style={styles.featuresList}>
-                    {features.map((feature, index) => (
-                        <View key={index} style={[styles.featureRow, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                            <View style={[styles.rowIconBox, { backgroundColor: feature.color + '15' }]}>
-                                <FontAwesome5 name={feature.icon} size={18} color={feature.color} />
-                            </View>
-                            <View style={styles.rowTextContainer}>
-                                <Text style={[styles.rowTitle, { color: theme.text }]}>{feature.title}</Text>
-                                <Text style={[styles.rowDesc, { color: theme.secondaryText }]}>{feature.desc}</Text>
-                            </View>
+                <View style={[styles.card, { backgroundColor: theme.card }]}>
+                    <View style={styles.devHeader}>
+                        <View style={[styles.devAvatar, { backgroundColor: isDarkMode ? '#2a2a2a' : '#fff3f0' }]}>
+                            <FontAwesome5 name="code" size={18} color="#ff7043" />
                         </View>
-                    ))}
-                </View>
-
-                <View style={[styles.infoBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                    <View style={styles.infoRow}>
-                        <MaterialCommunityIcons name="star-face" size={24} color="#ff7043" />
-                        <View style={styles.infoTextContainer}>
-                            <Text style={[styles.infoHeading, { color: theme.text }]}>Akıllı Mutfak</Text>
-                            <Text style={[styles.infoSubText, { color: theme.secondaryText }]}>Tariflerimiz modern algoritmalarla optimize edilir.</Text>
+                        <View style={styles.devInfo}>
+                            <Text style={[styles.devName, { color: theme.text }]}>Samet ERİLTER</Text>
+                            <Text style={[styles.devHandle, { color: theme.secondaryText }]}>@SametERILTER</Text>
                         </View>
                     </View>
-                </View>
 
-                <View style={styles.footer}>
-                    <Text style={[styles.versionText, { color: theme.secondaryText }]}>1.2.0 • 2024</Text>
+                    <View style={[styles.divider, { backgroundColor: theme.divider }]} />
+
+                    <TouchableOpacity
+                        style={[styles.githubButton, { backgroundColor: isDarkMode ? '#262626' : '#ffffff' }]}
+                        onPress={handleOpenGithub}
+                        activeOpacity={0.8}
+                    >
+                        <View style={[styles.githubIconBox, { backgroundColor: isDarkMode ? '#f5f5f5' : '#171717' }]}>
+                            <FontAwesome5 name="github" size={20} color={isDarkMode ? '#171717' : '#ffffff'} />
+                        </View>
+                        <View style={styles.githubTextContainer}>
+                            <Text style={[styles.githubTitle, { color: theme.text }]}>GitHub Profilim</Text>
+                            <Text style={styles.githubUrl} numberOfLines={1}>
+                                {GITHUB_URL}
+                            </Text>
+                        </View>
+                        <FontAwesome5 name="external-link-alt" size={14} color={theme.secondaryText} />
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -120,47 +93,123 @@ const AboutAppScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, paddingBottom: 100 },
-    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 15, paddingTop: 50 },
-    backButton: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 5, elevation: 1 },
-    headerTitle: { fontSize: 22, fontFamily: 'PoppinsExtraBold', marginLeft: 15 },
-    content: { paddingBottom: 40 },
-    heroSection: { alignItems: 'center', marginVertical: 20 },
-    logoBadge: { width: 64, height: 64, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-    appName: { fontSize: 24, fontFamily: 'PoppinsExtraBold' },
-    appTagline: { fontSize: 13, fontFamily: 'PoppinsRegular' },
-
-    featuredSection: { paddingHorizontal: 20, marginBottom: 25 },
-    aiCardSimple: {
-        padding: 24,
-        borderRadius: 28,
-        borderWidth: 0,
-        flexDirection: 'row',
-        alignItems: 'flex-start'
+    container: {
+        flex: 1,
     },
-    aiIconBox: { width: 56, height: 56, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
-    aiContent: { flex: 1, marginLeft: 16 },
-    aiHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
-    aiTitleSimple: { fontSize: 19, fontFamily: 'PoppinsExtraBold' },
-    aiDescSimple: { fontSize: 14, fontFamily: 'PoppinsRegular', lineHeight: 22 },
-
-    sectionTitle: { fontSize: 17, fontFamily: 'PoppinsExtraBold', marginBottom: 15, marginLeft: 20 },
-    featuresList: { paddingHorizontal: 20, gap: 10 },
-    featureRow: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 24, borderWidth: 0 },
-    rowIconBox: { width: 44, height: 44, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
-    rowTextContainer: { marginLeft: 14, flex: 1 },
-    rowTitle: { fontSize: 15, fontFamily: 'PoppinsExtraBold', marginBottom: 2 },
-    rowDesc: { fontSize: 12, fontFamily: 'PoppinsRegular' },
-
-    infoBox: { margin: 20, padding: 20, borderRadius: 24, borderWidth: 0 },
-    infoRow: { flexDirection: 'row', alignItems: 'center' },
-    infoTextContainer: { marginLeft: 15, flex: 1 },
-    infoHeading: { fontSize: 16, fontFamily: 'PoppinsBold' },
-    infoSubText: { fontSize: 13, fontFamily: 'PoppinsRegular', marginTop: 2 },
-
-    footer: { marginTop: 20, alignItems: 'center' },
-    footerText: { fontSize: 15, fontFamily: 'PoppinsExtraBold' },
-    versionText: { fontSize: 11, marginTop: 4 }
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 14,
+        paddingTop: 50,
+    },
+    backButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontFamily: 'PoppinsExtraBold',
+        marginLeft: 14,
+    },
+    content: {
+        paddingHorizontal: 20,
+        paddingTop: 12,
+        paddingBottom: 40,
+    },
+    heroSection: {
+        alignItems: 'center',
+        marginTop: 12,
+        marginBottom: 28,
+    },
+    logoBadge: {
+        width: 64,
+        height: 64,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    appName: {
+        fontSize: 22,
+        fontFamily: 'PoppinsExtraBold',
+    },
+    appVersion: {
+        fontSize: 13,
+        fontFamily: 'PoppinsRegular',
+        marginTop: 2,
+    },
+    sectionLabel: {
+        fontSize: 15,
+        fontFamily: 'PoppinsExtraBold',
+        marginBottom: 10,
+        marginLeft: 4,
+    },
+    card: {
+        borderRadius: 22,
+        padding: 16,
+        borderWidth: 0,
+    },
+    devHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    devAvatar: {
+        width: 46,
+        height: 46,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    devInfo: {
+        marginLeft: 14,
+        flex: 1,
+    },
+    devName: {
+        fontSize: 16,
+        fontFamily: 'PoppinsBold',
+    },
+    devHandle: {
+        fontSize: 13,
+        fontFamily: 'PoppinsRegular',
+        marginTop: 1,
+    },
+    divider: {
+        height: 1,
+        marginVertical: 14,
+    },
+    githubButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 12,
+        borderRadius: 16,
+        borderWidth: 0,
+    },
+    githubIconBox: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    githubTextContainer: {
+        flex: 1,
+        marginLeft: 12,
+        marginRight: 8,
+    },
+    githubTitle: {
+        fontSize: 14,
+        fontFamily: 'PoppinsBold',
+    },
+    githubUrl: {
+        fontSize: 12,
+        fontFamily: 'PoppinsRegular',
+        color: '#ff7043',
+        marginTop: 2,
+    },
 });
 
 export default AboutAppScreen;

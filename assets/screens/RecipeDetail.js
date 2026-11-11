@@ -2,14 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Animated,
+  Easing,
   Dimensions,
   TouchableOpacity,
   Alert,
-  Image,
   Share,
   Modal
 } from 'react-native';
@@ -19,7 +18,6 @@ import * as Speech from 'expo-speech';
 import LottieView from 'lottie-react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
-import { unsplashAPI } from '../config/unsplash';
 import { generateAIContent } from '../config/ai';
 import { useTheme } from '../context/ThemeContext';
 
@@ -44,6 +42,20 @@ function categorizeError(error) {
       type: 'quota',
       title: 'Günlük İstek Limiti Doldu',
       message: 'Yapay zeka servisinin günlük kullanım kotasına ulaşıldı. Lütfen daha sonra tekrar deneyin.',
+    };
+  }
+
+  if (
+    errStr.includes('503') ||
+    errStr.includes('high demand') ||
+    errStr.includes('overloaded') ||
+    errStr.includes('unavailable')
+  ) {
+    return {
+      error: true,
+      type: 'quota',
+      title: 'Sunucu Yoğunluğu',
+      message: 'Google Gemini sunucularında şu an aşırı yoğunluk yaşanıyor. Lütfen "Tekrar Dene" butonuna basarak yeniden deneyin.',
     };
   }
 
@@ -113,8 +125,6 @@ async function geminiRecipe(malzemeler, mealType, servingSize = 2, category = 'm
 SADECE aşağıdaki formatta tarifi ver. Başka HİÇBİR giriş cümlesi, açıklama veya "İşte tarifiniz" gibi ifadeler KULLANMA. Sadece formatı doldur:
 
 **Yemek Adı:** [Yemek adını yaz]
-
-**Resim Arama Kelimeleri:** [Bu yemek için en uygun resim arama kelimelerini İngilizce olarak yaz. Örnek: "pasta carbonara", "italian pasta dish", "creamy pasta" gibi. Sadece 2-3 kelime olsun.]
 
 **Hazırlama Süresi:** [Örn: 30 dk]
 **Zorluk Seviyesi:** [Örn: Kolay, Orta, Zor]
@@ -205,8 +215,6 @@ async function geminiRandomRecipe(mealTime, style, servingSize = 2) {
 SADECE aşağıdaki formatta tarifi ver.Başka HİÇBİR giriş cümlesi, açıklama veya "İşte tarifiniz" gibi ifadeler KULLANMA.Sadece formatı doldur:
 
 **Yemek Adı:** [Yemek adını yaz]
-
-**Resim Arama Kelimeleri:** [Bu yemek için en uygun resim arama kelimelerini İngilizce olarak yaz. Örnek: "pasta carbonara", "italian pasta dish", "creamy pasta" gibi. Sadece 2-3 kelime olsun.]
 
 **Hazırlama Süresi:** [Örn: 30 dk]
 **Zorluk Seviyesi:** [Örn: Kolay, Orta, Zor]
@@ -815,16 +823,272 @@ function extractMetadata(description, fallbackServingSize) {
   };
 }
 
-// Resim arama kelimelerini çıkaran fonksiyon
-function extractImageSearchTerms(description) {
-  const match = description.match(/\*\*\s*Resim Arama Kelimeleri\s*:\s*\*\*\s*(.*)/i) ||
-    description.match(/\*\*\s*Resim Arama Kelimeleri\s*:\s*(.*)/i);
-  if (match && match[1]) {
-    return match[1].trim();
-  }
-  // Eğer arama kelimeleri yoksa, tarif adını kullan
-  const recipeName = extractRecipeName(description);
-  return recipeName + ' food';
+function TopArrivalGlow({ triggerKey, isDarkMode }) {
+  const masterOpacity = useRef(new Animated.Value(0)).current;
+  const phaseAnim = useRef(new Animated.Value(0)).current;
+  const shimmerAnim = useRef(new Animated.Value(0)).current;
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    setVisible(true);
+    masterOpacity.setValue(0);
+    phaseAnim.setValue(0);
+    shimmerAnim.setValue(0);
+
+    const drift = Animated.loop(
+      Animated.sequence([
+        Animated.timing(phaseAnim, {
+          toValue: 1,
+          duration: 1350,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(phaseAnim, {
+          toValue: 0,
+          duration: 1350,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    const shimmerSweep = Animated.loop(
+      Animated.sequence([
+        Animated.timing(shimmerAnim, {
+          toValue: 1,
+          duration: 1700,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(shimmerAnim, {
+          toValue: 0,
+          duration: 1700,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    const fadeLifecycle = Animated.sequence([
+      Animated.timing(masterOpacity, {
+        toValue: 1,
+        duration: 450,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.delay(3200),
+      Animated.timing(masterOpacity, {
+        toValue: 0,
+        duration: 1500,
+        easing: Easing.inOut(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]);
+
+    drift.start();
+    shimmerSweep.start();
+    fadeLifecycle.start(({ finished }) => {
+      drift.stop();
+      shimmerSweep.stop();
+      if (finished) {
+        setVisible(false);
+      }
+    });
+
+    return () => {
+      drift.stop();
+      shimmerSweep.stop();
+      fadeLifecycle.stop();
+    };
+  }, [triggerKey]);
+
+  if (!visible) return null;
+
+  const leftWaveOpacity = phaseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.45, 1],
+  });
+
+  const rightWaveOpacity = phaseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0.45],
+  });
+
+  const leftDriftX = phaseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-width * 0.28, width * 0.18],
+  });
+
+  const rightDriftX = phaseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [width * 0.28, -width * 0.18],
+  });
+
+  const leftScaleX = phaseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.18],
+  });
+
+  const rightScaleX = phaseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1.18, 1],
+  });
+
+  const shimmerDriftX = shimmerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-width * 0.25, width * 0.25],
+  });
+
+  const shimmerOpacity = shimmerAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0.5, 0.95, 0.5],
+  });
+
+  const baseWashColors = isDarkMode
+    ? [
+        'rgba(255, 112, 67, 0.38)',
+        'rgba(255, 138, 80, 0.25)',
+        'rgba(255, 167, 38, 0.14)',
+        'rgba(255, 183, 77, 0.05)',
+        'rgba(255, 183, 77, 0.015)',
+        'rgba(255, 183, 77, 0)',
+      ]
+    : [
+        'rgba(255, 112, 67, 0.34)',
+        'rgba(255, 145, 77, 0.22)',
+        'rgba(255, 179, 71, 0.12)',
+        'rgba(255, 183, 77, 0.045)',
+        'rgba(255, 183, 77, 0.012)',
+        'rgba(255, 183, 77, 0)',
+      ];
+
+  const amberWaveColors = isDarkMode
+    ? [
+        'rgba(255, 179, 0, 0.48)',
+        'rgba(255, 145, 0, 0.26)',
+        'rgba(255, 152, 0, 0.10)',
+        'rgba(255, 152, 0, 0.02)',
+        'rgba(255, 152, 0, 0)',
+      ]
+    : [
+        'rgba(255, 171, 0, 0.46)',
+        'rgba(255, 145, 0, 0.25)',
+        'rgba(255, 183, 77, 0.10)',
+        'rgba(255, 183, 77, 0.02)',
+        'rgba(255, 183, 77, 0)',
+      ];
+
+  const coralWaveColors = isDarkMode
+    ? [
+        'rgba(255, 87, 34, 0.48)',
+        'rgba(255, 112, 67, 0.26)',
+        'rgba(255, 112, 67, 0.10)',
+        'rgba(255, 112, 67, 0.02)',
+        'rgba(255, 112, 67, 0)',
+      ]
+    : [
+        'rgba(255, 87, 34, 0.44)',
+        'rgba(255, 112, 67, 0.24)',
+        'rgba(255, 138, 101, 0.09)',
+        'rgba(255, 138, 101, 0.02)',
+        'rgba(255, 138, 101, 0)',
+      ];
+
+  const centerShimmerColors = isDarkMode
+    ? [
+        'rgba(255, 213, 79, 0.34)',
+        'rgba(255, 167, 38, 0.16)',
+        'rgba(255, 167, 38, 0.04)',
+        'rgba(255, 167, 38, 0)',
+      ]
+    : [
+        'rgba(255, 193, 7, 0.30)',
+        'rgba(255, 167, 38, 0.14)',
+        'rgba(255, 167, 38, 0.03)',
+        'rgba(255, 167, 38, 0)',
+      ];
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[
+        styles.topArrivalGlowContainer,
+        { opacity: masterOpacity }
+      ]}
+    >
+      {/* Dikey yumuşak temel sıcaklık: altta tam 0 alfa ile kusursuz erir */}
+      <LinearGradient
+        colors={baseWashColors}
+        locations={[0, 0.18, 0.38, 0.60, 0.82, 1]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
+
+      {/* Soldan sağa nefes alarak akan canlı amber-altın ışık dalgası */}
+      <Animated.View
+        style={{
+          position: 'absolute',
+          top: -20,
+          left: -width * 0.25,
+          width: width * 1.45,
+          height: 300,
+          opacity: leftWaveOpacity,
+          transform: [{ translateX: leftDriftX }, { scaleX: leftScaleX }],
+        }}
+      >
+        <LinearGradient
+          colors={amberWaveColors}
+          locations={[0, 0.24, 0.50, 0.76, 1]}
+          start={{ x: 0.1, y: 0 }}
+          end={{ x: 0.85, y: 0.92 }}
+          style={{ flex: 1 }}
+        />
+      </Animated.View>
+
+      {/* Sağdan sola ters fazda kayan sıcak mercan-turuncu ışık dalgası */}
+      <Animated.View
+        style={{
+          position: 'absolute',
+          top: -20,
+          right: -width * 0.25,
+          width: width * 1.45,
+          height: 300,
+          opacity: rightWaveOpacity,
+          transform: [{ translateX: rightDriftX }, { scaleX: rightScaleX }],
+        }}
+      >
+        <LinearGradient
+          colors={coralWaveColors}
+          locations={[0, 0.24, 0.50, 0.76, 1]}
+          start={{ x: 0.9, y: 0 }}
+          end={{ x: 0.15, y: 0.92 }}
+          style={{ flex: 1 }}
+        />
+      </Animated.View>
+
+      {/* Üstten çapraz süzülen sıcak altın parlama vurgusu */}
+      <Animated.View
+        style={{
+          position: 'absolute',
+          top: -10,
+          left: -width * 0.5,
+          width: width * 2.0,
+          height: 250,
+          opacity: shimmerOpacity,
+          transform: [{ translateX: shimmerDriftX }],
+        }}
+      >
+        <LinearGradient
+          colors={centerShimmerColors}
+          locations={[0, 0.32, 0.66, 1]}
+          start={{ x: 0.25, y: 0 }}
+          end={{ x: 0.75, y: 0.94 }}
+          style={{ flex: 1 }}
+        />
+      </Animated.View>
+    </Animated.View>
+  );
 }
 
 const RecipeDetail = ({ route, navigation }) => {
@@ -833,27 +1097,31 @@ const RecipeDetail = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [errorInfo, setErrorInfo] = useState(null);
   const [tarif, setTarif] = useState(null);
-  const [recipeImage, setRecipeImage] = useState(null);
-  const [photographer, setPhotographer] = useState(null);
-  const [imageLoading, setImageLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isToastActive, setIsToastActive] = useState(false);
   const [toastMessage, setToastMessage] = useState('Tarif Başarıyla Kaydedildi!');
   const [isSaved, setIsSaved] = useState(false);
+  const [isStickyVisible, setIsStickyVisible] = useState(false);
+  const isStickyRef = useRef(false);
   const toastFadeAnim = useRef(new Animated.Value(0)).current;
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [300, 400],
+  const stickyOpacity = scrollY.interpolate({
+    inputRange: [100, 150],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
 
-  const stickyOpacity = scrollY.interpolate({
-    inputRange: [350, 400],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
+  useEffect(() => {
+    const id = scrollY.addListener(({ value }) => {
+      const shouldShow = value > 110;
+      if (shouldShow !== isStickyRef.current) {
+        isStickyRef.current = shouldShow;
+        setIsStickyVisible(shouldShow);
+      }
+    });
+    return () => scrollY.removeListener(id);
+  }, []);
 
   useEffect(() => {
     generateRecipe();
@@ -893,8 +1161,6 @@ const RecipeDetail = ({ route, navigation }) => {
       } else if (result && result.description) {
         setTarif(result);
         setErrorInfo(null);
-        const searchTerms = extractImageSearchTerms(result.description);
-        loadRecipeImage(searchTerms);
 
         // Check if saved again with new tarif
         const saved = await AsyncStorage.getItem('saved_recipes');
@@ -918,24 +1184,6 @@ const RecipeDetail = ({ route, navigation }) => {
       setTarif(null);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadRecipeImage = async (terms) => {
-    setImageLoading(true);
-    try {
-      const result = await unsplashAPI.searchRecipeImage(terms);
-      if (result) {
-        setRecipeImage(result.url);
-        setPhotographer(result.photographer);
-      } else {
-        setRecipeImage(null);
-        setPhotographer(null);
-      }
-    } catch (error) {
-      console.error('Resim yükleme hatası:', error);
-    } finally {
-      setImageLoading(false);
     }
   };
 
@@ -967,7 +1215,7 @@ const RecipeDetail = ({ route, navigation }) => {
           description: tarif.description,
           malzemeler: malzemeler,
           tarih: new Date().toISOString(),
-          image: recipeImage
+          image: null
         });
         setToastMessage('Tarif Kaydedildi');
         setIsSaved(true);
@@ -1039,7 +1287,7 @@ const RecipeDetail = ({ route, navigation }) => {
       steps,
       tips,
       recipeName: extractRecipeName(tarif.description),
-      recipeImage,
+      recipeImage: null,
       malzemeler,
       description: tarif.description,
       isRandom
@@ -1126,10 +1374,23 @@ const RecipeDetail = ({ route, navigation }) => {
   if (!tarif) return null;
 
   const recipeName = extractRecipeName(tarif.description);
+  const meta = extractMetadata(tarif.description, servingSize);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Animated.View style={[styles.stickyHeader, { backgroundColor: theme.background, borderBottomColor: theme.border, opacity: stickyOpacity }]}>
+      <Animated.View
+        pointerEvents={isStickyVisible ? 'auto' : 'none'}
+        style={[
+          styles.stickyHeader,
+          {
+            backgroundColor: theme.background,
+            borderBottomColor: theme.border,
+            opacity: stickyOpacity,
+            elevation: isStickyVisible ? 4 : 0,
+            shadowOpacity: isStickyVisible ? 0.05 : 0,
+          }
+        ]}
+      >
         <View style={styles.stickyHeaderContent}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.stickyBackButton}>
             <FontAwesome5 name="arrow-left" size={18} color={theme.text} />
@@ -1155,118 +1416,87 @@ const RecipeDetail = ({ route, navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        {/* Resim Alanı veya Resim Yoksa Alternatif Header */}
-        {(imageLoading || recipeImage) ? (
-          <View style={styles.imageContainer}>
-            {recipeImage ? (
-              <View style={{ position: 'relative' }}>
-                <Image source={{ uri: recipeImage }} style={styles.recipeImage} />
-                <View style={styles.imageOverlay}>
-                  <Text style={styles.imageCredit}>
-                    Fotoğraf: {photographer ? `${photographer} | ` : ''}Unsplash
-                  </Text>
-                  <Text style={styles.imageCaption}>
-                    Fotoğraf temsilidir
-                  </Text>
-                </View>
-              </View>
-            ) : (
-              <View style={[styles.recipeImage, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', justifyContent: 'center', alignItems: 'center' }]}>
-                {imageLoading && <ActivityIndicator color="#ff7043" size="large" />}
-              </View>
-            )}
-            <LinearGradient colors={['rgba(0,0,0,0.6)', 'transparent']} style={styles.topGradient} />
-            <View style={styles.headerButtons}>
-              <TouchableOpacity style={styles.iconButton} onPress={() => navigation.goBack()}>
-                <FontAwesome5 name="arrow-left" size={18} color="#fff" />
-              </TouchableOpacity>
-              <View style={{ flexDirection: 'row', gap: 12 }}>
-                <TouchableOpacity style={styles.iconButton} onPress={shareRecipe}>
-                  <Octicons name="share" size={18} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.iconButton} onPress={toggleSaveRecipe}>
-                  <FontAwesome5 name="bookmark" size={18} color={isSaved ? "#ff7043" : "#fff"} solid={isSaved} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        ) : (
-          /* Resim Yoksa Gözükecek Basit Header */
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 60, marginBottom: 10 }}>
+        {/* En üstte tarif üretilince beliren, renk değiştiren ve kaybolan turuncu gradient animasyonu */}
+        <TopArrivalGlow triggerKey={tarif.description} isDarkMode={isDarkMode} />
+
+        {/* Sade Üst Navigasyon */}
+        <View style={styles.cleanTopBar}>
+          <TouchableOpacity
+            style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5' }]}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.8}
+          >
+            <FontAwesome5 name="arrow-left" size={18} color={theme.text} />
+          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
             <TouchableOpacity
-              style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: theme.border, borderWidth: 0 }]}
-              onPress={() => navigation.goBack()}
+              style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5' }]}
+              onPress={shareRecipe}
+              activeOpacity={0.8}
             >
-              <FontAwesome5 name="arrow-left" size={18} color={theme.text} />
+              <Octicons name="share" size={18} color={theme.text} />
             </TouchableOpacity>
-            <View style={{ flexDirection: 'row', gap: 12 }}>
-              <TouchableOpacity
-                style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: theme.border, borderWidth: 0 }]}
-                onPress={shareRecipe}
-              >
-                <Octicons name="share" size={18} color={theme.text} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: theme.border, borderWidth: 0 }]}
-                onPress={toggleSaveRecipe}
-              >
-                <FontAwesome5 name="bookmark" size={18} color={isSaved ? "#ff7043" : theme.text} solid={isSaved} />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5' }]}
+              onPress={toggleSaveRecipe}
+              activeOpacity={0.8}
+            >
+              <FontAwesome5 name="bookmark" size={18} color={isSaved ? "#ff7043" : theme.text} solid={isSaved} />
+            </TouchableOpacity>
           </View>
-        )}
+        </View>
 
-        <View style={{ padding: 24 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.recipeName, { color: theme.text }]}>{recipeName}</Text>
+        <View style={{ paddingHorizontal: 24, paddingTop: 10 }}>
+          <Text style={[styles.recipeName, { color: theme.text }]}>{recipeName}</Text>
 
-              <View style={{ flexDirection: 'row', gap: 12, marginTop: 16, marginBottom: 24 }}>
-                <TouchableOpacity
-                  style={[styles.voiceButton, isSpeaking && styles.voiceButtonActive]}
-                  onPress={isSpeaking ? stopSpeaking : speakRecipe}
-                >
-                  <FontAwesome5 name={isSpeaking ? "stop" : "volume-up"} size={14} color="#fff" />
-                  <Text style={styles.voiceButtonText}>{isSpeaking ? "Durdur" : "Sesli Oku"}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.voiceButton, { backgroundColor: isDarkMode ? theme.card : 'rgba(255,112,67,0.08)', borderColor: theme.border, borderWidth: isDarkMode ? 1 : 0 }]}
-                  onPress={generateRecipe}
-                >
-                  <FontAwesome5 name="redo" size={14} color="#ff7043" />
-                  <Text style={[styles.voiceButtonText, { color: theme.text }]}>Tarifi Yenile</Text>
-                </TouchableOpacity>
+          <View style={styles.actionButtonsRow}>
+            <TouchableOpacity
+              style={[styles.voiceButton, isSpeaking && styles.voiceButtonActive]}
+              onPress={isSpeaking ? stopSpeaking : speakRecipe}
+              activeOpacity={0.85}
+            >
+              <FontAwesome5 name={isSpeaking ? "stop" : "volume-up"} size={14} color="#fff" />
+              <Text style={styles.voiceButtonText}>{isSpeaking ? "Durdur" : "Sesli Oku"}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.voiceButton,
+                {
+                  backgroundColor: isDarkMode ? theme.card : 'rgba(255,112,67,0.1)',
+                  borderColor: theme.border,
+                  borderWidth: 0
+                }
+              ]}
+              onPress={generateRecipe}
+              activeOpacity={0.85}
+            >
+              <FontAwesome5 name="redo" size={14} color="#ff7043" />
+              <Text style={[styles.voiceButtonText, { color: isDarkMode ? theme.text : '#d84315' }]}>Tarifi Yenile</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Meta Bilgileri Kutuları */}
+          <View style={styles.metaContainer}>
+            <View style={styles.metaRow}>
+              <View style={[styles.metaBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                <FontAwesome5 name="clock" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
+                <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Süre</Text>
+                <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.time}</Text>
               </View>
-
-              {/* Meta Bilgileri Kutuları (SavedRecipeDetail.js stili) */}
-              <View style={styles.metaContainer}>
-                {(() => {
-                  const meta = extractMetadata(tarif.description, servingSize);
-                  return (
-                    <View style={styles.metaRow}>
-                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
-                        <FontAwesome5 name="clock" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
-                        <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Süre</Text>
-                        <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.time}</Text>
-                      </View>
-                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
-                        <FontAwesome5 name="chart-bar" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
-                        <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Zorluk</Text>
-                        <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.difficulty}</Text>
-                      </View>
-                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
-                        <FontAwesome5 name="fire-alt" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
-                        <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Kalori</Text>
-                        <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.calories}</Text>
-                      </View>
-                      <View style={[styles.metaBox, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}>
-                        <FontAwesome5 name="users" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
-                        <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Porsiyon</Text>
-                        <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.portion}</Text>
-                      </View>
-                    </View>
-                  );
-                })()}
+              <View style={[styles.metaBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                <FontAwesome5 name="chart-bar" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
+                <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Zorluk</Text>
+                <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.difficulty}</Text>
+              </View>
+              <View style={[styles.metaBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                <FontAwesome5 name="fire-alt" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
+                <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Kalori</Text>
+                <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.calories}</Text>
+              </View>
+              <View style={[styles.metaBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                <FontAwesome5 name="users" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
+                <Text style={[styles.metaLabel, { color: theme.secondaryText }]}>Porsiyon</Text>
+                <Text style={[styles.metaValue, { color: theme.text }]} numberOfLines={1}>{meta.portion}</Text>
               </View>
             </View>
           </View>
@@ -1676,70 +1906,37 @@ const styles = StyleSheet.create({
     fontFamily: 'PoppinsBold',
   },
 
-  // Resim Stilleri
-  imageContainer: {
-    marginBottom: 20,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  recipeImage: {
-    width: '100%',
-    height: 400,
-  },
-  imageOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  imageCaption: {
-    color: '#fff',
-    fontSize: 10,
-    fontFamily: 'PoppinsRegular',
-    textAlign: 'center',
-    opacity: 0.7,
-  },
-  imageCredit: {
-    color: '#fff',
-    fontSize: 10,
-    fontFamily: 'PoppinsRegular',
-    textAlign: 'center',
-  },
-  topGradient: {
+  // Üst Açılış Işık & Gradient Stilleri
+  topArrivalGlowContainer: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 150,
+    height: 320,
+    overflow: 'hidden',
+    zIndex: 0,
   },
-  headerButtons: {
-    position: 'absolute',
-    top: 50, // Adjust for status bar
-    left: 20,
-    right: 20,
+  cleanTopBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 56,
+    marginBottom: 14,
     zIndex: 10,
+  },
+  actionButtonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 20,
   },
   iconButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 0,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   startButton: {
     position: 'absolute',
@@ -1810,20 +2007,22 @@ const styles = StyleSheet.create({
     fontFamily: 'PoppinsBold',
   },
   voiceButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#6366f1',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 6,
+    height: 46,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    gap: 8,
   },
   voiceButtonActive: {
     backgroundColor: '#ef4444',
   },
   voiceButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'PoppinsBold',
   },
   ingredientChip: {

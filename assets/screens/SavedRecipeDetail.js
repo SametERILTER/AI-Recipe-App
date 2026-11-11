@@ -219,11 +219,12 @@ const SavedRecipeDetail = ({ route, navigation }) => {
 
   // Resim verisi farklı yerlerden farklı formatlarda gelebilir (image, imageData, imageData.url)
   const recipeImage = recipe.image || (recipe.imageData?.url ? recipe.imageData.url : (typeof recipe.imageData === 'string' ? recipe.imageData : null));
-  const hasImage = !!recipeImage;
+  const hasImage = typeof recipeImage === 'string' && recipeImage.trim() !== '';
   const photographer = recipe.imageData?.photographer || null;
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSavedInStorage, setIsSavedInStorage] = useState(false);
+  const [isStickyVisible, setIsStickyVisible] = useState(false);
 
   useEffect(() => {
     const checkSavedStatus = async () => {
@@ -348,8 +349,18 @@ const SavedRecipeDetail = ({ route, navigation }) => {
     }
   };
 
+  useEffect(() => {
+    const threshold = hasImage ? 300 : 110;
+    const listenerId = scrollY.addListener(({ value }) => {
+      setIsStickyVisible(value > threshold);
+    });
+    return () => {
+      scrollY.removeListener(listenerId);
+    };
+  }, [scrollY, hasImage]);
+
   const headerOpacity = scrollY.interpolate({
-    inputRange: [300, 360],
+    inputRange: hasImage ? [300, 360] : [110, 160],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
@@ -422,7 +433,7 @@ const SavedRecipeDetail = ({ route, navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }, !hasImage && { paddingTop: 60 }]}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -435,7 +446,7 @@ const SavedRecipeDetail = ({ route, navigation }) => {
       >
         {/* Header Buttons if NO Image */}
         {!hasImage && (
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 20 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 56, marginBottom: 14 }}>
             <TouchableOpacity
               style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}
               onPress={() => navigation.goBack()}
@@ -471,7 +482,7 @@ const SavedRecipeDetail = ({ route, navigation }) => {
         )}
 
         {/* Tarif Resmi */}
-        {hasImage && (
+        {hasImage && typeof recipeImage === 'string' && recipeImage.trim() !== '' && (
           <View style={styles.imageContainer}>
             <Image
               source={{ uri: recipeImage }}
@@ -561,28 +572,28 @@ const SavedRecipeDetail = ({ route, navigation }) => {
               return (
                 <View style={{ flexDirection: 'row', gap: 8, justifyContent: 'center' }}>
                   {prepTime !== '-' && (
-                    <View style={{ flex: 1, height: 82, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
+                    <View style={{ flex: 1, height: 82, backgroundColor: theme.card, borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: theme.border }}>
                       <FontAwesome5 name="clock" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
                       <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Süre</Text>
                       <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{prepTime}</Text>
                     </View>
                   )}
                   {difficulty !== '-' && (
-                    <View style={{ flex: 1, height: 82, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
+                    <View style={{ flex: 1, height: 82, backgroundColor: theme.card, borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: theme.border }}>
                       <FontAwesome5 name="chart-bar" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
                       <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Zorluk</Text>
                       <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{difficulty}</Text>
                     </View>
                   )}
                   {calorie !== '-' && (
-                    <View style={{ flex: 1, height: 82, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
+                    <View style={{ flex: 1, height: 82, backgroundColor: theme.card, borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: theme.border }}>
                       <FontAwesome5 name="fire-alt" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
                       <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Kalori</Text>
                       <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{calorie}</Text>
                     </View>
                   )}
                   {portion !== '-' && (
-                    <View style={{ flex: 1, height: 82, backgroundColor: isDarkMode ? theme.card : '#f5f5f5', borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: isDarkMode ? theme.border : '#e5e5e5' }}>
+                    <View style={{ flex: 1, height: 82, backgroundColor: theme.card, borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: theme.border }}>
                       <FontAwesome5 name="users" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
                       <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Porsiyon</Text>
                       <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{portion}</Text>
@@ -603,7 +614,19 @@ const SavedRecipeDetail = ({ route, navigation }) => {
       </ScrollView>
 
       {/* Sticky Header */}
-      <Animated.View style={[styles.stickyHeader, { backgroundColor: theme.background, borderBottomColor: theme.border, opacity: headerOpacity }]} pointerEvents="box-none">
+      <Animated.View
+        style={[
+          styles.stickyHeader,
+          {
+            backgroundColor: theme.background,
+            borderBottomColor: theme.border,
+            opacity: headerOpacity,
+            elevation: isStickyVisible ? 4 : 0,
+            shadowOpacity: isStickyVisible ? 0.05 : 0,
+          }
+        ]}
+        pointerEvents={isStickyVisible ? 'box-none' : 'none'}
+      >
         <View style={styles.stickyHeaderContent}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.stickyBackButton}>
             <FontAwesome5 name="arrow-left" size={20} color={theme.text} />

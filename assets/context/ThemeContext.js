@@ -35,7 +35,7 @@ export const ThemeProvider = ({ children }) => {
 
     const theme = {
         background: isDarkMode ? '#121212' : '#ffffff',
-        card: isDarkMode ? '#1e1e1e' : '#f3f3f3',
+        card: isDarkMode ? '#1e1e1e' : '#f7f7f7',
         text: isDarkMode ? '#f5f5f5' : '#171717',
         secondaryText: isDarkMode ? '#a3a3a3' : '#737373',
         border: 'transparent',

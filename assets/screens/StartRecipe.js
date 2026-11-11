@@ -77,8 +77,8 @@ const StartRecipe = ({ route, navigation }) => {
     const spinValue = useRef(new Animated.Value(0)).current;
 
     // Completion Animations
-    const successScale = useRef(new Animated.Value(2)).current;
-    const successTranslateY = useRef(new Animated.Value(height / 6)).current;
+    const successScale = useRef(new Animated.Value(1.5)).current;
+    const successTranslateY = useRef(new Animated.Value(height / 8)).current;
     const completionFade = useRef(new Animated.Value(0)).current;
 
     const musicList = [
@@ -499,77 +499,71 @@ const StartRecipe = ({ route, navigation }) => {
 
     if (isCompleted) {
         return (
-            <View style={[styles.container, { backgroundColor: theme.background }]}>
+            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                 <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
 
+                <ScrollView
+                    contentContainerStyle={styles.completionScrollContent}
+                    showsVerticalScrollIndicator={false}
+                >
+                    <View style={styles.completionContainer}>
+                        <Animated.View style={{
+                            transform: [
+                                { translateY: successTranslateY },
+                                { scale: successScale }
+                            ],
+                            zIndex: 10
+                        }}>
+                            <LottieView
+                                autoPlay
+                                loop={false}
+                                style={{
+                                    width: 150,
+                                    height: 150,
+                                }}
+                                source={require('../animations/Success.json')}
+                            />
+                        </Animated.View>
 
-                <View style={[styles.completionContainer, { paddingTop: height / 10 }]}>
-                    <Animated.View style={{
-                        transform: [
-                            { translateY: successTranslateY },
-                            { scale: successScale }
-                        ],
-                        zIndex: 10
-                    }}>
-                        <LottieView
-                            autoPlay
-                            loop={false}
-                            style={{
-                                width: 220,
-                                height: 220,
-                            }}
-                            source={require('../animations/Success.json')}
-                        />
-                    </Animated.View>
+                        <Animated.View style={{ opacity: completionFade, alignItems: 'center', width: '100%' }}>
+                            <Text style={[styles.congratsTitle, { color: theme.text }]}>Tebrikler!</Text>
+                            <Text style={[styles.congratsSubtitle, { color: theme.secondaryText }]}>
+                                Tarifi başarıyla tamamladınız.
+                            </Text>
 
-                    <Animated.View style={{ opacity: completionFade, alignItems: 'center', width: '100%' }}>
-                        <Text style={[styles.congratsTitle, { color: theme.text }]}>Tebrikler!</Text>
-                        <Text style={[styles.congratsSubtitle, { color: theme.secondaryText }]}>
-                            Tarifi başarıyla tamamladınız.
-                        </Text>
+                            <View style={[styles.preparedFoodContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                                <Text style={[styles.preparedFoodLabel, { color: theme.secondaryText }]}>HAZIRLANAN YEMEK</Text>
+                                <Text style={[styles.preparedFoodName, { color: theme.text }]}>{recipeName}</Text>
+                            </View>
 
+                            <Text style={[styles.cheerText, { color: theme.secondaryText }]}>
+                                Eline sağlık, çok güzel gözüküyor!
+                            </Text>
 
-                        <View style={[styles.preparedFoodContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                            <Text style={[styles.preparedFoodLabel, { color: theme.secondaryText }]}>HAZIRLANAN YEMEK</Text>
-                            <Text style={[styles.preparedFoodName, { color: theme.text }]}>{recipeName}</Text>
-                        </View>
+                            {/* Action Buttons */}
+                            <View style={styles.completionActions}>
+                                {description && !isSaved && (
+                                    <TouchableOpacity style={[styles.saveButton, { backgroundColor: isDarkMode ? theme.card : '#fff3f0', borderColor: isDarkMode ? theme.border : '#ffede6' }]} onPress={handleSaveRecipe}>
+                                        <FontAwesome5 name="bookmark" size={16} color="#ff7043" />
+                                        <Text style={[styles.saveButtonText, { color: '#ff7043' }]}>Tarifi Kaydet</Text>
+                                    </TouchableOpacity>
+                                )}
 
+                                {isSaved && (
+                                    <View style={[styles.savedInfoBadge, { backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.14)' : '#f0fdf4' }]}>
+                                        <FontAwesome5 name="check-circle" size={16} color="#10b981" />
+                                        <Text style={styles.savedInfoText}>Tarif Kaydedildi</Text>
+                                    </View>
+                                )}
 
-                        <Text style={[styles.cheerText, { color: theme.secondaryText }]}>
-                            Eline sağlık, çok güzel gözüküyor!
-                        </Text>
-
-                        {/* Action Buttons */}
-                        <View style={styles.completionActions}>
-                            {description && !isSaved && (
-                                <TouchableOpacity style={[styles.saveButton, { backgroundColor: isDarkMode ? theme.card : '#fff3f0', borderColor: isDarkMode ? theme.border : '#ffede6' }]} onPress={handleSaveRecipe}>
-                                    <FontAwesome5 name="bookmark" size={18} color="#ff7043" />
-                                    <Text style={[styles.saveButtonText, { color: '#ff7043' }]}>Tarifi Kaydet</Text>
+                                <TouchableOpacity style={styles.homeActionButton} onPress={() => navigation.navigate('MainTabs')}>
+                                    <Octicons name="home" size={16} color="#fff" />
+                                    <Text style={styles.homeActionButtonText}>Ana Sayfa</Text>
                                 </TouchableOpacity>
-                            )}
-
-                            {isSaved && (
-                                <View style={styles.savedInfoBadge}>
-                                    <FontAwesome5 name="check-circle" size={18} color="#10b981" />
-                                    <Text style={styles.savedInfoText}>Tarif Kaydedildi</Text>
-                                </View>
-                            )}
-
-                            <TouchableOpacity style={styles.homeActionButton} onPress={() => navigation.navigate('MainTabs')}>
-                                <Octicons name="home" size={18} color="#fff" />
-                                <Text style={styles.homeActionButtonText}>Ana Sayfa</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </Animated.View>
-                </View>
-
-                <Animated.View style={{ opacity: completionFade, position: 'absolute', bottom: 0, width: '100%' }}>
-                    <LinearGradient
-                        colors={['transparent', theme.background]}
-                        style={styles.bottomGradientCompletion}
-                        pointerEvents="none"
-                    />
-                </Animated.View>
+                            </View>
+                        </Animated.View>
+                    </View>
+                </ScrollView>
 
                 {/* Custom Toast */}
                 {showToast && (
@@ -593,7 +587,7 @@ const StartRecipe = ({ route, navigation }) => {
                         </LinearGradient>
                     </Animated.View>
                 )}
-            </View>
+            </SafeAreaView>
         );
     }
 
@@ -1078,8 +1072,13 @@ const styles = StyleSheet.create({
     },
 
     // Completion Styles
+    completionScrollContent: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        paddingTop: 20,
+        paddingBottom: 48,
+    },
     completionContainer: {
-        flex: 1,
         alignItems: 'center',
         paddingHorizontal: 24,
     },
@@ -1088,19 +1087,19 @@ const styles = StyleSheet.create({
         transform: [{ scale: 1.2 }],
     },
     congratsTitle: {
-        fontSize: 32,
+        fontSize: 24,
         fontFamily: 'PoppinsExtraBold',
         color: '#262626',
-        marginBottom: 12,
+        marginBottom: 6,
         textAlign: 'center',
     },
     congratsSubtitle: {
-        fontSize: 18,
+        fontSize: 14,
         color: '#737373',
         fontFamily: 'PoppinsRegular',
         textAlign: 'center',
-        marginBottom: 40,
-        lineHeight: 28,
+        marginBottom: 20,
+        lineHeight: 20,
     },
     tipsContainer: {
         width: '100%',
@@ -1193,62 +1192,63 @@ const styles = StyleSheet.create({
     preparedFoodContainer: {
         width: '100%',
         backgroundColor: '#fff7ed',
-        padding: 24,
-        borderRadius: 20,
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        borderRadius: 16,
         alignItems: 'center',
-        marginBottom: 24,
-        marginTop: 12,
+        marginBottom: 14,
+        marginTop: 0,
         borderWidth: 0,
         borderColor: '#fed7aa',
     },
     preparedFoodLabel: {
-        fontSize: 12,
+        fontSize: 11,
         fontFamily: 'PoppinsBold',
         color: '#f97316',
-        marginBottom: 8,
-        letterSpacing: 1.5,
+        marginBottom: 4,
+        letterSpacing: 1.2,
     },
     preparedFoodName: {
-        fontSize: 24,
+        fontSize: 18,
         fontFamily: 'PoppinsExtraBold',
         color: '#c2410c',
         textAlign: 'center',
-        lineHeight: 32,
+        lineHeight: 25,
     },
     cheerText: {
-        fontSize: 18,
+        fontSize: 14,
         fontFamily: 'PoppinsRegular',
         color: '#525252',
-        marginTop: 8,
+        marginTop: 2,
         textAlign: 'center',
     },
     completionActions: {
         width: '100%',
-        marginTop: 32,
-        gap: 16,
+        marginTop: 22,
+        gap: 12,
     },
     saveButton: {
         width: '100%',
-        height: 56,
+        height: 50,
         backgroundColor: '#fff',
-        borderRadius: 20,
+        borderRadius: 16,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 0,
         borderColor: '#ff7043',
-        gap: 12,
+        gap: 10,
     },
     saveButtonText: {
-        fontSize: 16,
+        fontSize: 15,
         fontFamily: 'PoppinsBold',
         color: '#ff7043',
     },
     homeActionButton: {
         width: '100%',
-        height: 56,
+        height: 50,
         backgroundColor: '#ff7043',
-        borderRadius: 20,
+        borderRadius: 16,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
@@ -1257,7 +1257,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 8 },
         shadowRadius: 16,
         elevation: 8,
-        gap: 12,
+        gap: 10,
     },
     // Music Player Styles
     musicButton: {
@@ -1383,7 +1383,7 @@ const styles = StyleSheet.create({
     },
 
     homeActionButtonText: {
-        fontSize: 16,
+        fontSize: 15,
         fontFamily: 'PoppinsBold',
         color: '#fff',
     },
@@ -1545,18 +1545,18 @@ const styles = StyleSheet.create({
     },
     savedInfoBadge: {
         width: '100%',
-        height: 56,
+        height: 50,
         backgroundColor: '#f0fdf4',
-        borderRadius: 20,
+        borderRadius: 16,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 0,
         borderColor: '#10b981',
-        gap: 12,
+        gap: 10,
     },
     savedInfoText: {
-        fontSize: 16,
+        fontSize: 15,
         fontFamily: 'PoppinsBold',
         color: '#10b981',
     },
