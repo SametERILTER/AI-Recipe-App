@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,9 @@ import {
   Pressable,
   Dimensions,
   ImageBackground,
-  Keyboard
+  Keyboard,
+  PanResponder,
+  BackHandler
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -20,6 +22,7 @@ import Animated, {
   interpolate,
   Extrapolation,
   withTiming,
+  withSpring,
   Easing,
   runOnJS,
 } from 'react-native-reanimated';
@@ -30,12 +33,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
+const COLLAPSED_SHEET_HEIGHT = 48;
+const DEFAULT_EXPANDED_HEIGHT = Math.max(550, Math.round((SCREEN_HEIGHT - 105) * 0.86));
 
 const HomeScreen = () => {
   const { isDarkMode, theme } = useTheme();
   const [input, setInput] = useState('');
   const [malzemeler, setMalzemeler] = useState([]);
-  const slideAnim = useSharedValue(100);
+  const slideAnim = useSharedValue(150);
   const scrollY = useSharedValue(0);
   const [inputFocused, setInputFocused] = useState(false);
   const [greeting, setGreeting] = useState('Merhaba');
@@ -209,56 +214,130 @@ const HomeScreen = () => {
     }
   ];
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const modalSheetY = useSharedValue(SCREEN_HEIGHT);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const sheetHeight = useSharedValue(COLLAPSED_SHEET_HEIGHT);
+  const expandedSheetHeight = useSharedValue(DEFAULT_EXPANDED_HEIGHT);
   const confirmAnim = useSharedValue(0);
   const [modalSelected, setModalSelected] = useState([]);
+  const isSheetOpenRef = useRef(false);
+  const expandedHeightRef = useRef(DEFAULT_EXPANDED_HEIGHT);
+  const dragStartHeightRef = useRef(COLLAPSED_SHEET_HEIGHT);
+  const syncSelectedRef = useRef(null);
 
-  const openModal = () => {
-    modalSheetY.value = SCREEN_HEIGHT;
-    confirmAnim.value = 0;
-    setModalVisible(true);
+  syncSelectedRef.current = () => {
+    setModalSelected(malzemeler);
   };
 
-  const closeModal = () => {
-    modalSheetY.value = withTiming(
-      SCREEN_HEIGHT,
-      {
-        duration: 220,
-        easing: Easing.in(Easing.cubic),
-      },
-      (finished) => {
-        if (finished) {
-          runOnJS(setModalVisible)(false);
+  const openSheet = () => {
+    Keyboard.dismiss();
+    setModalSelected(malzemeler);
+    isSheetOpenRef.current = true;
+    setSheetOpen(true);
+    sheetHeight.value = withSpring(expandedHeightRef.current, {
+      damping: 22,
+      stiffness: 220,
+      mass: 0.85,
+    });
+  };
+
+  const closeSheet = () => {
+    isSheetOpenRef.current = false;
+    setSheetOpen(false);
+    sheetHeight.value = withSpring(COLLAPSED_SHEET_HEIGHT, {
+      damping: 24,
+      stiffness: 240,
+      mass: 0.85,
+    });
+  };
+
+  const openSheetRef = useRef(openSheet);
+  const closeSheetRef = useRef(closeSheet);
+  openSheetRef.current = openSheet;
+  closeSheetRef.current = closeSheet;
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (isSheetOpenRef.current) {
+          closeSheetRef.current();
+          return true;
         }
-      }
-    );
-  };
+        return false;
+      };
+
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => subscription.remove();
+    }, [])
+  );
+
+  const dockPanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => !isSheetOpenRef.current,
+      onMoveShouldSetPanResponder: (_, gestureState) =>
+        Math.abs(gestureState.dy) > 5 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
+      onPanResponderGrant: () => {
+        dragStartHeightRef.current = isSheetOpenRef.current ? expandedHeightRef.current : COLLAPSED_SHEET_HEIGHT;
+        if (!isSheetOpenRef.current && syncSelectedRef.current) {
+          syncSelectedRef.current();
+        }
+      },
+      onPanResponderMove: (_, gestureState) => {
+        const targetExpanded = expandedHeightRef.current;
+        const rawHeight = dragStartHeightRef.current - gestureState.dy;
+        const nextHeight =
+          rawHeight > targetExpanded
+            ? targetExpanded + (rawHeight - targetExpanded) * 0.2
+            : Math.max(COLLAPSED_SHEET_HEIGHT, rawHeight);
+        sheetHeight.value = nextHeight;
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (Math.abs(gestureState.dy) < 8 && Math.abs(gestureState.dx) < 8) {
+          if (isSheetOpenRef.current) {
+            closeSheetRef.current();
+          } else {
+            openSheetRef.current();
+          }
+          return;
+        }
+
+        const targetExpanded = expandedHeightRef.current;
+        const currentHeight = dragStartHeightRef.current - gestureState.dy;
+        const openThreshold = COLLAPSED_SHEET_HEIGHT + (targetExpanded - COLLAPSED_SHEET_HEIGHT) * 0.28;
+        const closeThreshold = COLLAPSED_SHEET_HEIGHT + (targetExpanded - COLLAPSED_SHEET_HEIGHT) * 0.72;
+        const threshold = dragStartHeightRef.current === COLLAPSED_SHEET_HEIGHT ? openThreshold : closeThreshold;
+        const shouldOpen =
+          gestureState.vy < -0.35 || (gestureState.vy <= 0.35 && currentHeight > threshold);
+
+        if (shouldOpen) {
+          openSheetRef.current();
+        } else {
+          closeSheetRef.current();
+        }
+      },
+      onPanResponderTerminate: () => {
+        if (isSheetOpenRef.current) {
+          openSheetRef.current();
+        } else {
+          closeSheetRef.current();
+        }
+      },
+    })
+  ).current;
 
   useEffect(() => {
-    if (modalVisible) {
-      setModalSelected(malzemeler);
-      requestAnimationFrame(() => {
-        modalSheetY.value = withTiming(0, {
-          duration: 280,
-          easing: Easing.out(Easing.cubic),
-        });
-      });
-    }
-  }, [modalVisible]);
-
-  useEffect(() => {
-    if (modalVisible) {
+    if (sheetOpen) {
       confirmAnim.value = withTiming(modalSelected.length > 0 ? 1 : 0, {
         duration: 200,
         easing: Easing.out(Easing.cubic),
       });
+    } else {
+      confirmAnim.value = 0;
     }
-  }, [modalSelected, modalVisible]);
+  }, [modalSelected, sheetOpen]);
 
   const handleConfirm = () => {
     setMalzemeler(modalSelected);
-    closeModal();
+    closeSheet();
   };
 
   const openRandomModal = () => {
@@ -346,21 +425,102 @@ const HomeScreen = () => {
     setMalzemeler([]); // Malzemeleri temizle
   };
 
-  // Malzeme listesi değiştiğinde animasyon (yaylanma olmadan akıcı geçiş)
+  // Malzeme listesi değiştiğinde veya çekmece açıldığında FAB animasyonu
   useEffect(() => {
-    slideAnim.value = withTiming(malzemeler.length > 0 ? 0 : 100, {
+    slideAnim.value = withTiming(malzemeler.length > 0 && !sheetOpen ? 0 : 150, {
       duration: 240,
       easing: Easing.out(Easing.cubic),
     });
-  }, [malzemeler.length]);
+  }, [malzemeler.length, sheetOpen]);
 
   const fabAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: slideAnim.value }],
   }));
 
-  const modalSheetStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: modalSheetY.value }],
+  const sheetAnimatedStyle = useAnimatedStyle(() => {
+    const progress = interpolate(
+      sheetHeight.value,
+      [COLLAPSED_SHEET_HEIGHT, expandedSheetHeight.value],
+      [0, 1],
+      Extrapolation.CLAMP
+    );
+    return {
+      height: sheetHeight.value,
+      borderTopLeftRadius: interpolate(progress, [0, 1], [22, 28], Extrapolation.CLAMP),
+      borderTopRightRadius: interpolate(progress, [0, 1], [22, 28], Extrapolation.CLAMP),
+    };
+  });
+
+  const dockPromptAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      sheetHeight.value,
+      [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 55],
+      [1, 0],
+      Extrapolation.CLAMP
+    ),
+    transform: [
+      {
+        translateY: interpolate(
+          sheetHeight.value,
+          [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 55],
+          [0, -6],
+          Extrapolation.CLAMP
+        ),
+      },
+    ],
   }));
+
+  const sheetTopBarAnimatedStyle = useAnimatedStyle(() => ({
+    paddingTop: interpolate(
+      sheetHeight.value,
+      [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 160],
+      [6, 10],
+      Extrapolation.CLAMP
+    ),
+    paddingBottom: interpolate(
+      sheetHeight.value,
+      [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 160],
+      [6, 12],
+      Extrapolation.CLAMP
+    ),
+  }));
+
+  const sheetHeaderSlotAnimatedStyle = useAnimatedStyle(() => ({
+    marginTop: interpolate(
+      sheetHeight.value,
+      [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 160],
+      [0, 12],
+      Extrapolation.CLAMP
+    ),
+    height: interpolate(
+      sheetHeight.value,
+      [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 160],
+      [28, 34],
+      Extrapolation.CLAMP
+    ),
+  }));
+
+  const sheetHeaderAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      sheetHeight.value,
+      [COLLAPSED_SHEET_HEIGHT + 40, COLLAPSED_SHEET_HEIGHT + 120],
+      [0, 1],
+      Extrapolation.CLAMP
+    ),
+  }));
+
+  const sheetBodyAnimatedStyle = useAnimatedStyle(() => {
+    const progress = interpolate(
+      sheetHeight.value,
+      [COLLAPSED_SHEET_HEIGHT + 45, COLLAPSED_SHEET_HEIGHT + 180],
+      [0, 1],
+      Extrapolation.CLAMP
+    );
+    return {
+      opacity: progress,
+      transform: [{ translateY: interpolate(progress, [0, 1], [14, 0], Extrapolation.CLAMP) }],
+    };
+  });
 
   const confirmButtonStyle = useAnimatedStyle(() => ({
     opacity: confirmAnim.value,
@@ -417,8 +577,21 @@ const HomeScreen = () => {
   }));
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.background} />
+    <View
+      style={[styles.container, { backgroundColor: theme.background }]}
+      onLayout={(e) => {
+        const containerHeight = e.nativeEvent.layout.height;
+        if (containerHeight > 400) {
+          const targetHeight = Math.max(540, Math.round(containerHeight - 105));
+          expandedHeightRef.current = targetHeight;
+          expandedSheetHeight.value = targetHeight;
+        }
+      }}
+    >
+      <StatusBar
+        barStyle={isDarkMode || sheetOpen ? "light-content" : "dark-content"}
+        backgroundColor={sheetOpen ? "rgba(0,0,0,0.55)" : theme.background}
+      />
 
       {/* Header */}
       <Animated.View style={[styles.header, { backgroundColor: theme.background }, headerAnimatedStyle]}>
@@ -540,26 +713,6 @@ const HomeScreen = () => {
               </TouchableOpacity>
             ) : null}
           </View>
-
-          {/* Hızlı Malzeme Ekleme Butonu (Görsel Liste Açma) */}
-          <TouchableOpacity
-            style={[styles.catalogTriggerBtn, { backgroundColor: isDarkMode ? '#181818' : '#fafafa' }]}
-            onPress={openModal}
-            activeOpacity={0.8}
-          >
-            <View style={styles.catalogTriggerLeft}>
-              <View style={styles.catalogIconCircle}>
-                <FontAwesome5 name="th-large" size={13} color="#ff7043" />
-              </View>
-              <View>
-                <Text style={[styles.catalogTriggerTitle, { color: theme.text }]}>Hazır Malzeme Dolabı</Text>
-                <Text style={[styles.catalogTriggerSub, { color: theme.secondaryText }]}>
-                  {activeTab === 'meal' ? 'Sebze, et, bakliyat ve temel gıdalar' : 'Un, süt, şeker ve pasta malzemeleri'}
-                </Text>
-              </View>
-            </View>
-            <FontAwesome5 name="chevron-right" size={12} color={theme.secondaryText} />
-          </TouchableOpacity>
 
           {/* Eklenen Malzemeler (Tag Alanı) */}
           {malzemeler.length > 0 ? (
@@ -711,7 +864,7 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={{ height: 120 }} />
+        <View style={{ height: 165 }} />
       </Animated.ScrollView>
 
       {/* Floating Generate Button */}
@@ -727,65 +880,122 @@ const HomeScreen = () => {
         </Animated.View>
       )}
 
-      {/* 1. Malzeme Seçme Modalı */}
-      <Modal visible={modalVisible} animationType="none" transparent statusBarTranslucent onRequestClose={closeModal}>
-        <View style={styles.modalOverlay}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={closeModal} />
-          <Animated.View style={[styles.modalContainer, { backgroundColor: theme.background }, modalSheetStyle]}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: theme.text }]}>Hazır Malzemeler</Text>
-              <TouchableOpacity onPress={closeModal} style={styles.closeModalBtn}>
-                <FontAwesome5 name="times" size={20} color={theme.secondaryText} />
-              </TouchableOpacity>
-            </View>
-            <ScrollView contentContainerStyle={{ paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
-              {(activeTab === 'meal' ? readyIngredients : dessertIngredients).map((category, index) => (
-                <View key={index} style={{ marginBottom: 40 }}>
-                  <Text style={[styles.categoryTitle, { color: theme.text }]}>{category.title}</Text>
-                  <View style={styles.categoryGrid}>
-                    {category.data.map((item) => {
-                      const isSelected = modalSelected.includes(item.name);
-                      return (
-                        <TouchableOpacity
-                          key={item.name}
-                          style={[
-                            styles.gridItem,
-                            { backgroundColor: isSelected ? '#ff7043' : theme.card },
-                            isSelected && styles.gridItemSelected,
-                          ]}
-                          onPress={() => isSelected ? setModalSelected(modalSelected.filter(m => m !== item.name)) : setModalSelected([...modalSelected, item.name])}
-                          activeOpacity={0.85}
-                        >
-                          {isSelected && (
-                            <View style={styles.checkBadge}>
-                              <FontAwesome5 name="check" size={12} color="#ff7043" />
-                            </View>
-                          )}
-                          {item.image ? (
-                            <ImageBackground source={item.image} style={styles.gridImage} imageStyle={{ borderRadius: 16 }}>
-                              {isSelected && <View style={styles.gridImageSelectedTint} />}
-                              <View style={[styles.gridImageOverlay, isSelected && styles.gridImageOverlaySelected]}>
-                                <Text style={styles.gridImageText}>{item.name}</Text>
-                              </View>
-                            </ImageBackground>
-                          ) : (
-                            <Text style={[styles.gridText, { color: isSelected ? '#fff' : theme.text }]}>{item.name}</Text>
-                          )}
-                        </TouchableOpacity>
-                      )
-                    })}
-                  </View>
+      {/* Açıkken arkada direkt kararan overlay */}
+      {sheetOpen && (
+        <Pressable
+          style={styles.sheetBackdrop}
+          onPress={closeSheet}
+        />
+      )}
+
+      {/* Tab Bar Uzantısı: Direkt Yukarı Genişleyen Reanimated Malzeme Çekmecesi */}
+      <Animated.View
+        style={[
+          styles.expandableSheetContainer,
+          {
+            backgroundColor: isDarkMode ? '#181818' : '#ffffff',
+            shadowOpacity: isDarkMode ? 0.42 : 0.14,
+          },
+          sheetAnimatedStyle,
+        ]}
+      >
+        {/* Sürüklenebilir Üst Kısım */}
+        <Animated.View style={[styles.sheetTopBar, sheetTopBarAnimatedStyle]} {...dockPanResponder.panHandlers}>
+          <View style={[styles.pullDockHandle, { backgroundColor: isDarkMode ? '#3a3a3a' : '#dddddd' }]} />
+
+          <Animated.View style={[styles.sheetHeaderSwapSlot, sheetHeaderSlotAnimatedStyle]}>
+            {/* Kapalı durumdaki "Malzeme Seç" görünümü */}
+            <Animated.View
+              style={[styles.pullDockContent, dockPromptAnimatedStyle]}
+              pointerEvents={sheetOpen ? 'none' : 'auto'}
+            >
+              <FontAwesome5 name="chevron-up" size={11} color="#ff7043" />
+              <Text style={[styles.pullDockText, { color: theme.text }]}>Malzeme Seç</Text>
+              {malzemeler.length > 0 && (
+                <View style={styles.pullDockBadge}>
+                  <Text style={styles.pullDockBadgeText}>{malzemeler.length}</Text>
                 </View>
-              ))}
-            </ScrollView>
-            <Animated.View style={[styles.confirmContainer, confirmButtonStyle]} pointerEvents={modalSelected.length > 0 ? 'auto' : 'none'}>
-              <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
-                <Text style={styles.confirmBtnText}>Seçilenleri Ekle ({modalSelected.length})</Text>
+              )}
+            </Animated.View>
+
+            {/* Açık durumdaki başlık görünümü */}
+            <Animated.View
+              style={[styles.expandedSheetHeaderRow, sheetHeaderAnimatedStyle]}
+              pointerEvents={sheetOpen ? 'auto' : 'none'}
+            >
+              <Text style={[styles.expandedSheetTitle, { color: theme.text }]}>Hazır Malzemeler</Text>
+              <TouchableOpacity
+                onPress={closeSheet}
+                style={[styles.sheetCloseCircle, { backgroundColor: isDarkMode ? '#262626' : '#f1f1f1' }]}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <FontAwesome5 name="chevron-down" size={13} color={theme.text} />
               </TouchableOpacity>
             </Animated.View>
           </Animated.View>
-        </View>
-      </Modal>
+        </Animated.View>
+
+        {/* Çekmece İçeriği */}
+        <Animated.View
+          style={[styles.sheetBodyWrapper, sheetBodyAnimatedStyle]}
+          pointerEvents={sheetOpen ? 'auto' : 'none'}
+        >
+          <ScrollView
+            scrollEnabled={sheetOpen}
+            contentContainerStyle={{
+              paddingHorizontal: 22,
+              paddingTop: 14,
+              paddingBottom: modalSelected.length > 0 ? 92 : 24,
+            }}
+            showsVerticalScrollIndicator={false}
+          >
+            {(activeTab === 'meal' ? readyIngredients : dessertIngredients).map((category, index) => (
+              <View key={index} style={{ marginBottom: 28 }}>
+                <Text style={[styles.categoryTitle, { color: theme.text }]}>{category.title}</Text>
+                <View style={styles.categoryGrid}>
+                  {category.data.map((item) => {
+                    const isSelected = modalSelected.includes(item.name);
+                    return (
+                      <TouchableOpacity
+                        key={item.name}
+                        style={[
+                          styles.gridItem,
+                          { backgroundColor: isSelected ? '#ff7043' : theme.card },
+                          isSelected && styles.gridItemSelected,
+                        ]}
+                        onPress={() => isSelected ? setModalSelected(modalSelected.filter(m => m !== item.name)) : setModalSelected([...modalSelected, item.name])}
+                        activeOpacity={0.85}
+                      >
+                        {isSelected && (
+                          <View style={styles.checkBadge}>
+                            <FontAwesome5 name="check" size={12} color="#ff7043" />
+                          </View>
+                        )}
+                        {item.image ? (
+                          <ImageBackground source={item.image} style={styles.gridImage} imageStyle={{ borderRadius: 16 }}>
+                            {isSelected && <View style={styles.gridImageSelectedTint} />}
+                            <View style={[styles.gridImageOverlay, isSelected && styles.gridImageOverlaySelected]}>
+                              <Text style={styles.gridImageText}>{item.name}</Text>
+                            </View>
+                          </ImageBackground>
+                        ) : (
+                          <Text style={[styles.gridText, { color: isSelected ? '#fff' : theme.text }]}>{item.name}</Text>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+
+          <Animated.View style={[styles.confirmContainer, confirmButtonStyle]} pointerEvents={modalSelected.length > 0 ? 'auto' : 'none'}>
+            <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
+              <Text style={styles.confirmBtnText}>Seçilenleri Ekle ({modalSelected.length})</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </Animated.View>
+      </Animated.View>
 
       {/* 2. Rastgele Tarif Modalı */}
       <Modal visible={randomModalVisible} animationType="none" transparent statusBarTranslucent onRequestClose={closeRandomModal}>
@@ -1005,7 +1215,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 16,
     height: 50,
-    marginBottom: 10,
+    marginBottom: 0,
   },
   searchInput: {
     flex: 1,
@@ -1021,37 +1231,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 8,
-  },
-  catalogTriggerBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 16,
-  },
-  catalogTriggerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  catalogIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 112, 67, 0.12)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  catalogTriggerTitle: {
-    fontSize: 14,
-    fontFamily: 'PoppinsBold',
-  },
-  catalogTriggerSub: {
-    fontSize: 11,
-    fontFamily: 'PoppinsRegular',
-    marginTop: 1,
   },
   activeIngredientsArea: {
     marginTop: 14,
@@ -1254,10 +1433,93 @@ const styles = StyleSheet.create({
   },
   fabContainer: {
     position: 'absolute',
-    bottom: 24,
+    bottom: 62,
     left: 24,
     right: 24,
     zIndex: 10,
+  },
+  sheetBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    zIndex: 30,
+    elevation: 18,
+  },
+  expandableSheetContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -6 },
+    shadowRadius: 16,
+    elevation: 24,
+    zIndex: 35,
+  },
+  sheetTopBar: {
+    paddingTop: 6,
+    paddingBottom: 6,
+    alignItems: 'center',
+  },
+  pullDockHandle: {
+    width: 34,
+    height: 3.5,
+    borderRadius: 2,
+    marginBottom: 4,
+  },
+  sheetHeaderSwapSlot: {
+    width: '100%',
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pullDockContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  pullDockText: {
+    fontSize: 13,
+    fontFamily: 'PoppinsBold',
+    letterSpacing: 0.2,
+  },
+  pullDockBadge: {
+    backgroundColor: 'rgba(255, 112, 67, 0.14)',
+    paddingHorizontal: 7,
+    paddingVertical: 1,
+    borderRadius: 8,
+  },
+  pullDockBadgeText: {
+    color: '#ff7043',
+    fontSize: 11,
+    fontFamily: 'PoppinsBold',
+  },
+  expandedSheetHeaderRow: {
+    position: 'absolute',
+    left: 22,
+    right: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  expandedSheetTitle: {
+    fontSize: 18,
+    fontFamily: 'PoppinsExtraBold',
+  },
+  sheetCloseCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sheetBodyWrapper: {
+    flex: 1,
   },
   fabButton: {
     borderRadius: 20,
@@ -1394,9 +1656,9 @@ const styles = StyleSheet.create({
   },
   confirmContainer: {
     position: 'absolute',
-    bottom: 54,
-    left: 24,
-    right: 24,
+    bottom: 18,
+    left: 22,
+    right: 22,
   },
   confirmBtn: {
     backgroundColor: '#ff7043',
