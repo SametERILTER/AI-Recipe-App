@@ -118,7 +118,7 @@ const RecipeBookScreen = () => {
           <View style={styles.miniTab} />
         </View>
       </View>
-      <Text style={[styles.themeName, { color: isDarkMode ? '#fff' : '#737373' }, isSelected && { color: theme.primary, fontFamily: 'PoppinsBold' }]}>{theme.name}</Text>
+      <Text style={[styles.themeName, { color: isDarkMode ? '#fff' : '#737373' }, isSelected && { color: theme.primary, fontFamily: 'PlusJakartaSansBold' }]}>{theme.name}</Text>
     </TouchableOpacity>
   );
 
@@ -260,25 +260,25 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 28, fontFamily: 'Handwriting' },
   settingsBtn: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, height: 46, borderWidth: 0, borderColor: '#e5e5e5' },
-  searchInput: { flex: 1, paddingHorizontal: 12, fontFamily: 'PoppinsRegular', fontSize: 14 },
+  searchInput: { flex: 1, paddingHorizontal: 12, fontFamily: 'PlusJakartaSansRegular', fontSize: 14 },
   categoryBar: { paddingVertical: 12, borderWidth: 0 },
   categoryChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10, marginRight: 8, borderWidth: 0 },
-  categoryText: { fontSize: 13, fontFamily: 'PoppinsBold' },
+  categoryText: { fontSize: 13, fontFamily: 'PlusJakartaSansBold' },
   recipeCard: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 15, flexDirection: 'row', alignItems: 'center', borderWidth: 0 },
   recipeCardIcon: { width: 42, height: 42, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 15, borderWidth: 0 },
-  recipeTitle: { fontSize: 17, fontFamily: 'PoppinsBold', color: '#262626', marginBottom: 2 },
-  recipeCategory: { fontSize: 12, fontFamily: 'PoppinsBold' },
+  recipeTitle: { fontSize: 17, fontFamily: 'PlusJakartaSansBold', color: '#262626', marginBottom: 2 },
+  recipeCategory: { fontSize: 12, fontFamily: 'PlusJakartaSansBold' },
   addButtonContainer: { position: 'absolute', left: 20, right: 20, bottom: 24, zIndex: 10 },
   addButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ff7043', borderRadius: 16, paddingVertical: 16, elevation: 5 },
-  addButtonText: { fontSize: 16, fontFamily: 'PoppinsBold', color: '#fff' },
+  addButtonText: { fontSize: 16, fontFamily: 'PlusJakartaSansBold', color: '#fff' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContainer: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, height: 600 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  modalHeading: { fontSize: 20, fontFamily: 'PoppinsExtraBold', color: '#262626' },
+  modalHeading: { fontSize: 20, fontFamily: 'PlusJakartaSansExtraBold', color: '#262626' },
   settingSection: { marginBottom: 20 },
-  settingLabel: { fontSize: 15, fontFamily: 'PoppinsBold', color: '#737373', marginBottom: 10 },
+  settingLabel: { fontSize: 15, fontFamily: 'PlusJakartaSansBold', color: '#737373', marginBottom: 10 },
   nameInputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 12, paddingHorizontal: 15, height: 50, borderWidth: 0, borderColor: '#e5e5e5' },
-  nameInput: { flex: 1, fontSize: 15, fontFamily: 'PoppinsRegular', color: '#262626' },
+  nameInput: { flex: 1, fontSize: 15, fontFamily: 'PlusJakartaSansRegular', color: '#262626' },
   themeOption: { width: 90, marginRight: 12, alignItems: 'center', padding: 4, borderRadius: 12, borderWidth: 0, borderColor: 'transparent' },
   miniPhone: { width: 70, height: 100, borderRadius: 10, borderWidth: 0, overflow: 'hidden', marginBottom: 5 },
   miniHeader: { height: 20, borderWidth: 0 },
@@ -286,11 +286,11 @@ const styles = StyleSheet.create({
   miniCard: { height: 10, borderRadius: 3, backgroundColor: '#fff', borderWidth: 0 },
   miniTabbar: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 12, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', borderWidth: 0, borderTopColor: '#eee' },
   miniTab: { width: 8, height: 2, backgroundColor: '#eee' },
-  themeName: { fontSize: 11, fontFamily: 'PoppinsRegular' },
+  themeName: { fontSize: 11, fontFamily: 'PlusJakartaSansRegular' },
   doneBtn: { height: 50, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
-  doneBtnText: { color: '#fff', fontSize: 15, fontFamily: 'PoppinsBold' },
+  doneBtnText: { color: '#fff', fontSize: 15, fontFamily: 'PlusJakartaSansBold' },
   emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 40 },
-  emptyTitle: { fontSize: 18, fontFamily: 'PoppinsBold', color: '#737373', marginBottom: 5 },
+  emptyTitle: { fontSize: 18, fontFamily: 'PlusJakartaSansBold', color: '#737373', marginBottom: 5 },
   emptySubtitle: { fontSize: 14, color: '#a3a3a3', textAlign: 'center' },
 });
 

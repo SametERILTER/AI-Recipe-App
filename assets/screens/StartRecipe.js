@@ -35,7 +35,7 @@ function parseInlineBold(text, baseStyle) {
             {parts.map((part, index) => {
                 if (part.startsWith('**') && part.endsWith('**')) {
                     return (
-                        <Text key={index} style={{ fontFamily: 'PoppinsBold' }}>
+                        <Text key={index} style={{ fontFamily: 'PlusJakartaSansBold' }}>
                             {part.substring(2, part.length - 2)}
                         </Text>
                     );
@@ -816,7 +816,7 @@ const StartRecipe = ({ route, navigation }) => {
                                 <View style={[styles.infoIconBox, { backgroundColor: '#ef444415', marginBottom: 20, marginRight: 0 }]}>
                                     <MaterialCommunityIcons name="cellphone-off" size={48} color="#ef4444" />
                                 </View>
-                                <Text style={{ color: theme.text, textAlign: 'center', marginBottom: 32, fontSize: 16, fontFamily: 'PoppinsRegular', lineHeight: 24 }}>
+                                <Text style={{ color: theme.text, textAlign: 'center', marginBottom: 32, fontSize: 16, fontFamily: 'PlusJakartaSansRegular', lineHeight: 24 }}>
                                     Sensör ve sallama hareketleri ile adım geçişi yapmak için ayarlardan bu özelliği aktifleştirebilirsiniz.
                                 </Text>
                                 <TouchableOpacity
@@ -915,7 +915,7 @@ const StartRecipe = ({ route, navigation }) => {
                                         {isSelected && (
                                             <View style={styles.playingBadge}>
                                                 <FontAwesome5 name="volume-up" size={12} color={item.color} />
-                                                <Text style={{ fontSize: 10, fontFamily: 'PoppinsBold', color: item.color, marginLeft: 4 }}>Çaliyor</Text>
+                                                <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSansBold', color: item.color, marginLeft: 4 }}>Çaliyor</Text>
                                             </View>
                                         )}
 
@@ -932,7 +932,7 @@ const StartRecipe = ({ route, navigation }) => {
                         {isPlaying && (
                             <TouchableOpacity style={styles.stopMusicCheckButton} onPress={stopSound}>
                                 <FontAwesome5 name="stop" size={14} color="#ef4444" style={{ marginRight: 8 }} />
-                                <Text style={{ fontFamily: 'PoppinsBold', color: '#ef4444' }}>Müziği Durdur</Text>
+                                <Text style={{ fontFamily: 'PlusJakartaSansBold', color: '#ef4444' }}>Müziği Durdur</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -965,7 +965,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 16,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#383838',
     },
     progressContainer: {
@@ -1018,18 +1018,18 @@ const styles = StyleSheet.create({
     },
     stepBadgeText: {
         color: '#fff',
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         fontSize: 18,
     },
     stepLabel: {
         fontSize: 14,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#a3a3a3',
         letterSpacing: 1.5,
     },
     stepTextContent: {
         fontSize: 22,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#2a3340ff',
         textAlign: 'left',
         lineHeight: 34,
@@ -1064,7 +1064,7 @@ const styles = StyleSheet.create({
     },
     nextButtonText: {
         fontSize: 18,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#fff',
     },
     disabledButton: {
@@ -1088,7 +1088,7 @@ const styles = StyleSheet.create({
     },
     congratsTitle: {
         fontSize: 24,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
         color: '#262626',
         marginBottom: 6,
         textAlign: 'center',
@@ -1096,7 +1096,7 @@ const styles = StyleSheet.create({
     congratsSubtitle: {
         fontSize: 14,
         color: '#737373',
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         textAlign: 'center',
         marginBottom: 20,
         lineHeight: 20,
@@ -1111,7 +1111,7 @@ const styles = StyleSheet.create({
     },
     tipsTitle: {
         fontSize: 18,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#262626',
         marginBottom: 16,
     },
@@ -1133,7 +1133,7 @@ const styles = StyleSheet.create({
     tipText: {
         fontSize: 15,
         color: '#2a3340ff',
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         lineHeight: 22,
         flex: 1,
     },
@@ -1152,7 +1152,7 @@ const styles = StyleSheet.create({
     },
     finishButtonText: {
         fontSize: 18,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#fff',
     },
     bottomGradient: {
@@ -1179,12 +1179,12 @@ const styles = StyleSheet.create({
     },
     chefTipTitle: {
         fontSize: 15,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#262626',
     },
     chefTipText: {
         fontSize: 15,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         color: '#2a3340ff',
         lineHeight: 24,
     },
@@ -1203,21 +1203,21 @@ const styles = StyleSheet.create({
     },
     preparedFoodLabel: {
         fontSize: 11,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#f97316',
         marginBottom: 4,
         letterSpacing: 1.2,
     },
     preparedFoodName: {
         fontSize: 18,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
         color: '#c2410c',
         textAlign: 'center',
         lineHeight: 25,
     },
     cheerText: {
         fontSize: 14,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         color: '#525252',
         marginTop: 2,
         textAlign: 'center',
@@ -1241,7 +1241,7 @@ const styles = StyleSheet.create({
     },
     saveButtonText: {
         fontSize: 15,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#ff7043',
     },
     homeActionButton: {
@@ -1282,7 +1282,7 @@ const styles = StyleSheet.create({
     },
     musicButtonText: {
         fontSize: 14,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#ff7043',
     },
     musicModalContent: {
@@ -1306,13 +1306,13 @@ const styles = StyleSheet.create({
     },
     musicModalTitle: {
         fontSize: 24,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
         color: '#262626',
         marginBottom: 4,
     },
     musicModalSubtitle: {
         fontSize: 15,
-        fontFamily: 'PoppinsMedium',
+        fontFamily: 'PlusJakartaSansMedium',
         color: '#737373',
     },
     modalCloseButtonSmall: {
@@ -1349,7 +1349,7 @@ const styles = StyleSheet.create({
     },
     musicCardTitle: {
         fontSize: 18,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
         color: '#fff',
         marginLeft: 16,
         flex: 1,
@@ -1384,7 +1384,7 @@ const styles = StyleSheet.create({
 
     homeActionButtonText: {
         fontSize: 15,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#fff',
     },
     speakButton: {
@@ -1406,7 +1406,7 @@ const styles = StyleSheet.create({
     },
     speakButtonText: {
         fontSize: 12,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#fff',
     },
     // Sensor Info & Modal Styles
@@ -1425,7 +1425,7 @@ const styles = StyleSheet.create({
     },
     sensorInfoText: {
         fontSize: 11,
-        fontFamily: 'PoppinsMedium',
+        fontFamily: 'PlusJakartaSansMedium',
         color: '#a3a3a3',
         marginRight: 6,
     },
@@ -1464,14 +1464,14 @@ const styles = StyleSheet.create({
     },
     modalTitle: {
         fontSize: 22,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#262626',
         marginBottom: 8,
         marginTop: 10,
     },
     modalSubtitle: {
         fontSize: 14,
-        fontFamily: 'PoppinsMedium',
+        fontFamily: 'PlusJakartaSansMedium',
         color: '#737373',
         marginBottom: 32,
         textAlign: 'center',
@@ -1495,13 +1495,13 @@ const styles = StyleSheet.create({
     },
     infoTopic: {
         fontSize: 16,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#262626',
         marginBottom: 4,
     },
     infoDesc: {
         fontSize: 14,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         color: '#737373',
         lineHeight: 20,
     },
@@ -1521,7 +1521,7 @@ const styles = StyleSheet.create({
     },
     gotItButtonText: {
         fontSize: 16,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#fff',
     },
     termBox: {
@@ -1532,7 +1532,7 @@ const styles = StyleSheet.create({
     },
     termTitle: {
         fontSize: 12,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#0369a1',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
@@ -1540,7 +1540,7 @@ const styles = StyleSheet.create({
     termText: {
         fontSize: 14,
         color: '#075985',
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         lineHeight: 20,
     },
     savedInfoBadge: {
@@ -1557,7 +1557,7 @@ const styles = StyleSheet.create({
     },
     savedInfoText: {
         fontSize: 15,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#10b981',
     },
     toastContainer: {
@@ -1583,7 +1583,7 @@ const styles = StyleSheet.create({
     },
     toastText: {
         color: '#fff',
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         fontSize: 15,
     },
 });

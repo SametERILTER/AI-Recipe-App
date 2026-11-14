@@ -39,7 +39,7 @@ function parseInlineBold(text, baseStyle) {
       {parts.map((part, index) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           return (
-            <Text key={index} style={{ fontFamily: 'PoppinsBold' }}>
+            <Text key={index} style={{ fontFamily: 'PlusJakartaSansBold' }}>
               {part.substring(2, part.length - 2)}
             </Text>
           );
@@ -185,7 +185,7 @@ function renderFormattedText(text, theme, isDarkMode) {
 
     if (/^-/.test(line.trim())) {
       return (
-        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: isDarkMode ? theme.card : '#ffffff', borderBottomColor: theme.border, borderWidth: 0 }]}>
+        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: theme.background, borderBottomColor: theme.border, borderWidth: 0 }]}>
           <View style={styles.ingredientIconContainer}>
             <FontAwesome5 name="check" size={10} color="#ff7043" />
           </View>
@@ -589,29 +589,29 @@ const SavedRecipeDetail = ({ route, navigation }) => {
                   {prepTime !== '-' && (
                     <View style={{ flex: 1, height: 82, backgroundColor: theme.card, borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: theme.border }}>
                       <FontAwesome5 name="clock" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
-                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Süre</Text>
-                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{prepTime}</Text>
+                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PlusJakartaSansRegular', textAlign: 'center' }}>Süre</Text>
+                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PlusJakartaSansBold' }} numberOfLines={1}>{prepTime}</Text>
                     </View>
                   )}
                   {difficulty !== '-' && (
                     <View style={{ flex: 1, height: 82, backgroundColor: theme.card, borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: theme.border }}>
                       <FontAwesome5 name="chart-bar" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
-                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Zorluk</Text>
-                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{difficulty}</Text>
+                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PlusJakartaSansRegular', textAlign: 'center' }}>Zorluk</Text>
+                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PlusJakartaSansBold' }} numberOfLines={1}>{difficulty}</Text>
                     </View>
                   )}
                   {calorie !== '-' && (
                     <View style={{ flex: 1, height: 82, backgroundColor: theme.card, borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: theme.border }}>
                       <FontAwesome5 name="fire-alt" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
-                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Kalori</Text>
-                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{calorie}</Text>
+                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PlusJakartaSansRegular', textAlign: 'center' }}>Kalori</Text>
+                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PlusJakartaSansBold' }} numberOfLines={1}>{calorie}</Text>
                     </View>
                   )}
                   {portion !== '-' && (
                     <View style={{ flex: 1, height: 82, backgroundColor: theme.card, borderRadius: 14, justifyContent: 'center', alignItems: 'center', padding: 4, borderWidth: 0, borderColor: theme.border }}>
                       <FontAwesome5 name="users" size={18} color="#ff7043" style={{ marginBottom: 6 }} />
-                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PoppinsRegular', textAlign: 'center' }}>Porsiyon</Text>
-                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PoppinsBold' }} numberOfLines={1}>{portion}</Text>
+                      <Text style={{ fontSize: 11, color: theme.secondaryText, fontFamily: 'PlusJakartaSansRegular', textAlign: 'center' }}>Porsiyon</Text>
+                      <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', marginTop: 2, fontFamily: 'PlusJakartaSansBold' }} numberOfLines={1}>{portion}</Text>
                     </View>
                   )}
                 </View>
@@ -700,7 +700,7 @@ const styles = StyleSheet.create({
   },
   recipeName: {
     fontSize: 28,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
     color: '#262626',
     marginBottom: 12,
   },
@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
   ingredientsText: {
     fontSize: 14,
     color: '#ff7043',
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginLeft: 6,
   },
   metaTag: {
@@ -741,7 +741,7 @@ const styles = StyleSheet.create({
   metaText: {
     fontSize: 13,
     color: '#737373',
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginLeft: 6,
   },
   recipeCard: {
@@ -772,14 +772,14 @@ const styles = StyleSheet.create({
   imageCaption: {
     color: '#fff',
     fontSize: 10,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     textAlign: 'center',
     opacity: 0.7,
   },
   imageCredit: {
     color: '#fff',
     fontSize: 10,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     textAlign: 'center',
   },
   sectionIcon: {
@@ -787,7 +787,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#262626',
   },
   stepContainer: {
@@ -821,14 +821,14 @@ const styles = StyleSheet.create({
   },
   stepNumberText: {
     fontSize: 14,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#fff',
   },
   stepText: {
     flex: 1,
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 24,
     paddingTop: 2,
   },
@@ -857,7 +857,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2a3340',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 22,
   },
   bulletContainer: {
@@ -878,13 +878,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 24,
   },
   normalText: {
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 24,
     marginBottom: 8,
   },
@@ -956,7 +956,7 @@ const styles = StyleSheet.create({
   startButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     zIndex: 6
   },
   stickyHeader: {
@@ -991,7 +991,7 @@ const styles = StyleSheet.create({
   },
   stickyHeaderTitle: {
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#262626',
     flex: 1,
     textAlign: 'center',
@@ -1013,7 +1013,7 @@ const styles = StyleSheet.create({
   voiceButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   termBox: {
     marginTop: 12,
@@ -1023,7 +1023,7 @@ const styles = StyleSheet.create({
   },
   termTitle: {
     fontSize: 12,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#0369a1',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -1031,7 +1031,7 @@ const styles = StyleSheet.create({
   termText: {
     fontSize: 13,
     color: '#075985',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 18,
   },
   chefTipContainer: {
@@ -1047,12 +1047,12 @@ const styles = StyleSheet.create({
   },
   chefTipTitle: {
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#262626',
   },
   chefTipText: {
     fontSize: 15,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     color: '#2a3340ff',
     lineHeight: 24,
   },

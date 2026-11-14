@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
     },
     centeredHeaderTitle: {
         fontSize: 18,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         textAlign: 'center',
     },
     bigTitleContainer: {
@@ -388,14 +388,14 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 28,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
     },
     section: {
         marginBottom: 24,
     },
     sectionHeader: {
         fontSize: 16,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
         marginBottom: 12,
         marginLeft: 4,
         letterSpacing: 0.5,
@@ -424,11 +424,11 @@ const styles = StyleSheet.create({
     },
     settingTitle: {
         fontSize: 15,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
     },
     settingSubtitle: {
         fontSize: 12,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         marginTop: 2,
     },
     divider: {
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     versionText: {
         textAlign: 'center',
         fontSize: 12,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         marginTop: 8,
     },
     modalOverlay: {
@@ -454,12 +454,12 @@ const styles = StyleSheet.create({
     },
     modalTitle: {
         fontSize: 20,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
         marginBottom: 6,
     },
     modalSub: {
         fontSize: 13,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         marginBottom: 16,
     },
     optionCard: {
@@ -472,12 +472,12 @@ const styles = StyleSheet.create({
     },
     optionLabel: {
         fontSize: 15,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         marginBottom: 3,
     },
     optionDesc: {
         fontSize: 12,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         lineHeight: 17,
     },
 });

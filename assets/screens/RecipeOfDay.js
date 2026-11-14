@@ -316,10 +316,10 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 180, justifyContent: 'flex-end', padding: 16 }}
                     >
                         <View style={styles.cardContent}>
-                            <Text style={{ fontFamily: 'PoppinsBold', fontSize: 24, color: '#fff', textShadowColor: 'rgba(0, 0, 0, 0.3)', textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3 }}>
+                            <Text style={{ fontFamily: 'PlusJakartaSansBold', fontSize: 24, color: '#fff', textShadowColor: 'rgba(0, 0, 0, 0.3)', textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3 }}>
                                 Akşam Menüsü
                             </Text>
-                            <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 14, color: '#ecfeff' }}>
+                            <Text style={{ fontFamily: 'PlusJakartaSansRegular', fontSize: 14, color: '#ecfeff' }}>
                                 3 Lezzet Bir Arada
                             </Text>
                         </View>
@@ -336,8 +336,8 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                                     <FontAwesome5 name="mug-hot" size={16} color="#3b82f6" />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 12, color: theme.secondaryText, marginBottom: 2 }}>Başlangıç</Text>
-                                    <Text style={{ fontFamily: 'PoppinsBold', fontSize: 15, color: theme.text }}>{menu.dinnerSet.soup.isim}</Text>
+                                    <Text style={{ fontFamily: 'PlusJakartaSansRegular', fontSize: 12, color: theme.secondaryText, marginBottom: 2 }}>Başlangıç</Text>
+                                    <Text style={{ fontFamily: 'PlusJakartaSansBold', fontSize: 15, color: theme.text }}>{menu.dinnerSet.soup.isim}</Text>
                                 </View>
                                 <FontAwesome5 name="chevron-right" size={12} color={theme.border} />
                             </TouchableOpacity>
@@ -352,8 +352,8 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                                     <FontAwesome5 name="leaf" size={16} color="#22c55e" />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 12, color: theme.secondaryText, marginBottom: 2 }}>Yan Lezzet</Text>
-                                    <Text style={{ fontFamily: 'PoppinsBold', fontSize: 15, color: theme.text }}>{menu.dinnerSet.side.isim}</Text>
+                                    <Text style={{ fontFamily: 'PlusJakartaSansRegular', fontSize: 12, color: theme.secondaryText, marginBottom: 2 }}>Yan Lezzet</Text>
+                                    <Text style={{ fontFamily: 'PlusJakartaSansBold', fontSize: 15, color: theme.text }}>{menu.dinnerSet.side.isim}</Text>
                                 </View>
                                 <FontAwesome5 name="chevron-right" size={12} color={theme.border} />
                             </TouchableOpacity>
@@ -368,8 +368,8 @@ ${recipe.hazirlanis.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                                     <FontAwesome5 name="utensils" size={16} color="#9333ea" />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={{ fontFamily: 'PoppinsBold', fontSize: 11, color: "#9333ea", marginBottom: 2 }}>ANA ÖĞÜN</Text>
-                                    <Text style={{ fontFamily: 'PoppinsBold', fontSize: 16, color: isDarkMode ? '#c084fc' : '#6b21a8' }}>{menu.dinnerSet.main.isim}</Text>
+                                    <Text style={{ fontFamily: 'PlusJakartaSansBold', fontSize: 11, color: "#9333ea", marginBottom: 2 }}>ANA ÖĞÜN</Text>
+                                    <Text style={{ fontFamily: 'PlusJakartaSansBold', fontSize: 16, color: isDarkMode ? '#c084fc' : '#6b21a8' }}>{menu.dinnerSet.main.isim}</Text>
                                 </View>
                                 <FontAwesome5 name="chevron-right" size={12} color={isDarkMode ? '#581c87' : '#d8b4fe'} />
                             </TouchableOpacity>
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#262626',
     },
     scrollContent: {
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 15,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         color: '#737373',
         marginBottom: 30,
         textAlign: 'center',
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
     },
     mealTitle: {
         fontSize: 18,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#383838',
     },
     card: {
@@ -503,17 +503,17 @@ const styles = StyleSheet.create({
     tagText: {
         color: '#fff',
         fontSize: 11,
-        fontFamily: 'PoppinsMedium',
+        fontFamily: 'PlusJakartaSansMedium',
     },
     recipeName: {
         fontSize: 20,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#fff',
         marginBottom: 4,
     },
     recipeIngredients: {
         fontSize: 13,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         color: 'rgba(255,255,255,0.9)',
     },
     connectorLine: {
@@ -535,13 +535,13 @@ const styles = StyleSheet.create({
     },
     infoTitle: {
         fontSize: 14,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#525252',
         marginBottom: 2,
     },
     infoText: {
         fontSize: 12,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         color: '#737373',
         lineHeight: 16,
     }

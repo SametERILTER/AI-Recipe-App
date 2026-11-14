@@ -508,16 +508,16 @@ const styles = StyleSheet.create({
   },
   centeredHeaderTitle: {
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     textAlign: 'center',
   },
   title: {
     fontSize: 28,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
   },
   subtitle: {
     fontSize: 14,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     marginTop: 4,
   },
   scrollContainer: {
@@ -543,7 +543,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 12,
     fontSize: 16,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
   },
   clearBtn: {
     padding: 4,
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   dailyCard: {
     height: 220,
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
   dailyBadgeText: {
     color: '#fff',
     fontSize: 12,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   difficultyBadge: {
     flexDirection: 'row',
@@ -606,11 +606,11 @@ const styles = StyleSheet.create({
   difficultyText: {
     color: '#fff',
     fontSize: 12,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   dailyTitle: {
     fontSize: 26,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
     color: '#fff',
     marginBottom: 16,
     lineHeight: 32,
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
   dailyMetaText: {
     color: '#fff',
     fontSize: 14,
-    fontFamily: 'PoppinsSemiBold',
+    fontFamily: 'PlusJakartaSansSemiBold',
   },
   dailyButton: {
     flexDirection: 'row',
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
   },
   dailyButtonText: {
     color: '#ff7043',
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     fontSize: 14,
   },
   dailyDecorIcon: {
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
   resultsTitle: {
     fontSize: 16,
     marginBottom: 16,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   recipeCard: {
     padding: 16,
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
   },
   recipeName: {
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginBottom: 8,
   },
   metaContainer: {
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 13,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
   },
   difficultyContainer: {
     flexDirection: 'row',
@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
   },
   difficultyLabelText: {
     fontSize: 12,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
   },
   starContainer: {
     flexDirection: 'row',
@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
   },
   catCardTitle: {
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     lineHeight: 20,
   },
   catCardBottom: {
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
   },
   catMetaText: {
     fontSize: 11,
-    fontFamily: 'PoppinsRegular'
+    fontFamily: 'PlusJakartaSansRegular'
   },
   quickCatSection: {
     marginTop: 24,
@@ -791,12 +791,12 @@ const styles = StyleSheet.create({
   },
   quickCatText: {
     fontSize: 14,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginBottom: 2,
   },
   quickCatCount: {
     fontSize: 11,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
   },
   quickCatArrow: {
     opacity: 0.5,

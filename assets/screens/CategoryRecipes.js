@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 32,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
         color: '#262626',
     },
     badge: {
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     countText: {
         fontSize: 15,
         color: '#737373',
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
     },
     listContainer: {
         paddingHorizontal: 24,
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     },
     recipeName: {
         fontSize: 18,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#262626',
         marginBottom: 8,
     },
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     metaText: {
         fontSize: 13,
         color: '#737373',
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
     },
     difficultyContainer: {
         flexDirection: 'row',
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     difficultyLabelText: {
         fontSize: 12,
         color: '#a3a3a3',
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
     },
     actionArea: {
         marginLeft: 15,
@@ -309,14 +309,14 @@ const styles = StyleSheet.create({
     },
     aiTitle: {
         fontSize: 18,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         color: '#fff',
         marginBottom: 4,
     },
     aiSubtitle: {
         fontSize: 13,
         color: 'rgba(255,255,255,0.9)',
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         marginBottom: 12,
         lineHeight: 18,
     },
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     },
     aiButtonText: {
         color: '#ff7043',
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
         fontSize: 13,
     },
     aiDecorIcon: {

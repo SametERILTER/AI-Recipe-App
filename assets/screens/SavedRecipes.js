@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: 26,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
     letterSpacing: 0.3,
   },
   headerSearchBtn: {
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 12,
     fontSize: 16,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
   },
   categoryBar: {
     marginVertical: 12,
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 14,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   categoryTextActive: {
     color: '#fff',
@@ -340,12 +340,12 @@ const styles = StyleSheet.create({
   },
   recipeListTitle: {
     fontSize: 16,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginBottom: 3,
   },
   recipeListSub: {
     fontSize: 12,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 16,
   },
   chevronBox: {
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 18,
     textAlign: 'center',
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
 });
 

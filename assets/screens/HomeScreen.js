@@ -13,7 +13,10 @@ import {
   ImageBackground,
   Keyboard,
   PanResponder,
-  BackHandler
+  BackHandler,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -36,6 +39,10 @@ import { getRecentRecipes } from '../utils/recentRecipes';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 const HomeScreen = () => {
   const { isDarkMode, theme } = useTheme();
   const insets = useSafeAreaInsets();
@@ -43,7 +50,57 @@ const HomeScreen = () => {
   const modalScrollBottomPadding = Math.max(insets.bottom + 115, 145);
   const [input, setInput] = useState('');
   const [malzemeler, setMalzemeler] = useState([]);
+  const hasIngredients = malzemeler.length > 0;
+  const [showSubmitButton, setShowSubmitButton] = useState(hasIngredients);
+  const footerProgress = useSharedValue(hasIngredients ? 1 : 0);
+  const wasPantryOpenRef = useRef(false);
   const scrollY = useSharedValue(0);
+
+  useEffect(() => {
+    if (pantryModalVisible) {
+      wasPantryOpenRef.current = true;
+      return;
+    }
+
+    const applyChange = () => {
+      if (hasIngredients === showSubmitButton) return;
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      if (hasIngredients) {
+        footerProgress.value = 0;
+      }
+      setShowSubmitButton(hasIngredients);
+    };
+
+    if (wasPantryOpenRef.current) {
+      wasPantryOpenRef.current = false;
+      const timer = setTimeout(applyChange, 120);
+      return () => clearTimeout(timer);
+    }
+
+    applyChange();
+  }, [hasIngredients, pantryModalVisible]);
+
+  useEffect(() => {
+    if (showSubmitButton) {
+      requestAnimationFrame(() => {
+        footerProgress.value = withTiming(1, {
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+        });
+      });
+    }
+  }, [showSubmitButton]);
+
+  const wizardSubmitBtnAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: interpolate(footerProgress.value, [0, 1], [32, 0], Extrapolation.CLAMP),
+      },
+      {
+        scale: interpolate(footerProgress.value, [0, 1], [0.92, 1], Extrapolation.CLAMP),
+      },
+    ],
+  }));
   const [greeting, setGreeting] = useState('Merhaba');
 
   const navigation = useNavigation();
@@ -313,8 +370,18 @@ const HomeScreen = () => {
   }, [pantryModalVisible]);
 
   const confirmPantrySelection = () => {
-    setMalzemeler([...pantrySelected]);
+    const next = [...pantrySelected];
+    setMalzemeler(next);
     closePantryModal();
+    setTimeout(() => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      if (next.length > 0) {
+        footerProgress.value = 0;
+        setShowSubmitButton(true);
+      } else {
+        setShowSubmitButton(false);
+      }
+    }, 340);
   };
 
   const togglePantryItem = (name) => {
@@ -499,7 +566,7 @@ const HomeScreen = () => {
 
   const bigTitleAnimatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(scrollY.value, [0, 45], [1, 0], Extrapolation.CLAMP),
-    height: interpolate(scrollY.value, [0, 70], [38, 0], Extrapolation.CLAMP),
+    height: interpolate(scrollY.value, [0, 70], [44, 0], Extrapolation.CLAMP),
     transform: [
       { translateY: interpolate(scrollY.value, [0, 55], [0, -10], Extrapolation.CLAMP) },
     ],
@@ -782,7 +849,7 @@ const HomeScreen = () => {
             {/* Modal Header */}
             <View style={styles.wizardModalHeader}>
               <View style={{ flex: 1 }}>
-                <Text style={[styles.modalTitle, { color: theme.text }]}>Tarif Sihirbazı</Text>
+                <Text style={[styles.modalTitle, { color: theme.text }]}>Tarif Üret</Text>
                 <Text style={[styles.modalSubTitle, { color: theme.secondaryText }]}>
                   Malzemelerini seç, şefin tarifini yazsın
                 </Text>
@@ -887,7 +954,7 @@ const HomeScreen = () => {
                     <FontAwesome5 name="images" size={13} color="#fff" />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={[styles.openPantryTitle, { color: theme.text }]}>Resimli Dolaptan Seç</Text>
+                    <Text style={[styles.openPantryTitle, { color: theme.text }]}>Hazır Malzemelerden Seç</Text>
                     <Text style={[styles.openPantrySub, { color: theme.secondaryText }]}>
                       Fotoğraflı hazır malzemeleri dokunarak ekle
                     </Text>
@@ -955,7 +1022,7 @@ const HomeScreen = () => {
                           style={[
                             styles.wizardPortionText,
                             { color: isSelected ? '#ffffff' : theme.text },
-                            isSelected && { fontFamily: 'PoppinsBold' }
+                            isSelected && { fontFamily: 'PlusJakartaSansBold' }
                           ]}
                         >
                           {option.label}
@@ -1012,7 +1079,7 @@ const HomeScreen = () => {
               </View>
             </ScrollView>
 
-            {/* Sabit Alt Buton */}
+            {/* Sabit Alt Butonlar */}
             <View
               style={[
                 styles.wizardStickyBottom,
@@ -1023,27 +1090,47 @@ const HomeScreen = () => {
                 },
               ]}
             >
-              <TouchableOpacity
-                style={[
-                  styles.wizardSubmitBtn,
-                  { opacity: malzemeler.length > 0 ? 1 : 0.6 }
-                ]}
-                onPress={tarifUret}
-                disabled={malzemeler.length === 0}
-                activeOpacity={0.88}
-              >
-                <LinearGradient
-                  colors={malzemeler.length > 0 ? ['#ff7043', '#ea580c'] : ['#bdbdbd', '#9e9e9e']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.wizardSubmitBtnGradient}
-                >
-                  <FontAwesome5 name="magic" size={17} color="#fff" style={{ marginRight: 10 }} />
-                  <Text style={styles.wizardSubmitBtnText}>
-                    {malzemeler.length > 0 ? `Tarifi Oluştur (${malzemeler.length} Malzeme)` : 'En Az 1 Malzeme Ekleyin'}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
+              <View style={styles.wizardFooterRow}>
+                <View style={{ flex: 1 }}>
+                  <TouchableOpacity
+                    style={[
+                      styles.wizardPantryBottomBtn,
+                      {
+                        backgroundColor: theme.card,
+                      },
+                    ]}
+                    onPress={openPantryModal}
+                    activeOpacity={0.85}
+                  >
+                    <FontAwesome5 name="images" size={15} color="#ff7043" style={{ marginRight: 8 }} />
+                    <Text style={[styles.wizardPantryBottomBtnText, { color: '#ff7043' }]} numberOfLines={1}>
+                      Malzeme Seç
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {showSubmitButton && (
+                  <Animated.View style={[{ flex: 1.35 }, wizardSubmitBtnAnimatedStyle]}>
+                    <TouchableOpacity
+                      style={styles.wizardSubmitBtn}
+                      onPress={tarifUret}
+                      activeOpacity={0.88}
+                    >
+                      <LinearGradient
+                        colors={['#ff7043', '#ea580c']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.wizardSubmitBtnGradient}
+                      >
+                        <FontAwesome5 name="magic" size={15} color="#fff" style={{ marginRight: 8 }} />
+                        <Text style={styles.wizardSubmitBtnText} numberOfLines={1}>
+                          {`Tarifi Oluştur (${malzemeler.length})`}
+                        </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </Animated.View>
+                )}
+              </View>
             </View>
           </Animated.View>
         </View>
@@ -1315,7 +1402,7 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 13,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#ff7043',
     letterSpacing: 0.3,
   },
@@ -1323,19 +1410,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     fontSize: 18,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
   },
   bigTitleSlot: {
-    height: 38,
+    height: 44,
     justifyContent: 'center',
     overflow: 'hidden',
   },
   headerTitle: {
     fontSize: 26,
-    fontFamily: 'PoppinsExtraBold',
+    lineHeight: 34,
+    includeFontPadding: false,
+    fontFamily: 'PlusJakartaSansExtraBold',
   },
   scrollContent: {
-    paddingTop: 136,
+    paddingTop: 142,
     paddingHorizontal: 24,
     paddingBottom: 24,
   },
@@ -1367,10 +1456,10 @@ const styles = StyleSheet.create({
   },
   modeBtnText: {
     fontSize: 13,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: 'PlusJakartaSansMedium',
   },
   modeBtnTextActive: {
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   searchBarBox: {
     flexDirection: 'row',
@@ -1383,7 +1472,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 12,
     fontSize: 14,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
   },
   addIngredientBtn: {
     width: 34,
@@ -1407,11 +1496,11 @@ const styles = StyleSheet.create({
   },
   activeIngredientsCount: {
     fontSize: 12,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: 'PlusJakartaSansMedium',
   },
   clearAllBtnText: {
     fontSize: 12,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#ff7043',
   },
   ingredientsChipsRow: {
@@ -1430,7 +1519,7 @@ const styles = StyleSheet.create({
   },
   myIngredientChipText: {
     fontSize: 13,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: 'PlusJakartaSansMedium',
   },
   myIngredientRemoveBtn: {
     width: 18,
@@ -1446,13 +1535,13 @@ const styles = StyleSheet.create({
   },
   cardHeaderTitle: {
     fontSize: 17,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginBottom: 14,
     letterSpacing: 0,
   },
   miniHeader: {
     fontSize: 12,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     letterSpacing: 0.5,
     marginBottom: 10,
   },
@@ -1470,10 +1559,10 @@ const styles = StyleSheet.create({
   },
   portionItemText: {
     fontSize: 13,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: 'PlusJakartaSansMedium',
   },
   portionItemTextActive: {
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   styleHeaderRow: {
     flexDirection: 'row',
@@ -1493,10 +1582,10 @@ const styles = StyleSheet.create({
   },
   styleChipText: {
     fontSize: 13,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: 'PlusJakartaSansMedium',
   },
   styleChipTextActive: {
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   quickCardsRow: {
     flexDirection: 'row',
@@ -1531,25 +1620,25 @@ const styles = StyleSheet.create({
   },
   gradientCardTitle: {
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#ffffff',
     marginTop: 10,
     marginBottom: 2,
   },
   gradientCardDesc: {
     fontSize: 11,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     color: 'rgba(255, 255, 255, 0.85)',
   },
   plainCardTitle: {
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginTop: 10,
     marginBottom: 2,
   },
   plainCardDesc: {
     fontSize: 11,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
   },
   quickActionHalf: {
     flex: 1,
@@ -1583,13 +1672,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quickCardTitle: {
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     fontSize: 15,
     color: '#fff',
     marginBottom: 2,
   },
   quickCardSub: {
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     fontSize: 11,
     color: 'rgba(255,255,255,0.88)',
   },
@@ -1624,7 +1713,7 @@ const styles = StyleSheet.create({
   },
   heroBadgeText: {
     fontSize: 11,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#ff7043',
     letterSpacing: 0.3,
   },
@@ -1637,17 +1726,17 @@ const styles = StyleSheet.create({
   heroIngredientsCountText: {
     color: '#fff',
     fontSize: 11,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   heroTitle: {
     fontSize: 20,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
     lineHeight: 27,
     marginBottom: 8,
   },
   heroSubtitle: {
     fontSize: 13,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 19,
     marginBottom: 0,
   },
@@ -1664,7 +1753,7 @@ const styles = StyleSheet.create({
   },
   recentCountText: {
     fontSize: 12,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: 'PlusJakartaSansMedium',
   },
   recentScrollContent: {
     paddingRight: 8,
@@ -1693,12 +1782,12 @@ const styles = StyleSheet.create({
   },
   recentSourceText: {
     fontSize: 10,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#ff7043',
   },
   recentCardTitle: {
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     lineHeight: 20,
     marginBottom: 12,
     minHeight: 40,
@@ -1710,7 +1799,7 @@ const styles = StyleSheet.create({
   },
   recentCardMeta: {
     fontSize: 12,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     flex: 1,
     marginRight: 8,
   },
@@ -1718,7 +1807,7 @@ const styles = StyleSheet.create({
   // Sections & Quick Concepts
   sectionHeading: {
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginBottom: 14,
     letterSpacing: -0.2,
   },
@@ -1748,12 +1837,12 @@ const styles = StyleSheet.create({
   },
   conceptTitle: {
     fontSize: 13,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     lineHeight: 17,
   },
   conceptDesc: {
     fontSize: 11,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     marginTop: 1,
   },
 
@@ -1781,7 +1870,7 @@ const styles = StyleSheet.create({
   fabText: {
     color: '#fff',
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     letterSpacing: 0.3,
   },
   fabBadge: {
@@ -1794,7 +1883,7 @@ const styles = StyleSheet.create({
   fabBadgeText: {
     color: '#ff7043',
     fontSize: 11,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
 
   // Wizard & Pantry Modal
@@ -1815,7 +1904,7 @@ const styles = StyleSheet.create({
   },
   modalSubTitle: {
     fontSize: 12,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     marginTop: 2,
   },
   wizardTabRow: {
@@ -1841,10 +1930,10 @@ const styles = StyleSheet.create({
   },
   wizardTabBtnText: {
     fontSize: 13,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: 'PlusJakartaSansMedium',
   },
   wizardTabBtnTextActive: {
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   wizardInputBox: {
     flexDirection: 'row',
@@ -1858,7 +1947,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 12,
     fontSize: 14,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
   },
   wizardAddBtn: {
     width: 34,
@@ -1887,11 +1976,11 @@ const styles = StyleSheet.create({
   },
   openPantryTitle: {
     fontSize: 13,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   openPantrySub: {
     fontSize: 11,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     marginTop: 1,
   },
   openPantryArrow: {
@@ -1911,7 +2000,7 @@ const styles = StyleSheet.create({
   },
   selectedMalzemelerCount: {
     fontSize: 13,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   selectedChipsRow: {
     flexDirection: 'row',
@@ -1930,7 +2019,7 @@ const styles = StyleSheet.create({
   },
   selectedChipText: {
     fontSize: 13,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   selectedChipRemove: {
     width: 18,
@@ -1940,17 +2029,17 @@ const styles = StyleSheet.create({
   },
   wizardSectionTitle: {
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginBottom: 2,
   },
   wizardSectionSub: {
     fontSize: 12,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     marginBottom: 14,
   },
   catLabel: {
     fontSize: 12,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     letterSpacing: 0.3,
     marginBottom: 8,
   },
@@ -1969,7 +2058,7 @@ const styles = StyleSheet.create({
   },
   pantryChipText: {
     fontSize: 12,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: 'PlusJakartaSansMedium',
   },
   wizardPrefsBox: {
     marginTop: 6,
@@ -1980,7 +2069,7 @@ const styles = StyleSheet.create({
   },
   wizardPrefLabel: {
     fontSize: 12,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     letterSpacing: 0.3,
     marginBottom: 8,
   },
@@ -1998,7 +2087,7 @@ const styles = StyleSheet.create({
   },
   wizardPortionText: {
     fontSize: 13,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: 'PlusJakartaSansMedium',
   },
   wizardStickyBottom: {
     position: 'absolute',
@@ -2009,6 +2098,24 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 28,
     borderTopWidth: 1,
+  },
+  wizardFooterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  wizardPantryBottomBtn: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+  },
+  wizardPantryBottomBtnText: {
+    fontSize: 15,
+    fontFamily: 'PlusJakartaSansBold',
   },
   wizardSubmitBtn: {
     borderRadius: 18,
@@ -2028,7 +2135,7 @@ const styles = StyleSheet.create({
   wizardSubmitBtnText: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     letterSpacing: 0.2,
   },
   modalOverlay: {
@@ -2060,14 +2167,14 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 22,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
   },
   closeModalBtn: {
     padding: 4,
   },
   categoryTitle: {
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginBottom: 12,
     marginLeft: 4,
   },
@@ -2090,7 +2197,7 @@ const styles = StyleSheet.create({
   },
   gridText: {
     fontSize: 14,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   gridImage: {
     width: '100%',
@@ -2114,7 +2221,7 @@ const styles = StyleSheet.create({
   gridImageText: {
     color: '#fff',
     fontSize: 12,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   checkBadge: {
     position: 'absolute',
@@ -2142,7 +2249,7 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     fontSize: 20,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -2168,7 +2275,7 @@ const styles = StyleSheet.create({
   optionText: {
     marginTop: 10,
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     textAlign: 'center',
   },
   optionIconContainer: {
@@ -2203,7 +2310,7 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   settingsHeaderBtn: {
     padding: 2,
@@ -2241,12 +2348,12 @@ const styles = StyleSheet.create({
   },
   settingsLabel: {
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginBottom: 4,
   },
   settingsSubLabel: {
     fontSize: 14,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     marginBottom: 20,
   },
   levelOptions: {
@@ -2276,14 +2383,14 @@ const styles = StyleSheet.create({
   },
   levelTitle: {
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   levelTitleActive: {
     color: '#262626',
   },
   levelSub: {
     fontSize: 12,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     marginTop: 2,
   },
   levelCheck: {
@@ -2309,7 +2416,7 @@ const styles = StyleSheet.create({
   settingsConfirmText: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
 });
 

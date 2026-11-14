@@ -158,32 +158,11 @@ function AppContent() {
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    'PoppinsRegular': require('./assets/fonts/Poppins_400Regular.ttf'),
-    'PoppinsMedium': require('./assets/fonts/Poppins_500Medium.ttf'),
-    'PoppinsSemiBold': require('./assets/fonts/Poppins_600SemiBold.ttf'),
-    'PoppinsBold': require('./assets/fonts/Poppins_700Bold.ttf'),
-    'PoppinsExtraBold': require('./assets/fonts/Poppins_800ExtraBold.ttf'),
-    'ManropeRegular': require('./assets/fonts/Poppins_400Regular.ttf'),
-    'ManropeMedium': require('./assets/fonts/Poppins_500Medium.ttf'),
-    'ManropeSemiBold': require('./assets/fonts/Poppins_600SemiBold.ttf'),
-    'ManropeBold': require('./assets/fonts/Poppins_700Bold.ttf'),
-    'ManropeExtraBold': require('./assets/fonts/Poppins_800ExtraBold.ttf'),
-    'RubikRegular': require('./assets/fonts/Poppins_400Regular.ttf'),
-    'RubikMedium': require('./assets/fonts/Poppins_500Medium.ttf'),
-    'RubikSemiBold': require('./assets/fonts/Poppins_600SemiBold.ttf'),
-    'RubikBold': require('./assets/fonts/Poppins_700Bold.ttf'),
-    'RubikExtraBold': require('./assets/fonts/Poppins_800ExtraBold.ttf'),
-    'OutfitRegular': require('./assets/fonts/Poppins_400Regular.ttf'),
-    'OutfitMedium': require('./assets/fonts/Poppins_500Medium.ttf'),
-    'OutfitSemiBold': require('./assets/fonts/Poppins_600SemiBold.ttf'),
-    'OutfitBold': require('./assets/fonts/Poppins_700Bold.ttf'),
-    'OutfitExtraBold': require('./assets/fonts/Poppins_800ExtraBold.ttf'),
-    'TextRegular': require('./assets/fonts/Poppins_400Regular.ttf'),
-    'TextNormal': require('./assets/fonts/Poppins_400Regular.ttf'),
-    'TextMedium': require('./assets/fonts/Poppins_500Medium.ttf'),
-    'TextSemiBold': require('./assets/fonts/Poppins_600SemiBold.ttf'),
-    'TextBold': require('./assets/fonts/Poppins_700Bold.ttf'),
-    'TextExtraBold': require('./assets/fonts/Poppins_800ExtraBold.ttf'),
+    'PlusJakartaSansRegular': require('./assets/fonts/PlusJakartaSans_400Regular.ttf'),
+    'PlusJakartaSansMedium': require('./assets/fonts/PlusJakartaSans_500Medium.ttf'),
+    'PlusJakartaSansSemiBold': require('./assets/fonts/PlusJakartaSans_600SemiBold.ttf'),
+    'PlusJakartaSansBold': require('./assets/fonts/PlusJakartaSans_700Bold.ttf'),
+    'PlusJakartaSansExtraBold': require('./assets/fonts/PlusJakartaSans_800ExtraBold.ttf'),
     'Handwriting': require('./assets/fonts/Parisienne-Regular.ttf')
   });
 

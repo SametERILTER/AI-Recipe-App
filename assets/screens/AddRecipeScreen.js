@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: 24,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
     color: '#262626',
   },
   paperBody: {
@@ -310,13 +310,13 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   dateLabel: {
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#737373',
     marginRight: 8,
     fontSize: 14,
   },
   dateValue: {
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     color: '#383838',
     fontSize: 14,
   },
@@ -325,13 +325,13 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#383838',
     marginBottom: 8,
   },
   titleInput: {
     fontSize: 22,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     color: '#181818',
     borderWidth: 0,
     borderBottomColor: '#a3a3a3',
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   ingredientInput: {
     flex: 1,
     fontSize: 16,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     color: '#181818',
   },
   addBtn: {
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#383838',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
   },
   removeBtn: {
     padding: 4,
@@ -415,12 +415,12 @@ const styles = StyleSheet.create({
   aiBtnText: {
     color: '#ff7043',
     fontSize: 13,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginLeft: 6,
   },
   instructionsInput: {
     fontSize: 16, // Handwriting size
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     color: '#181818',
     lineHeight: 28, // Line height
     minHeight: 200,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginLeft: 10,
   },
   catChip: {
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   },
   catChipText: {
     fontSize: 14,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#737373',
   },
   catChipTextActive: {

@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
         marginLeft: 14,
     },
     content: {
@@ -135,16 +135,16 @@ const styles = StyleSheet.create({
     },
     appName: {
         fontSize: 22,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
     },
     appVersion: {
         fontSize: 13,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         marginTop: 2,
     },
     sectionLabel: {
         fontSize: 15,
-        fontFamily: 'PoppinsExtraBold',
+        fontFamily: 'PlusJakartaSansExtraBold',
         marginBottom: 10,
         marginLeft: 4,
     },
@@ -170,11 +170,11 @@ const styles = StyleSheet.create({
     },
     devName: {
         fontSize: 16,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
     },
     devHandle: {
         fontSize: 13,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         marginTop: 1,
     },
     divider: {
@@ -202,11 +202,11 @@ const styles = StyleSheet.create({
     },
     githubTitle: {
         fontSize: 14,
-        fontFamily: 'PoppinsBold',
+        fontFamily: 'PlusJakartaSansBold',
     },
     githubUrl: {
         fontSize: 12,
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PlusJakartaSansRegular',
         color: '#ff7043',
         marginTop: 2,
     },

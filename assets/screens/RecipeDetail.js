@@ -418,7 +418,7 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
           source={require('../animations/Cooking.json')}
         />
         <Text style={[styles.loadingTitle, { color: theme.text }]}>Tarif Hazırlanıyor...</Text>
-        <Text style={{ textAlign: 'center', color: theme.secondaryText, fontFamily: 'PoppinsRegular', fontSize: 14, marginTop: 4, maxWidth: 260 }}>
+        <Text style={{ textAlign: 'center', color: theme.secondaryText, fontFamily: 'PlusJakartaSansRegular', fontSize: 14, marginTop: 4, maxWidth: 260 }}>
           Yapay zeka şefimiz sizin için özel bir tarif oluşturuyor.
         </Text>
       </View>
@@ -432,10 +432,10 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
         marginBottom: 16,
       }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ fontSize: 14, color: theme.secondaryText, fontFamily: 'PoppinsMedium', flex: 1 }}>
+          <Text style={{ fontSize: 14, color: theme.secondaryText, fontFamily: 'PlusJakartaSansMedium', flex: 1 }}>
             {loadingSteps[currentStep]}
           </Text>
-          <Text style={{ fontSize: 18, color: '#ff7043', fontFamily: 'PoppinsExtraBold' }}>
+          <Text style={{ fontSize: 18, color: '#ff7043', fontFamily: 'PlusJakartaSansExtraBold' }}>
             %{percent}
           </Text>
         </View>
@@ -474,7 +474,7 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
               <FontAwesome5 name="dice" size={28} color="#ff7043" />
             </View>
             <Text style={[styles.loadingHighlightText, { color: theme.text }]}>{getRandomRecipeText().toUpperCase()}</Text>
-            <Text style={{ color: theme.secondaryText, fontFamily: 'PoppinsRegular', fontSize: 13, textAlign: 'center' }}>
+            <Text style={{ color: theme.secondaryText, fontFamily: 'PlusJakartaSansRegular', fontSize: 13, textAlign: 'center' }}>
               Sizin için en uygun lezzeti seçiyoruz...
             </Text>
           </View>
@@ -499,7 +499,7 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
                 }}>
                   <FontAwesome5 name="shopping-basket" size={13} color="#ff7043" />
                 </View>
-                <Text style={{ fontSize: 15, fontFamily: 'PoppinsBold', color: theme.text }}>
+                <Text style={{ fontSize: 15, fontFamily: 'PlusJakartaSansBold', color: theme.text }}>
                   Seçilen Malzemeler
                 </Text>
               </View>
@@ -509,7 +509,7 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
                 paddingVertical: 4,
                 borderRadius: 10,
               }}>
-                <Text style={{ fontSize: 12, fontFamily: 'PoppinsBold', color: '#ff7043' }}>
+                <Text style={{ fontSize: 12, fontFamily: 'PlusJakartaSansBold', color: '#ff7043' }}>
                   {malzemeler?.length || 0} Malzeme
                 </Text>
               </View>
@@ -543,7 +543,7 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
                   }}>
                     <FontAwesome5 name="check" size={9} color="#ff7043" />
                   </View>
-                  <Text style={{ color: theme.text, fontSize: 14, fontFamily: 'PoppinsSemiBold' }}>{malzeme}</Text>
+                  <Text style={{ color: theme.text, fontSize: 14, fontFamily: 'PlusJakartaSansSemiBold' }}>{malzeme}</Text>
                 </View>
               ))}
             </ScrollView>
@@ -559,7 +559,7 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
                 marginTop: 12,
               }}>
                 <FontAwesome5 name="sliders-h" size={12} color="#ff7043" style={{ marginRight: 8 }} />
-                <Text style={{ color: theme.secondaryText, fontFamily: 'PoppinsMedium', fontSize: 12, flex: 1 }}>
+                <Text style={{ color: theme.secondaryText, fontFamily: 'PlusJakartaSansMedium', fontSize: 12, flex: 1 }}>
                   {mealTypeText}
                 </Text>
               </View>
@@ -574,7 +574,7 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
           <FontAwesome5 name="hourglass-half" size={13} color={theme.secondaryText} />
           <Text style={[styles.timeText, { fontSize: 13, color: theme.secondaryText }]}>Bu işlem yaklaşık 10 saniye sürer</Text>
         </View>
-        <Text style={[styles.aiFooterText, { color: theme.secondaryText, fontFamily: 'PoppinsRegular', opacity: 0.7, marginBottom: 4 }]}>Gemini AI ile güçlendirilmiştir</Text>
+        <Text style={[styles.aiFooterText, { color: theme.secondaryText, fontFamily: 'PlusJakartaSansRegular', opacity: 0.7, marginBottom: 4 }]}>Gemini AI ile güçlendirilmiştir</Text>
       </View>
 
     </View>
@@ -589,7 +589,7 @@ function parseInlineBold(text, baseStyle) {
       {parts.map((part, index) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           return (
-            <Text key={index} style={{ fontFamily: 'PoppinsBold' }}>
+            <Text key={index} style={{ fontFamily: 'PlusJakartaSansBold' }}>
               {part.substring(2, part.length - 2)}
             </Text>
           );
@@ -740,7 +740,7 @@ function renderFormattedText(text, theme, isDarkMode) {
     // Tire ile başlayan liste öğeleri
     if (/^-/.test(line.trim())) {
       return (
-        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: isDarkMode ? theme.card : '#ffffff', borderBottomColor: theme.border }]}>
+        <View key={lineIndex} style={[styles.ingredientRow, { backgroundColor: theme.background, borderBottomColor: theme.border }]}>
           <View style={styles.ingredientIconContainer}>
             <FontAwesome5 name="check" size={10} color="#ff7043" />
           </View>
@@ -1559,7 +1559,7 @@ const styles = StyleSheet.create({
   },
   loadingTitle: {
     fontSize: 24,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#262626',
     marginBottom: 8,
     textAlign: 'center',
@@ -1591,7 +1591,7 @@ const styles = StyleSheet.create({
   },
   loadingListTitle: {
     fontSize: 16,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#262626',
     marginLeft: 8,
   },
@@ -1616,7 +1616,7 @@ const styles = StyleSheet.create({
   loadingIngredientText: {
     fontSize: 16,
     color: '#383838',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
   },
   aiFooter: {
     marginTop: 24,
@@ -1645,7 +1645,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 13,
     color: '#c2410c',
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginLeft: 6,
   },
   loadingPreferenceBox: {
@@ -1682,7 +1682,7 @@ const styles = StyleSheet.create({
   },
   loadingHighlightText: {
     fontSize: 18,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
     color: '#262626',
     textAlign: 'center',
     marginBottom: 8,
@@ -1725,7 +1725,7 @@ const styles = StyleSheet.create({
   },
   recipeName: {
     fontSize: 28,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
     color: '#262626',
     marginBottom: 12,
   },
@@ -1758,7 +1758,7 @@ const styles = StyleSheet.create({
   ingredientsText: {
     fontSize: 14,
     color: '#ff7043',
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     marginLeft: 6,
   },
   recipeCard: {
@@ -1792,14 +1792,14 @@ const styles = StyleSheet.create({
   imageCaption: {
     color: '#fff',
     fontSize: 10,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     textAlign: 'center',
     opacity: 0.7,
   },
   imageCredit: {
     color: '#fff',
     fontSize: 10,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     textAlign: 'center',
   },
 
@@ -1808,7 +1808,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#262626',
   },
   stepContainer: {
@@ -1842,14 +1842,14 @@ const styles = StyleSheet.create({
   },
   stepNumberText: {
     fontSize: 14,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#fff',
   },
   stepText: {
     flex: 1,
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 24,
     paddingTop: 2,
   },
@@ -1878,7 +1878,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2a3340',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 22,
   },
   bulletContainer: {
@@ -1899,13 +1899,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 24,
   },
   normalText: {
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 24,
     marginBottom: 8,
   },
@@ -1922,7 +1922,7 @@ const styles = StyleSheet.create({
   refreshButtonText: {
     color: '#ff7043',
     fontSize: 16,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
 
   // Üst Açılış Işık & Gradient Stilleri
@@ -2015,7 +2015,7 @@ const styles = StyleSheet.create({
   },
   stickyHeaderTitle: {
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#262626',
     flex: 1,
     textAlign: 'center',
@@ -2023,7 +2023,7 @@ const styles = StyleSheet.create({
   startButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   voiceButton: {
     flex: 1,
@@ -2042,7 +2042,7 @@ const styles = StyleSheet.create({
   voiceButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   ingredientChip: {
     backgroundColor: 'rgba(255, 112, 67, 0.15)',
@@ -2055,7 +2055,7 @@ const styles = StyleSheet.create({
   ingredientChipText: {
     color: '#d84315',
     fontSize: 14,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   termBox: {
     marginTop: 12,
@@ -2065,7 +2065,7 @@ const styles = StyleSheet.create({
   },
   termTitle: {
     fontSize: 12,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#0369a1',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -2073,7 +2073,7 @@ const styles = StyleSheet.create({
   termText: {
     fontSize: 13,
     color: '#075985',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 18,
   },
   chefTipContainer: {
@@ -2089,12 +2089,12 @@ const styles = StyleSheet.create({
   },
   chefTipTitle: {
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#262626',
   },
   chefTipText: {
     fontSize: 15,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     color: '#2a3340ff',
     lineHeight: 24,
   },
@@ -2132,7 +2132,7 @@ const styles = StyleSheet.create({
   toastText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
   },
   metaContainer: {
     marginBottom: 24,
@@ -2153,14 +2153,14 @@ const styles = StyleSheet.create({
   },
   metaLabel: {
     fontSize: 11,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     textAlign: 'center',
   },
   metaValue: {
     fontSize: 12,
     textAlign: 'center',
     marginTop: 2,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   errorHeader: {
     paddingTop: 54,
@@ -2198,13 +2198,13 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: 20,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     textAlign: 'center',
     marginBottom: 10,
   },
   errorMessage: {
     fontSize: 14,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 24,
@@ -2227,7 +2227,7 @@ const styles = StyleSheet.create({
   },
   retryButtonText: {
     fontSize: 15,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#ffffff',
   },
   secondaryErrorButton: {
@@ -2241,7 +2241,7 @@ const styles = StyleSheet.create({
   },
   secondaryErrorButtonText: {
     fontSize: 14,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: 'PlusJakartaSansMedium',
   },
 });
 

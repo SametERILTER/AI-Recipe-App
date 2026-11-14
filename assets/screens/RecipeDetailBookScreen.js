@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     marginLeft: -8,
   },
   dateText: {
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#a3a3a3',
     fontSize: 14,
   },
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: 28,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
     color: '#262626',
     marginBottom: 16,
     lineHeight: 34,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#383838',
   },
   ingredientList: {
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   ingredientText: {
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     flex: 1,
   },
   instructionsContainer: {
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   instructionHeader: {
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
     color: '#181818',
     marginTop: 16,
     marginBottom: 8,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   instructionText: {
     fontSize: 16,
     color: '#2a3340ff',
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     lineHeight: 26,
     flex: 1,
     marginBottom: 8,

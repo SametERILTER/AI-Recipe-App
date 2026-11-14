@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 34,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
     textAlign: 'center',
     lineHeight: 42,
   },
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     textAlign: 'center',
     marginTop: 16,
     lineHeight: 24,
@@ -259,14 +259,14 @@ const styles = StyleSheet.create({
   },
   levelTitleMain: {
     fontSize: 28,
-    fontFamily: 'PoppinsExtraBold',
+    fontFamily: 'PlusJakartaSansExtraBold',
     textAlign: 'center',
     lineHeight: 34,
     marginBottom: 12,
   },
   levelSubtitleMain: {
     fontSize: 15,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     textAlign: 'center',
     marginBottom: 32,
     paddingHorizontal: 10,
@@ -303,14 +303,14 @@ const styles = StyleSheet.create({
   },
   levelTitle: {
     fontSize: 16,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   levelTitleActive: {
     color: '#ff7043',
   },
   levelSub: {
     fontSize: 12,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PlusJakartaSansRegular',
     marginTop: 2,
   },
   buttonSection: {
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'PlusJakartaSansBold',
   },
   arrowCircle: {
     width: 36,
