@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
+import { recordRecentRecipe, removeRecentRecipe } from '../utils/recentRecipes';
 
 
 const { width } = Dimensions.get('window');
@@ -50,6 +51,21 @@ const RecipeDetailBookScreen = ({ route }) => {
   const { recipe } = route.params;
   const navigation = useNavigation();
 
+  useEffect(() => {
+    if (recipe?.title) {
+      recordRecentRecipe({
+        title: recipe.title,
+        sourceLabel: 'Tarif Defteri',
+        icon: 'book-open',
+        routeName: 'RecipeDetailBook',
+        params: { recipe },
+        meta: Array.isArray(recipe?.ingredients) && recipe.ingredients.length > 0
+          ? `${recipe.ingredients.length} malzeme`
+          : 'Kişisel tarif',
+      });
+    }
+  }, [recipe]);
+
   const handleDeleteBookRecipe = () => {
     Alert.alert(
       'Tarifi Sil',
@@ -67,6 +83,7 @@ const RecipeDetailBookScreen = ({ route }) => {
                 r => (r.id && recipe.id ? r.id !== recipe.id : r.createdAt !== recipe.createdAt && r.title !== recipe.title)
               );
               await AsyncStorage.setItem('recipeBooks', JSON.stringify(list));
+              await removeRecentRecipe('RecipeDetailBook', recipe?.title);
               navigation.goBack();
             } catch (e) {
               Alert.alert('Hata', 'Tarif silinemedi.');

@@ -16,6 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Speech from 'expo-speech';
 import { useTheme } from '../context/ThemeContext';
+import { recordRecentRecipe } from '../utils/recentRecipes';
 
 
 const { width } = Dimensions.get('window');
@@ -241,6 +242,20 @@ const SavedRecipeDetail = ({ route, navigation }) => {
       }
     };
     checkSavedStatus();
+
+    const recipeTitle = recipe?.yemekAdi || extractRecipeName(recipe?.description || '');
+    if (recipeTitle) {
+      recordRecentRecipe({
+        title: recipeTitle,
+        sourceLabel: 'Tarif',
+        icon: 'utensils',
+        routeName: 'SavedRecipeDetail',
+        params: { recipe },
+        meta: Array.isArray(recipe?.malzemeler) && recipe.malzemeler.length > 0
+          ? `${recipe.malzemeler.length} malzeme`
+          : 'Kayıtlı / Katalog',
+      });
+    }
 
     return () => {
       Speech.stop();

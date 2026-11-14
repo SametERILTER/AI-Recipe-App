@@ -30,22 +30,34 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
+import { getRecentRecipes } from '../utils/recentRecipes';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const COLLAPSED_SHEET_HEIGHT = 48;
-const DEFAULT_EXPANDED_HEIGHT = Math.max(550, Math.round((SCREEN_HEIGHT - 105) * 0.86));
 
 const HomeScreen = () => {
   const { isDarkMode, theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const modalFooterBottomPadding = Math.max(insets.bottom + 18, 48);
+  const modalScrollBottomPadding = Math.max(insets.bottom + 115, 145);
   const [input, setInput] = useState('');
   const [malzemeler, setMalzemeler] = useState([]);
-  const slideAnim = useSharedValue(150);
   const scrollY = useSharedValue(0);
-  const [inputFocused, setInputFocused] = useState(false);
   const [greeting, setGreeting] = useState('Merhaba');
 
   const navigation = useNavigation();
+
+  // Yapay Zeka Tarif Sihirbazı modal state'leri
+  const [wizardModalVisible, setWizardModalVisible] = useState(false);
+  const wizardSheetY = useSharedValue(SCREEN_HEIGHT);
+  const isWizardOpenRef = useRef(false);
+
+  // Resimli Hazır Malzemeler modal state'leri
+  const [pantryModalVisible, setPantryModalVisible] = useState(false);
+  const pantrySheetY = useSharedValue(SCREEN_HEIGHT);
+  const [pantrySelected, setPantrySelected] = useState([]);
+  const isPantryOpenRef = useRef(false);
 
   // Rastgele tarif modal state'leri
   const [randomModalVisible, setRandomModalVisible] = useState(false);
@@ -60,19 +72,24 @@ const HomeScreen = () => {
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
   const settingsSheetY = useSharedValue(SCREEN_HEIGHT);
   const [cookingLevel, setCookingLevel] = useState('intermediate'); // varsayılan orta
+  const [recentRecipes, setRecentRecipes] = useState([]);
 
-  // Ayarları yükle
+  // Ayarları ve son bakılan tarifleri yükle
   useFocusEffect(
     useCallback(() => {
-      const loadSettings = async () => {
+      const loadFocusData = async () => {
         try {
-          const savedLevel = await AsyncStorage.getItem('chef_cooking_level');
+          const [savedLevel, recents] = await Promise.all([
+            AsyncStorage.getItem('chef_cooking_level'),
+            getRecentRecipes(),
+          ]);
           if (savedLevel) setCookingLevel(savedLevel);
+          setRecentRecipes(recents);
         } catch (e) {
-          console.log('Ayarlar yüklenemedi:', e);
+          console.log('Ana sayfa verileri yüklenemedi:', e);
         }
       };
-      loadSettings();
+      loadFocusData();
     }, [])
   );
 
@@ -214,52 +231,109 @@ const HomeScreen = () => {
     }
   ];
 
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const sheetHeight = useSharedValue(COLLAPSED_SHEET_HEIGHT);
-  const expandedSheetHeight = useSharedValue(DEFAULT_EXPANDED_HEIGHT);
-  const confirmAnim = useSharedValue(0);
-  const [modalSelected, setModalSelected] = useState([]);
-  const isSheetOpenRef = useRef(false);
-  const expandedHeightRef = useRef(DEFAULT_EXPANDED_HEIGHT);
-  const dragStartHeightRef = useRef(COLLAPSED_SHEET_HEIGHT);
-  const syncSelectedRef = useRef(null);
-
-  syncSelectedRef.current = () => {
-    setModalSelected(malzemeler);
-  };
-
-  const openSheet = () => {
+  const openWizardModal = () => {
     Keyboard.dismiss();
-    setModalSelected(malzemeler);
-    isSheetOpenRef.current = true;
-    setSheetOpen(true);
-    sheetHeight.value = withSpring(expandedHeightRef.current, {
-      damping: 22,
-      stiffness: 220,
-      mass: 0.85,
-    });
+    wizardSheetY.value = SCREEN_HEIGHT;
+    isWizardOpenRef.current = true;
+    setWizardModalVisible(true);
   };
 
-  const closeSheet = () => {
-    isSheetOpenRef.current = false;
-    setSheetOpen(false);
-    sheetHeight.value = withSpring(COLLAPSED_SHEET_HEIGHT, {
-      damping: 24,
-      stiffness: 240,
-      mass: 0.85,
-    });
+  const closeWizardModal = () => {
+    Keyboard.dismiss();
+    isWizardOpenRef.current = false;
+    wizardSheetY.value = withTiming(
+      SCREEN_HEIGHT,
+      {
+        duration: 220,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(setWizardModalVisible)(false);
+        }
+      }
+    );
   };
 
-  const openSheetRef = useRef(openSheet);
-  const closeSheetRef = useRef(closeSheet);
-  openSheetRef.current = openSheet;
-  closeSheetRef.current = closeSheet;
+  useEffect(() => {
+    if (wizardModalVisible) {
+      requestAnimationFrame(() => {
+        wizardSheetY.value = withTiming(0, {
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+        });
+      });
+    }
+  }, [wizardModalVisible]);
+
+  const openWizardWithStyle = (styleKey) => {
+    setSelectedMealType(styleKey);
+    setActiveTab('meal');
+    openWizardModal();
+  };
+
+  const openWizardWithTab = (tabKey) => {
+    setActiveTab(tabKey);
+    openWizardModal();
+  };
+
+  const openPantryModal = () => {
+    Keyboard.dismiss();
+    setPantrySelected([...malzemeler]);
+    pantrySheetY.value = SCREEN_HEIGHT;
+    isPantryOpenRef.current = true;
+    setPantryModalVisible(true);
+  };
+
+  const closePantryModal = () => {
+    isPantryOpenRef.current = false;
+    pantrySheetY.value = withTiming(
+      SCREEN_HEIGHT,
+      {
+        duration: 220,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(setPantryModalVisible)(false);
+        }
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (pantryModalVisible) {
+      requestAnimationFrame(() => {
+        pantrySheetY.value = withTiming(0, {
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+        });
+      });
+    }
+  }, [pantryModalVisible]);
+
+  const confirmPantrySelection = () => {
+    setMalzemeler([...pantrySelected]);
+    closePantryModal();
+  };
+
+  const togglePantryItem = (name) => {
+    if (pantrySelected.includes(name)) {
+      setPantrySelected(pantrySelected.filter(item => item !== name));
+    } else {
+      setPantrySelected([...pantrySelected, name]);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        if (isSheetOpenRef.current) {
-          closeSheetRef.current();
+        if (isPantryOpenRef.current) {
+          closePantryModal();
+          return true;
+        }
+        if (isWizardOpenRef.current) {
+          closeWizardModal();
           return true;
         }
         return false;
@@ -269,76 +343,6 @@ const HomeScreen = () => {
       return () => subscription.remove();
     }, [])
   );
-
-  const dockPanResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => !isSheetOpenRef.current,
-      onMoveShouldSetPanResponder: (_, gestureState) =>
-        Math.abs(gestureState.dy) > 5 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
-      onPanResponderGrant: () => {
-        dragStartHeightRef.current = isSheetOpenRef.current ? expandedHeightRef.current : COLLAPSED_SHEET_HEIGHT;
-        if (!isSheetOpenRef.current && syncSelectedRef.current) {
-          syncSelectedRef.current();
-        }
-      },
-      onPanResponderMove: (_, gestureState) => {
-        const targetExpanded = expandedHeightRef.current;
-        const rawHeight = dragStartHeightRef.current - gestureState.dy;
-        const nextHeight =
-          rawHeight > targetExpanded
-            ? targetExpanded + (rawHeight - targetExpanded) * 0.2
-            : Math.max(COLLAPSED_SHEET_HEIGHT, rawHeight);
-        sheetHeight.value = nextHeight;
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        if (Math.abs(gestureState.dy) < 8 && Math.abs(gestureState.dx) < 8) {
-          if (isSheetOpenRef.current) {
-            closeSheetRef.current();
-          } else {
-            openSheetRef.current();
-          }
-          return;
-        }
-
-        const targetExpanded = expandedHeightRef.current;
-        const currentHeight = dragStartHeightRef.current - gestureState.dy;
-        const openThreshold = COLLAPSED_SHEET_HEIGHT + (targetExpanded - COLLAPSED_SHEET_HEIGHT) * 0.28;
-        const closeThreshold = COLLAPSED_SHEET_HEIGHT + (targetExpanded - COLLAPSED_SHEET_HEIGHT) * 0.72;
-        const threshold = dragStartHeightRef.current === COLLAPSED_SHEET_HEIGHT ? openThreshold : closeThreshold;
-        const shouldOpen =
-          gestureState.vy < -0.35 || (gestureState.vy <= 0.35 && currentHeight > threshold);
-
-        if (shouldOpen) {
-          openSheetRef.current();
-        } else {
-          closeSheetRef.current();
-        }
-      },
-      onPanResponderTerminate: () => {
-        if (isSheetOpenRef.current) {
-          openSheetRef.current();
-        } else {
-          closeSheetRef.current();
-        }
-      },
-    })
-  ).current;
-
-  useEffect(() => {
-    if (sheetOpen) {
-      confirmAnim.value = withTiming(modalSelected.length > 0 ? 1 : 0, {
-        duration: 200,
-        easing: Easing.out(Easing.cubic),
-      });
-    } else {
-      confirmAnim.value = 0;
-    }
-  }, [modalSelected, sheetOpen]);
-
-  const handleConfirm = () => {
-    setMalzemeler(modalSelected);
-    closeSheet();
-  };
 
   const openRandomModal = () => {
     randomSheetY.value = SCREEN_HEIGHT;
@@ -416,115 +420,40 @@ const HomeScreen = () => {
     }
   };
 
+  const toggleMalzeme = (item) => {
+    if (malzemeler.includes(item)) {
+      setMalzemeler(malzemeler.filter(m => m !== item));
+    } else {
+      setMalzemeler([...malzemeler, item]);
+    }
+  };
+
   const malzemeSil = (item) => {
     setMalzemeler(malzemeler.filter(malzeme => malzeme !== item));
   };
 
   const tarifUret = () => {
-    navigation.navigate('RecipeDetail', { malzemeler, mealType: selectedMealType, servingSize, category: activeTab });
-    setMalzemeler([]); // Malzemeleri temizle
+    if (malzemeler.length === 0) return;
+    const currentMalzemeler = [...malzemeler];
+    const currentMealType = selectedMealType;
+    const currentServing = servingSize;
+    const currentCategory = activeTab;
+    closeWizardModal();
+    navigation.navigate('RecipeDetail', {
+      malzemeler: currentMalzemeler,
+      mealType: currentMealType,
+      servingSize: currentServing,
+      category: currentCategory,
+    });
+    setMalzemeler([]);
   };
 
-  // Malzeme listesi değiştiğinde veya çekmece açıldığında FAB animasyonu
-  useEffect(() => {
-    slideAnim.value = withTiming(malzemeler.length > 0 && !sheetOpen ? 0 : 150, {
-      duration: 240,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [malzemeler.length, sheetOpen]);
-
-  const fabAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: slideAnim.value }],
+  const wizardSheetStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: wizardSheetY.value }],
   }));
 
-  const sheetAnimatedStyle = useAnimatedStyle(() => {
-    const progress = interpolate(
-      sheetHeight.value,
-      [COLLAPSED_SHEET_HEIGHT, expandedSheetHeight.value],
-      [0, 1],
-      Extrapolation.CLAMP
-    );
-    return {
-      height: sheetHeight.value,
-      borderTopLeftRadius: interpolate(progress, [0, 1], [22, 28], Extrapolation.CLAMP),
-      borderTopRightRadius: interpolate(progress, [0, 1], [22, 28], Extrapolation.CLAMP),
-    };
-  });
-
-  const dockPromptAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      sheetHeight.value,
-      [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 55],
-      [1, 0],
-      Extrapolation.CLAMP
-    ),
-    transform: [
-      {
-        translateY: interpolate(
-          sheetHeight.value,
-          [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 55],
-          [0, -6],
-          Extrapolation.CLAMP
-        ),
-      },
-    ],
-  }));
-
-  const sheetTopBarAnimatedStyle = useAnimatedStyle(() => ({
-    paddingTop: interpolate(
-      sheetHeight.value,
-      [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 160],
-      [6, 10],
-      Extrapolation.CLAMP
-    ),
-    paddingBottom: interpolate(
-      sheetHeight.value,
-      [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 160],
-      [6, 12],
-      Extrapolation.CLAMP
-    ),
-  }));
-
-  const sheetHeaderSlotAnimatedStyle = useAnimatedStyle(() => ({
-    marginTop: interpolate(
-      sheetHeight.value,
-      [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 160],
-      [0, 12],
-      Extrapolation.CLAMP
-    ),
-    height: interpolate(
-      sheetHeight.value,
-      [COLLAPSED_SHEET_HEIGHT, COLLAPSED_SHEET_HEIGHT + 160],
-      [28, 34],
-      Extrapolation.CLAMP
-    ),
-  }));
-
-  const sheetHeaderAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      sheetHeight.value,
-      [COLLAPSED_SHEET_HEIGHT + 40, COLLAPSED_SHEET_HEIGHT + 120],
-      [0, 1],
-      Extrapolation.CLAMP
-    ),
-  }));
-
-  const sheetBodyAnimatedStyle = useAnimatedStyle(() => {
-    const progress = interpolate(
-      sheetHeight.value,
-      [COLLAPSED_SHEET_HEIGHT + 45, COLLAPSED_SHEET_HEIGHT + 180],
-      [0, 1],
-      Extrapolation.CLAMP
-    );
-    return {
-      opacity: progress,
-      transform: [{ translateY: interpolate(progress, [0, 1], [14, 0], Extrapolation.CLAMP) }],
-    };
-  });
-
-  const confirmButtonStyle = useAnimatedStyle(() => ({
-    opacity: confirmAnim.value,
-    transform: [{ translateY: (1 - confirmAnim.value) * 20 }],
+  const pantrySheetStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: pantrySheetY.value }],
   }));
 
   const randomSheetStyle = useAnimatedStyle(() => ({
@@ -577,20 +506,10 @@ const HomeScreen = () => {
   }));
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: theme.background }]}
-      onLayout={(e) => {
-        const containerHeight = e.nativeEvent.layout.height;
-        if (containerHeight > 400) {
-          const targetHeight = Math.max(540, Math.round(containerHeight - 105));
-          expandedHeightRef.current = targetHeight;
-          expandedSheetHeight.value = targetHeight;
-        }
-      }}
-    >
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar
-        barStyle={isDarkMode || sheetOpen ? "light-content" : "dark-content"}
-        backgroundColor={sheetOpen ? "rgba(0,0,0,0.55)" : theme.background}
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
+        backgroundColor={theme.background}
       />
 
       {/* Header */}
@@ -632,203 +551,86 @@ const HomeScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-
-        {/* 1. ÜST KART: YEMEK VEYA TATLI MODU & HIZLI ARAMA */}
-        <View style={[styles.mainCard, { backgroundColor: theme.card }]}>
-          {/* Yemek / Tatlı Switch */}
-          <View style={[styles.modeSelector, { backgroundColor: isDarkMode ? '#141414' : '#ebebeb' }]}>
-            <TouchableOpacity
-              style={[
-                styles.modeBtn,
-                activeTab === 'meal' && [styles.modeBtnActive, { backgroundColor: isDarkMode ? '#222222' : '#ffffff' }]
-              ]}
-              onPress={() => setActiveTab('meal')}
-              activeOpacity={0.85}
-            >
-              <FontAwesome5
-                name="utensils"
-                size={13}
-                color={activeTab === 'meal' ? '#ff7043' : theme.secondaryText}
-                style={{ marginRight: 8 }}
-              />
-              <Text
-                style={[
-                  styles.modeBtnText,
-                  { color: activeTab === 'meal' ? theme.text : theme.secondaryText },
-                  activeTab === 'meal' && styles.modeBtnTextActive
-                ]}
-              >
-                Yemek Tarifi
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.modeBtn,
-                activeTab === 'dessert' && [styles.modeBtnActive, { backgroundColor: isDarkMode ? '#222222' : '#ffffff' }]
-              ]}
-              onPress={() => setActiveTab('dessert')}
-              activeOpacity={0.85}
-            >
-              <FontAwesome5
-                name="cookie-bite"
-                size={13}
-                color={activeTab === 'dessert' ? '#ff7043' : theme.secondaryText}
-                style={{ marginRight: 8 }}
-              />
-              <Text
-                style={[
-                  styles.modeBtnText,
-                  { color: activeTab === 'dessert' ? theme.text : theme.secondaryText },
-                  activeTab === 'dessert' && styles.modeBtnTextActive
-                ]}
-              >
-                Tatlı Tarifi
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Malzeme Giriş Çubuğu + Sağ Ekle Butonu */}
-          <View style={[styles.searchBarBox, { backgroundColor: isDarkMode ? '#141414' : '#ffffff' }]}>
-            <FontAwesome5
-              name="carrot"
-              size={15}
-              color={inputFocused ? '#ff7043' : theme.secondaryText}
-              style={{ marginLeft: 16 }}
-            />
-            <TextInput
-              style={[styles.searchInput, { color: theme.text }]}
-              placeholder={activeTab === 'meal' ? 'Elindeki malzemeyi yaz (örn. domates)' : 'Tatlı malzemesi yaz (örn. çikolata)'}
-              value={input}
-              onChangeText={setInput}
-              onSubmitEditing={malzemeEkle}
-              onFocus={() => setInputFocused(true)}
-              onBlur={() => setInputFocused(false)}
-              placeholderTextColor={theme.secondaryText}
-              returnKeyType="done"
-            />
-            {input.trim().length > 0 ? (
-              <TouchableOpacity onPress={malzemeEkle} style={styles.addIngredientBtn} activeOpacity={0.85}>
-                <FontAwesome5 name="plus" size={12} color="#fff" />
-              </TouchableOpacity>
-            ) : null}
-          </View>
-
-          {/* Eklenen Malzemeler (Tag Alanı) */}
-          {malzemeler.length > 0 ? (
-            <View style={styles.activeIngredientsArea}>
-              <View style={styles.activeIngredientsHeader}>
-                <Text style={[styles.activeIngredientsCount, { color: theme.secondaryText }]}>
-                  Mutfaktaki Malzemeler ({malzemeler.length})
-                </Text>
-                <TouchableOpacity onPress={() => setMalzemeler([])} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                  <Text style={styles.clearAllBtnText}>Temizle</Text>
-                </TouchableOpacity>
+        {/* 1. HERO KARTI - AKILLI ŞEF MASASI */}
+        <TouchableOpacity
+          style={styles.heroCardContainer}
+          onPress={openWizardModal}
+          activeOpacity={0.92}
+        >
+          <LinearGradient
+            colors={isDarkMode ? ['#271c18', '#1a1310'] : ['#fff5f0', '#ffeae0']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[
+              styles.heroCard,
+              { borderColor: isDarkMode ? '#4a2c22' : '#ffd5c2' }
+            ]}
+          >
+            {malzemeler.length > 0 && (
+              <View style={styles.heroBadgeRow}>
+                <View style={styles.heroIngredientsCount}>
+                  <Text style={styles.heroIngredientsCountText}>
+                    {malzemeler.length} malzeme hazır
+                  </Text>
+                </View>
               </View>
-              <View style={styles.ingredientsChipsRow}>
-                {malzemeler.map((item, index) => (
-                  <View key={index} style={[styles.myIngredientChip, { backgroundColor: isDarkMode ? '#222222' : '#ffffff' }]}>
-                    <Text style={[styles.myIngredientChipText, { color: theme.text }]}>{item}</Text>
-                    <TouchableOpacity
-                      onPress={() => malzemeSil(item)}
-                      style={[styles.myIngredientRemoveBtn, { backgroundColor: isDarkMode ? '#333333' : '#f0f0f0' }]}
-                      hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-                    >
-                      <FontAwesome5 name="times" size={9} color={theme.text} />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
+            )}
+
+            <Text style={[styles.heroTitle, { color: theme.text }]}>
+              Dolabındaki Malzemelerle Harika Bir Tarif Üret
+            </Text>
+
+            <Text style={[styles.heroSubtitle, { color: theme.secondaryText }]}>
+              {malzemeler.length > 0
+                ? `${malzemeler.slice(0, 3).join(', ')}${malzemeler.length > 3 ? ` ve +${malzemeler.length - 3}` : ''} seçili.`
+                : 'Elindeki malzemeleri ekle; şef sana özel adım adım tarif hazırlasın.'}
+            </Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* SON BAKILAN TARİFLER */}
+        {recentRecipes.length > 0 && (
+          <View style={styles.recentSection}>
+            <View style={styles.recentHeaderRow}>
+              <Text style={[styles.sectionHeading, { color: theme.text, marginBottom: 0 }]}>
+                Son Bakılan Tarifler
+              </Text>
+              <Text style={[styles.recentCountText, { color: theme.secondaryText }]}>
+                Son {recentRecipes.length} tarif
+              </Text>
             </View>
-          ) : null}
-        </View>
-
-        {/* 2. PORSİYON VE TARZ TEK ŞIK KARTTA */}
-        <View style={[styles.setupCard, { backgroundColor: theme.card }]}>
-          <Text style={[styles.cardHeaderTitle, { color: theme.text }]}>Tarif Tercihleri</Text>
-
-          {/* Porsiyon Seçici */}
-          <Text style={[styles.miniHeader, { color: theme.secondaryText }]}>Porsiyon</Text>
-          <View style={styles.portionsBar}>
-            {[
-              { label: '1 Kişi', value: 1 },
-              { label: '2 Kişi', value: 2 },
-              { label: '4 Kişi', value: 4 },
-              { label: '4+ Kişi', value: '4+' },
-            ].map((option) => {
-              const isSelected = servingSize === option.value;
-              return (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.recentScrollContent}
+            >
+              {recentRecipes.map((item) => (
                 <TouchableOpacity
-                  key={option.value}
+                  key={item.id}
                   style={[
-                    styles.portionItem,
-                    {
-                      backgroundColor: isSelected ? '#ff7043' : (isDarkMode ? '#141414' : '#ffffff')
-                    }
+                    styles.recentCard,
+                    { backgroundColor: theme.card, borderColor: theme.border }
                   ]}
-                  onPress={() => setServingSize(option.value)}
-                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate(item.routeName, item.params)}
+                  activeOpacity={0.86}
                 >
-                  <Text
-                    style={[
-                      styles.portionItemText,
-                      { color: isSelected ? '#ffffff' : theme.text },
-                      isSelected && styles.portionItemTextActive
-                    ]}
-                  >
-                    {option.label}
+                  <Text style={[styles.recentCardTitle, { color: theme.text }]} numberOfLines={2}>
+                    {item.title}
                   </Text>
+                  <View style={styles.recentCardFooter}>
+                    <Text style={[styles.recentCardMeta, { color: theme.secondaryText }]} numberOfLines={1}>
+                      {item.meta || 'Tarifi aç'}
+                    </Text>
+                    <FontAwesome5 name="chevron-right" size={11} color="#ff7043" />
+                  </View>
                 </TouchableOpacity>
-              );
-            })}
+              ))}
+            </ScrollView>
           </View>
+        )}
 
-          {/* Tarz Seçici (Hafif, Pratik, Misafir vb.) */}
-          <View style={styles.styleHeaderRow}>
-            <Text style={[styles.miniHeader, { color: theme.secondaryText, marginBottom: 0 }]}>Yemek Tarzı</Text>
-            {selectedMealType ? (
-              <TouchableOpacity onPress={() => setSelectedMealType(null)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Text style={styles.clearAllBtnText}>Sıfırla</Text>
-              </TouchableOpacity>
-            ) : null}
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.stylesScroll}>
-            {mealTypes.map((type) => {
-              const isSelected = selectedMealType === type.key;
-              return (
-                <TouchableOpacity
-                  key={type.key}
-                  style={[
-                    styles.styleChip,
-                    {
-                      backgroundColor: isSelected ? '#ff7043' : (isDarkMode ? '#141414' : '#ffffff')
-                    }
-                  ]}
-                  onPress={() => setSelectedMealType(isSelected ? null : type.key)}
-                  activeOpacity={0.8}
-                >
-                  <FontAwesome5
-                    name={type.icon}
-                    size={11}
-                    color={isSelected ? '#ffffff' : '#ff7043'}
-                    style={{ marginRight: 7 }}
-                  />
-                  <Text
-                    style={[
-                      styles.styleChipText,
-                      { color: isSelected ? '#ffffff' : theme.text },
-                      isSelected && styles.styleChipTextActive
-                    ]}
-                  >
-                    {type.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-
-        {/* 3. HIZLI SEÇENEKLER (Günün Menüsü & Rastgele Tarif) */}
+        {/* 2. GÜNÜN İLHAMI: GÜNÜN MENÜSÜ & RASTGELE TARİF */}
+        <Text style={[styles.sectionHeading, { color: theme.text }]}>Günün İlhamı</Text>
         <View style={styles.quickCardsRow}>
           <TouchableOpacity
             style={styles.quickCardWrapper}
@@ -854,7 +656,7 @@ const HomeScreen = () => {
             onPress={openRandomModal}
             activeOpacity={0.9}
           >
-            <View style={[styles.plainCard, { backgroundColor: theme.card }]}>
+            <View style={[styles.plainCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
               <View style={[styles.cardIconBadge, { backgroundColor: 'rgba(255, 112, 67, 0.14)' }]}>
                 <FontAwesome5 name="dice" size={16} color="#ff7043" />
               </View>
@@ -864,138 +666,498 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={{ height: 165 }} />
+        {/* 3. HIZLI FİKİRLER */}
+        <Text style={[styles.sectionHeading, { color: theme.text }]}>Hızlı Fikirler</Text>
+        <View style={styles.conceptsGrid}>
+          {[
+            {
+              id: 'pratik',
+              title: '15 Dk Yemekleri',
+              desc: 'Hızlı & pratik',
+              icon: 'clock',
+              color: '#3b82f6',
+              bgLight: '#eff6ff',
+              bgDark: '#172554',
+              action: () => openWizardWithStyle('pratik'),
+            },
+            {
+              id: 'hafif',
+              title: 'Hafif & Fit',
+              desc: 'Düşük kalorili',
+              icon: 'leaf',
+              color: '#10b981',
+              bgLight: '#ecfdf5',
+              bgDark: '#064e3b',
+              action: () => openWizardWithStyle('hafif'),
+            },
+            {
+              id: 'dessert',
+              title: 'Tatlı Kaçamağı',
+              desc: 'Hızlı tatlılar',
+              icon: 'cookie-bite',
+              color: '#ec4899',
+              bgLight: '#fdf2f8',
+              bgDark: '#500724',
+              action: () => openWizardWithTab('dessert'),
+            },
+            {
+              id: 'misafir',
+              title: 'Misafir Sofrası',
+              desc: 'Özenli lezzetler',
+              icon: 'users',
+              color: '#8b5cf6',
+              bgLight: '#f5f3ff',
+              bgDark: '#2e1065',
+              action: () => openWizardWithStyle('misafir'),
+            },
+          ].map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={[
+                styles.conceptCard,
+                { backgroundColor: theme.card, borderColor: theme.border }
+              ]}
+              onPress={item.action}
+              activeOpacity={0.85}
+            >
+              <View
+                style={[
+                  styles.conceptIconBox,
+                  { backgroundColor: isDarkMode ? item.bgDark : item.bgLight }
+                ]}
+              >
+                <FontAwesome5 name={item.icon} size={15} color={item.color} />
+              </View>
+              <View style={styles.conceptTextCol}>
+                <Text style={[styles.conceptTitle, { color: theme.text }]}>{item.title}</Text>
+                <Text style={[styles.conceptDesc, { color: theme.secondaryText }]}>{item.desc}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={{ height: 120 }} />
       </Animated.ScrollView>
 
-      {/* Floating Generate Button */}
-      {malzemeler.length > 0 && (
-        <Animated.View style={[styles.fabContainer, fabAnimatedStyle]}>
-          <TouchableOpacity style={styles.fabButton} onPress={tarifUret} activeOpacity={0.9}>
-            <FontAwesome5 name="magic" size={20} color="#fff" style={{ marginRight: 10 }} />
-            <Text style={styles.fabText}>Tarif Üret</Text>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{malzemeler.length}</Text>
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
-      )}
-
-      {/* Açıkken arkada direkt kararan overlay */}
-      {sheetOpen && (
-        <Pressable
-          style={styles.sheetBackdrop}
-          onPress={closeSheet}
-        />
-      )}
-
-      {/* Tab Bar Uzantısı: Direkt Yukarı Genişleyen Reanimated Malzeme Çekmecesi */}
-      <Animated.View
-        style={[
-          styles.expandableSheetContainer,
-          {
-            backgroundColor: isDarkMode ? '#181818' : '#ffffff',
-            shadowOpacity: isDarkMode ? 0.42 : 0.14,
-          },
-          sheetAnimatedStyle,
-        ]}
+      {/* Floating Action Button (FAB) */}
+      <TouchableOpacity
+        style={styles.mainFab}
+        onPress={openWizardModal}
+        activeOpacity={0.88}
       >
-        {/* Sürüklenebilir Üst Kısım */}
-        <Animated.View style={[styles.sheetTopBar, sheetTopBarAnimatedStyle]} {...dockPanResponder.panHandlers}>
-          <View style={[styles.pullDockHandle, { backgroundColor: isDarkMode ? '#3a3a3a' : '#dddddd' }]} />
+        <LinearGradient
+          colors={['#ff7043', '#ea580c']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.fabGradient}
+        >
+          <FontAwesome5 name="plus" size={16} color="#fff" style={{ marginRight: 8 }} />
+          <Text style={styles.fabText}>Tarif Üret</Text>
+          {malzemeler.length > 0 && (
+            <View style={styles.fabBadge}>
+              <Text style={styles.fabBadgeText}>{malzemeler.length}</Text>
+            </View>
+          )}
+        </LinearGradient>
+      </TouchableOpacity>
 
-          <Animated.View style={[styles.sheetHeaderSwapSlot, sheetHeaderSlotAnimatedStyle]}>
-            {/* Kapalı durumdaki "Malzeme Seç" görünümü */}
-            <Animated.View
-              style={[styles.pullDockContent, dockPromptAnimatedStyle]}
-              pointerEvents={sheetOpen ? 'none' : 'auto'}
+      {/* 1. Yapay Zeka Tarif Sihirbazı Modalı */}
+      <Modal
+        visible={wizardModalVisible}
+        animationType="none"
+        transparent
+        statusBarTranslucent
+        onRequestClose={closeWizardModal}
+      >
+        <View style={styles.modalOverlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={closeWizardModal} />
+          <Animated.View
+            style={[
+              styles.modalContainer,
+              styles.wizardModalContainer,
+              { backgroundColor: theme.background },
+              wizardSheetStyle,
+            ]}
+          >
+            {/* Modal Header */}
+            <View style={styles.wizardModalHeader}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.modalTitle, { color: theme.text }]}>Tarif Sihirbazı</Text>
+                <Text style={[styles.modalSubTitle, { color: theme.secondaryText }]}>
+                  Malzemelerini seç, şefin tarifini yazsın
+                </Text>
+              </View>
+              <TouchableOpacity onPress={closeWizardModal} style={styles.closeModalBtn}>
+                <FontAwesome5 name="times" size={19} color={theme.secondaryText} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              contentContainerStyle={{ paddingHorizontal: 22, paddingBottom: modalScrollBottomPadding }}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
             >
-              <FontAwesome5 name="chevron-up" size={11} color="#ff7043" />
-              <Text style={[styles.pullDockText, { color: theme.text }]}>Malzeme Seç</Text>
+              {/* Yemek / Tatlı Toggle */}
+              <View style={[styles.wizardTabRow, { backgroundColor: isDarkMode ? '#181818' : '#f0f0f0' }]}>
+                <TouchableOpacity
+                  style={[
+                    styles.wizardTabBtn,
+                    activeTab === 'meal' && [styles.wizardTabBtnActive, { backgroundColor: isDarkMode ? '#282828' : '#ffffff' }]
+                  ]}
+                  onPress={() => setActiveTab('meal')}
+                  activeOpacity={0.85}
+                >
+                  <FontAwesome5
+                    name="utensils"
+                    size={13}
+                    color={activeTab === 'meal' ? '#ff7043' : theme.secondaryText}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text
+                    style={[
+                      styles.wizardTabBtnText,
+                      { color: activeTab === 'meal' ? theme.text : theme.secondaryText },
+                      activeTab === 'meal' && styles.wizardTabBtnTextActive
+                    ]}
+                  >
+                    Yemek Tarifi
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.wizardTabBtn,
+                    activeTab === 'dessert' && [styles.wizardTabBtnActive, { backgroundColor: isDarkMode ? '#282828' : '#ffffff' }]
+                  ]}
+                  onPress={() => setActiveTab('dessert')}
+                  activeOpacity={0.85}
+                >
+                  <FontAwesome5
+                    name="cookie-bite"
+                    size={13}
+                    color={activeTab === 'dessert' ? '#ff7043' : theme.secondaryText}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text
+                    style={[
+                      styles.wizardTabBtnText,
+                      { color: activeTab === 'dessert' ? theme.text : theme.secondaryText },
+                      activeTab === 'dessert' && styles.wizardTabBtnTextActive
+                    ]}
+                  >
+                    Tatlı Tarifi
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Malzeme Ekleme Alanı */}
+              <View style={{ marginBottom: 16 }}>
+                {/* 1. Yazarak Arama Input */}
+                <View style={[styles.wizardInputBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                  <FontAwesome5 name="carrot" size={15} color="#ff7043" style={{ marginLeft: 14 }} />
+                  <TextInput
+                    style={[styles.wizardInput, { color: theme.text }]}
+                    placeholder={activeTab === 'meal' ? 'Malzeme yaz (örn. domates, makarna)' : 'Tatlı malzemesi yaz (örn. çikolata)'}
+                    value={input}
+                    onChangeText={setInput}
+                    onSubmitEditing={malzemeEkle}
+                    placeholderTextColor={theme.secondaryText}
+                    returnKeyType="done"
+                  />
+                  {input.trim().length > 0 && (
+                    <TouchableOpacity onPress={malzemeEkle} style={styles.wizardAddBtn} activeOpacity={0.85}>
+                      <FontAwesome5 name="plus" size={12} color="#fff" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {/* 2. Resimli Dolaptan Seç Butonu */}
+                <TouchableOpacity
+                  style={[
+                    styles.openPantryBtn,
+                    {
+                      backgroundColor: isDarkMode ? '#221915' : '#fff3ee',
+                      borderColor: isDarkMode ? '#44261c' : '#ffd8c8'
+                    }
+                  ]}
+                  onPress={openPantryModal}
+                  activeOpacity={0.85}
+                >
+                  <View style={styles.openPantryIconCircle}>
+                    <FontAwesome5 name="images" size={13} color="#fff" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.openPantryTitle, { color: theme.text }]}>Resimli Dolaptan Seç</Text>
+                    <Text style={[styles.openPantrySub, { color: theme.secondaryText }]}>
+                      Fotoğraflı hazır malzemeleri dokunarak ekle
+                    </Text>
+                  </View>
+                  <View style={styles.openPantryArrow}>
+                    <FontAwesome5 name="chevron-right" size={12} color="#ff7043" />
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+              {/* Eklenen Malzemeler Chip Listesi */}
               {malzemeler.length > 0 && (
-                <View style={styles.pullDockBadge}>
-                  <Text style={styles.pullDockBadgeText}>{malzemeler.length}</Text>
+                <View style={styles.selectedMalzemelerArea}>
+                  <View style={styles.selectedMalzemelerHeader}>
+                    <Text style={[styles.selectedMalzemelerCount, { color: theme.text }]}>
+                      Seçilen Malzemeler ({malzemeler.length})
+                    </Text>
+                    <TouchableOpacity onPress={() => setMalzemeler([])} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
+                      <Text style={styles.clearAllBtnText}>Temizle</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.selectedChipsRow}>
+                    {malzemeler.map((item, index) => (
+                      <View key={index} style={[styles.selectedChip, { backgroundColor: isDarkMode ? '#281c17' : '#fff1eb', borderColor: '#ff7043' }]}>
+                        <Text style={[styles.selectedChipText, { color: isDarkMode ? '#ff8a65' : '#ea580c' }]}>{item}</Text>
+                        <TouchableOpacity
+                          onPress={() => malzemeSil(item)}
+                          style={styles.selectedChipRemove}
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <FontAwesome5 name="times" size={10} color="#ff7043" />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
                 </View>
               )}
-            </Animated.View>
 
-            {/* Açık durumdaki başlık görünümü */}
-            <Animated.View
-              style={[styles.expandedSheetHeaderRow, sheetHeaderAnimatedStyle]}
-              pointerEvents={sheetOpen ? 'auto' : 'none'}
-            >
-              <Text style={[styles.expandedSheetTitle, { color: theme.text }]}>Hazır Malzemeler</Text>
-              <TouchableOpacity
-                onPress={closeSheet}
-                style={[styles.sheetCloseCircle, { backgroundColor: isDarkMode ? '#262626' : '#f1f1f1' }]}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <FontAwesome5 name="chevron-down" size={13} color={theme.text} />
-              </TouchableOpacity>
-            </Animated.View>
-          </Animated.View>
-        </Animated.View>
+              {/* Porsiyon ve Yemek Tarzı Tercihleri */}
+              <View style={[styles.wizardPrefsBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                <Text style={[styles.wizardSectionTitle, { color: theme.text, marginBottom: 12 }]}>
+                  Tarif Tercihleri
+                </Text>
 
-        {/* Çekmece İçeriği */}
-        <Animated.View
-          style={[styles.sheetBodyWrapper, sheetBodyAnimatedStyle]}
-          pointerEvents={sheetOpen ? 'auto' : 'none'}
-        >
-          <ScrollView
-            scrollEnabled={sheetOpen}
-            contentContainerStyle={{
-              paddingHorizontal: 22,
-              paddingTop: 14,
-              paddingBottom: modalSelected.length > 0 ? 92 : 24,
-            }}
-            showsVerticalScrollIndicator={false}
-          >
-            {(activeTab === 'meal' ? readyIngredients : dessertIngredients).map((category, index) => (
-              <View key={index} style={{ marginBottom: 28 }}>
-                <Text style={[styles.categoryTitle, { color: theme.text }]}>{category.title}</Text>
-                <View style={styles.categoryGrid}>
-                  {category.data.map((item) => {
-                    const isSelected = modalSelected.includes(item.name);
+                <Text style={[styles.wizardPrefLabel, { color: theme.secondaryText }]}>Porsiyon</Text>
+                <View style={styles.wizardPortionsRow}>
+                  {[
+                    { label: '1 Kişi', value: 1 },
+                    { label: '2 Kişi', value: 2 },
+                    { label: '4 Kişi', value: 4 },
+                    { label: '4+ Kişi', value: '4+' },
+                  ].map((option) => {
+                    const isSelected = servingSize === option.value;
                     return (
                       <TouchableOpacity
-                        key={item.name}
+                        key={option.value}
                         style={[
-                          styles.gridItem,
-                          { backgroundColor: isSelected ? '#ff7043' : theme.card },
-                          isSelected && styles.gridItemSelected,
+                          styles.wizardPortionBtn,
+                          { backgroundColor: isSelected ? '#ff7043' : (isDarkMode ? '#1a1a1a' : '#f5f5f5') }
                         ]}
-                        onPress={() => isSelected ? setModalSelected(modalSelected.filter(m => m !== item.name)) : setModalSelected([...modalSelected, item.name])}
-                        activeOpacity={0.85}
+                        onPress={() => setServingSize(option.value)}
+                        activeOpacity={0.8}
                       >
-                        {isSelected && (
-                          <View style={styles.checkBadge}>
-                            <FontAwesome5 name="check" size={12} color="#ff7043" />
-                          </View>
-                        )}
-                        {item.image ? (
-                          <ImageBackground source={item.image} style={styles.gridImage} imageStyle={{ borderRadius: 16 }}>
-                            {isSelected && <View style={styles.gridImageSelectedTint} />}
-                            <View style={[styles.gridImageOverlay, isSelected && styles.gridImageOverlaySelected]}>
-                              <Text style={styles.gridImageText}>{item.name}</Text>
-                            </View>
-                          </ImageBackground>
-                        ) : (
-                          <Text style={[styles.gridText, { color: isSelected ? '#fff' : theme.text }]}>{item.name}</Text>
-                        )}
+                        <Text
+                          style={[
+                            styles.wizardPortionText,
+                            { color: isSelected ? '#ffffff' : theme.text },
+                            isSelected && { fontFamily: 'PoppinsBold' }
+                          ]}
+                        >
+                          {option.label}
+                        </Text>
                       </TouchableOpacity>
                     );
                   })}
                 </View>
-              </View>
-            ))}
-          </ScrollView>
 
-          <Animated.View style={[styles.confirmContainer, confirmButtonStyle]} pointerEvents={modalSelected.length > 0 ? 'auto' : 'none'}>
-            <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
-              <Text style={styles.confirmBtnText}>Seçilenleri Ekle ({modalSelected.length})</Text>
-            </TouchableOpacity>
+                <View style={styles.styleHeaderRow}>
+                  <Text style={[styles.wizardPrefLabel, { color: theme.secondaryText, marginBottom: 0 }]}>
+                    Tarz (İsteğe Bağlı)
+                  </Text>
+                  {selectedMealType && (
+                    <TouchableOpacity onPress={() => setSelectedMealType(null)} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
+                      <Text style={styles.clearAllBtnText}>Sıfırla</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                  {mealTypes.map((type) => {
+                    const isSelected = selectedMealType === type.key;
+                    return (
+                      <TouchableOpacity
+                        key={type.key}
+                        style={[
+                          styles.styleChip,
+                          {
+                            backgroundColor: isSelected ? '#ff7043' : (isDarkMode ? '#1a1a1a' : '#f5f5f5')
+                          }
+                        ]}
+                        onPress={() => setSelectedMealType(isSelected ? null : type.key)}
+                        activeOpacity={0.8}
+                      >
+                        <FontAwesome5
+                          name={type.icon}
+                          size={11}
+                          color={isSelected ? '#ffffff' : '#ff7043'}
+                          style={{ marginRight: 6 }}
+                        />
+                        <Text
+                          style={[
+                            styles.styleChipText,
+                            { color: isSelected ? '#ffffff' : theme.text },
+                            isSelected && styles.styleChipTextActive
+                          ]}
+                        >
+                          {type.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            </ScrollView>
+
+            {/* Sabit Alt Buton */}
+            <View
+              style={[
+                styles.wizardStickyBottom,
+                {
+                  backgroundColor: theme.background,
+                  borderTopColor: theme.divider,
+                  paddingBottom: modalFooterBottomPadding,
+                },
+              ]}
+            >
+              <TouchableOpacity
+                style={[
+                  styles.wizardSubmitBtn,
+                  { opacity: malzemeler.length > 0 ? 1 : 0.6 }
+                ]}
+                onPress={tarifUret}
+                disabled={malzemeler.length === 0}
+                activeOpacity={0.88}
+              >
+                <LinearGradient
+                  colors={malzemeler.length > 0 ? ['#ff7043', '#ea580c'] : ['#bdbdbd', '#9e9e9e']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.wizardSubmitBtnGradient}
+                >
+                  <FontAwesome5 name="magic" size={17} color="#fff" style={{ marginRight: 10 }} />
+                  <Text style={styles.wizardSubmitBtnText}>
+                    {malzemeler.length > 0 ? `Tarifi Oluştur (${malzemeler.length} Malzeme)` : 'En Az 1 Malzeme Ekleyin'}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           </Animated.View>
-        </Animated.View>
-      </Animated.View>
+        </View>
+      </Modal>
+
+      {/* 2. Resimli Hazır Malzemeler Modalı */}
+      <Modal
+        visible={pantryModalVisible}
+        animationType="none"
+        transparent
+        statusBarTranslucent
+        onRequestClose={closePantryModal}
+      >
+        <View style={styles.modalOverlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={closePantryModal} />
+          <Animated.View
+            style={[
+              styles.modalContainer,
+              styles.wizardModalContainer,
+              { backgroundColor: theme.background },
+              pantrySheetStyle,
+            ]}
+          >
+            {/* Pantry Modal Header */}
+            <View style={styles.wizardModalHeader}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.modalTitle, { color: theme.text }]}>Dolabımdan Seç</Text>
+                <Text style={[styles.modalSubTitle, { color: theme.secondaryText }]}>
+                  Mutfaktaki hazır malzemeleri dokunarak işaretle
+                </Text>
+              </View>
+              <TouchableOpacity onPress={closePantryModal} style={styles.closeModalBtn}>
+                <FontAwesome5 name="times" size={19} color={theme.secondaryText} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              contentContainerStyle={{ paddingHorizontal: 22, paddingTop: 6, paddingBottom: modalScrollBottomPadding }}
+              showsVerticalScrollIndicator={false}
+            >
+              {(activeTab === 'meal' ? readyIngredients : dessertIngredients).map((category, index) => (
+                <View key={index} style={{ marginBottom: 24 }}>
+                  <Text style={[styles.categoryTitle, { color: theme.text }]}>{category.title}</Text>
+                  <View style={styles.categoryGrid}>
+                    {category.data.map((item) => {
+                      const isSelected = pantrySelected.includes(item.name);
+                      return (
+                        <TouchableOpacity
+                          key={item.name}
+                          style={[
+                            styles.gridItem,
+                            { backgroundColor: isSelected ? '#ff7043' : theme.card },
+                            isSelected && styles.gridItemSelected,
+                          ]}
+                          onPress={() => togglePantryItem(item.name)}
+                          activeOpacity={0.85}
+                        >
+                          {isSelected && (
+                            <View style={styles.checkBadge}>
+                              <FontAwesome5 name="check" size={12} color="#ff7043" />
+                            </View>
+                          )}
+                          {item.image ? (
+                            <ImageBackground source={item.image} style={styles.gridImage} imageStyle={{ borderRadius: 16 }}>
+                              {isSelected && <View style={styles.gridImageSelectedTint} />}
+                              <View style={[styles.gridImageOverlay, isSelected && styles.gridImageOverlaySelected]}>
+                                <Text style={styles.gridImageText}>{item.name}</Text>
+                              </View>
+                            </ImageBackground>
+                          ) : (
+                            <Text style={[styles.gridText, { color: isSelected ? '#fff' : theme.text }]}>{item.name}</Text>
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+
+            {/* Sabit Onay Butonu */}
+            <View
+              style={[
+                styles.wizardStickyBottom,
+                {
+                  backgroundColor: theme.background,
+                  borderTopColor: theme.divider,
+                  paddingBottom: modalFooterBottomPadding,
+                },
+              ]}
+            >
+              <TouchableOpacity
+                style={styles.wizardSubmitBtn}
+                onPress={confirmPantrySelection}
+                activeOpacity={0.88}
+              >
+                <LinearGradient
+                  colors={['#ff7043', '#ea580c']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.wizardSubmitBtnGradient}
+                >
+                  <FontAwesome5 name="check" size={16} color="#fff" style={{ marginRight: 8 }} />
+                  <Text style={styles.wizardSubmitBtnText}>
+                    {pantrySelected.length > 0
+                      ? `Seçilenleri Ekle (${pantrySelected.length})`
+                      : 'Seçimi Tamamla'}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </View>
+      </Modal>
 
       {/* 2. Rastgele Tarif Modalı */}
       <Modal visible={randomModalVisible} animationType="none" transparent statusBarTranslucent onRequestClose={closeRandomModal}>
@@ -1431,126 +1593,443 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: 'rgba(255,255,255,0.88)',
   },
-  fabContainer: {
-    position: 'absolute',
-    bottom: 62,
-    left: 24,
-    right: 24,
-    zIndex: 10,
+  // Hero Card
+  heroCardContainer: {
+    marginBottom: 24,
   },
-  sheetBackdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
-    zIndex: 30,
-    elevation: 18,
+  heroCard: {
+    borderRadius: 26,
+    padding: 22,
+    borderWidth: 1,
+    shadowColor: '#ff7043',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    elevation: 4,
   },
-  expandableSheetContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -6 },
-    shadowRadius: 16,
-    elevation: 24,
-    zIndex: 35,
-  },
-  sheetTopBar: {
-    paddingTop: 6,
-    paddingBottom: 6,
-    alignItems: 'center',
-  },
-  pullDockHandle: {
-    width: 34,
-    height: 3.5,
-    borderRadius: 2,
-    marginBottom: 4,
-  },
-  sheetHeaderSwapSlot: {
-    width: '100%',
-    height: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  pullDockContent: {
+  heroBadgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
+    marginBottom: 12,
   },
-  pullDockText: {
-    fontSize: 13,
+  heroBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 112, 67, 0.12)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    gap: 6,
+  },
+  heroBadgeText: {
+    fontSize: 11,
     fontFamily: 'PoppinsBold',
-    letterSpacing: 0.2,
+    color: '#ff7043',
+    letterSpacing: 0.3,
   },
-  pullDockBadge: {
-    backgroundColor: 'rgba(255, 112, 67, 0.14)',
-    paddingHorizontal: 7,
-    paddingVertical: 1,
+  heroIngredientsCount: {
+    backgroundColor: '#ff7043',
+    paddingHorizontal: 9,
+    paddingVertical: 3,
     borderRadius: 8,
   },
-  pullDockBadgeText: {
-    color: '#ff7043',
+  heroIngredientsCountText: {
+    color: '#fff',
     fontSize: 11,
     fontFamily: 'PoppinsBold',
   },
-  expandedSheetHeaderRow: {
-    position: 'absolute',
-    left: 22,
-    right: 22,
+  heroTitle: {
+    fontSize: 20,
+    fontFamily: 'PoppinsExtraBold',
+    lineHeight: 27,
+    marginBottom: 8,
+  },
+  heroSubtitle: {
+    fontSize: 13,
+    fontFamily: 'PoppinsRegular',
+    lineHeight: 19,
+    marginBottom: 0,
+  },
+
+  // Son Bakılan Tarifler
+  recentSection: {
+    marginBottom: 24,
+  },
+  recentHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 14,
+  },
+  recentCountText: {
+    fontSize: 12,
+    fontFamily: 'PoppinsMedium',
+  },
+  recentScrollContent: {
+    paddingRight: 8,
+    gap: 12,
+  },
+  recentCard: {
+    width: 210,
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    justifyContent: 'space-between',
+  },
+  recentCardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  recentSourcePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255, 112, 67, 0.12)',
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  recentSourceText: {
+    fontSize: 10,
+    fontFamily: 'PoppinsBold',
+    color: '#ff7043',
+  },
+  recentCardTitle: {
+    fontSize: 15,
+    fontFamily: 'PoppinsBold',
+    lineHeight: 20,
+    marginBottom: 12,
+    minHeight: 40,
+  },
+  recentCardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  expandedSheetTitle: {
-    fontSize: 18,
-    fontFamily: 'PoppinsExtraBold',
+  recentCardMeta: {
+    fontSize: 12,
+    fontFamily: 'PoppinsRegular',
+    flex: 1,
+    marginRight: 8,
   },
-  sheetCloseCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+
+  // Sections & Quick Concepts
+  sectionHeading: {
+    fontSize: 18,
+    fontFamily: 'PoppinsBold',
+    marginBottom: 14,
+    letterSpacing: -0.2,
+  },
+  conceptsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  conceptCard: {
+    width: '48%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    gap: 12,
+  },
+  conceptIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  sheetBodyWrapper: {
+  conceptTextCol: {
     flex: 1,
   },
-  fabButton: {
-    borderRadius: 20,
+  conceptTitle: {
+    fontSize: 13,
+    fontFamily: 'PoppinsBold',
+    lineHeight: 17,
+  },
+  conceptDesc: {
+    fontSize: 11,
+    fontFamily: 'PoppinsRegular',
+    marginTop: 1,
+  },
+
+  // FAB (Floating Action Button)
+  mainFab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 20,
+    borderRadius: 28,
     overflow: 'hidden',
-    elevation: 8,
     shadowColor: '#ff7043',
-    shadowOpacity: 0.4,
     shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
     shadowRadius: 16,
-    backgroundColor: '#ff7043',
+    elevation: 12,
+    zIndex: 25,
+  },
+  fabGradient: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 18,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 28,
   },
   fabText: {
-    fontSize: 18,
-    fontFamily: 'PoppinsBold',
     color: '#fff',
+    fontSize: 15,
+    fontFamily: 'PoppinsBold',
+    letterSpacing: 0.3,
   },
-  badge: {
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    paddingHorizontal: 8,
+  fabBadge: {
+    backgroundColor: '#fff',
+    marginLeft: 8,
+    paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 10,
-    marginLeft: 10,
   },
-  badgeText: {
-    color: '#fff',
+  fabBadgeText: {
+    color: '#ff7043',
+    fontSize: 11,
     fontFamily: 'PoppinsBold',
+  },
+
+  // Wizard & Pantry Modal
+  wizardModalContainer: {
+    height: '92%',
+    maxHeight: '95%',
+    paddingHorizontal: 0,
+    paddingTop: 16,
+    paddingBottom: 0,
+  },
+  wizardModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 22,
+    paddingTop: 6,
+    marginBottom: 16,
+  },
+  modalSubTitle: {
     fontSize: 12,
+    fontFamily: 'PoppinsRegular',
+    marginTop: 2,
+  },
+  wizardTabRow: {
+    flexDirection: 'row',
+    borderRadius: 14,
+    padding: 4,
+    marginBottom: 16,
+  },
+  wizardTabBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 11,
+  },
+  wizardTabBtnActive: {
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  wizardTabBtnText: {
+    fontSize: 13,
+    fontFamily: 'PoppinsMedium',
+  },
+  wizardTabBtnTextActive: {
+    fontFamily: 'PoppinsBold',
+  },
+  wizardInputBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 16,
+    borderWidth: 1,
+    height: 52,
+    marginBottom: 10,
+  },
+  wizardInput: {
+    flex: 1,
+    paddingHorizontal: 12,
+    fontSize: 14,
+    fontFamily: 'PoppinsRegular',
+  },
+  wizardAddBtn: {
+    width: 34,
+    height: 34,
+    backgroundColor: '#ff7043',
+    borderRadius: 11,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  openPantryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 12,
+  },
+  openPantryIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: '#ff7043',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  openPantryTitle: {
+    fontSize: 13,
+    fontFamily: 'PoppinsBold',
+  },
+  openPantrySub: {
+    fontSize: 11,
+    fontFamily: 'PoppinsRegular',
+    marginTop: 1,
+  },
+  openPantryArrow: {
+    paddingRight: 4,
+  },
+  selectedMalzemelerArea: {
+    marginBottom: 14,
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 112, 67, 0.06)',
+  },
+  selectedMalzemelerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  selectedMalzemelerCount: {
+    fontSize: 13,
+    fontFamily: 'PoppinsBold',
+  },
+  selectedChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  selectedChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingLeft: 12,
+    paddingRight: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 6,
+  },
+  selectedChipText: {
+    fontSize: 13,
+    fontFamily: 'PoppinsBold',
+  },
+  selectedChipRemove: {
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  wizardSectionTitle: {
+    fontSize: 15,
+    fontFamily: 'PoppinsBold',
+    marginBottom: 2,
+  },
+  wizardSectionSub: {
+    fontSize: 12,
+    fontFamily: 'PoppinsRegular',
+    marginBottom: 14,
+  },
+  catLabel: {
+    fontSize: 12,
+    fontFamily: 'PoppinsBold',
+    letterSpacing: 0.3,
+    marginBottom: 8,
+  },
+  ingredientChipsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  pantryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 7,
+    paddingHorizontal: 11,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  pantryChipText: {
+    fontSize: 12,
+    fontFamily: 'PoppinsMedium',
+  },
+  wizardPrefsBox: {
+    marginTop: 6,
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginBottom: 10,
+  },
+  wizardPrefLabel: {
+    fontSize: 12,
+    fontFamily: 'PoppinsBold',
+    letterSpacing: 0.3,
+    marginBottom: 8,
+  },
+  wizardPortionsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  wizardPortionBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  wizardPortionText: {
+    fontSize: 13,
+    fontFamily: 'PoppinsMedium',
+  },
+  wizardStickyBottom: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 22,
+    paddingTop: 12,
+    paddingBottom: 28,
+    borderTopWidth: 1,
+  },
+  wizardSubmitBtn: {
+    borderRadius: 18,
+    overflow: 'hidden',
+    shadowColor: '#ff7043',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 8,
+  },
+  wizardSubmitBtnGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+  },
+  wizardSubmitBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'PoppinsBold',
+    letterSpacing: 0.2,
   },
   modalOverlay: {
     flex: 1,
@@ -1654,28 +2133,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  confirmContainer: {
-    position: 'absolute',
-    bottom: 18,
-    left: 22,
-    right: 22,
-  },
-  confirmBtn: {
-    backgroundColor: '#ff7043',
-    paddingVertical: 16,
-    borderRadius: 20,
-    alignItems: 'center',
-    shadowColor: '#ff7043',
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  confirmBtnText: {
-    color: '#fff',
-    fontSize: 18,
-    fontFamily: 'PoppinsBold',
-  },
+
   randomModalContainer: {
     height: '82%',
   },

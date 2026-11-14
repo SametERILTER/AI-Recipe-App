@@ -20,6 +20,7 @@ import LottieView from 'lottie-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { generateAIContent } from '../config/ai';
 import { useTheme } from '../context/ThemeContext';
+import { recordRecentRecipe } from '../utils/recentRecipes';
 
 
 const { width, height } = Dimensions.get('window');
@@ -1161,6 +1162,24 @@ const RecipeDetail = ({ route, navigation }) => {
       } else if (result && result.description) {
         setTarif(result);
         setErrorInfo(null);
+
+        const generatedName = extractRecipeName(result.description);
+        recordRecentRecipe({
+          title: generatedName,
+          sourceLabel: 'Şef Tarifi',
+          icon: 'magic',
+          routeName: 'SavedRecipeDetail',
+          params: {
+            recipe: {
+              yemekAdi: generatedName,
+              description: result.description,
+              malzemeler,
+              tarih: new Date().toISOString(),
+              image: null,
+            },
+          },
+          meta: malzemeler.length > 0 ? `${malzemeler.length} malzeme` : 'Özel tarif',
+        });
 
         // Check if saved again with new tarif
         const saved = await AsyncStorage.getItem('saved_recipes');
