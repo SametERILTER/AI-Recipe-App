@@ -18,6 +18,7 @@ import * as Speech from 'expo-speech';
 import LottieView from 'lottie-react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { generateAIContent } from '../config/ai';
 import { useTheme } from '../context/ThemeContext';
 import { recordRecentRecipe } from '../utils/recentRecipes';
@@ -335,40 +336,56 @@ function getMealTypeText(mealType) {
 
 function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style }) {
   const { isDarkMode, theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const [progress] = useState(new Animated.Value(0));
   const [percent, setPercent] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
+  const pulseAnim = useRef(new Animated.Value(0.4)).current;
 
   const loadingSteps = [
     "Malzemeler inceleniyor...",
-    "Şef önlüğünü giyiyor...",
-    "Lezzet haritası çıkarılıyor...",
-    "En iyi tarif aranıyor...",
+    "Lezzet uyumu hesaplanıyor...",
+    "Adımlar hazırlanıyor...",
     "Püf noktalar ekleniyor...",
     "Sunum tabağı hazırlanıyor..."
   ];
 
   useEffect(() => {
-    // 1. Progress Bar Animation
     Animated.timing(progress, {
       toValue: 95,
-      duration: 8000,
+      duration: 8500,
+      easing: Easing.out(Easing.cubic),
       useNativeDriver: false,
     }).start();
 
-    // 3. Update percentage text
+    const pulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 750,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 0.4,
+          duration: 750,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    pulseLoop.start();
+
     const listener = progress.addListener(({ value }) => {
       setPercent(Math.floor(value));
     });
 
-    // 4. Cycle through steps
     const stepInterval = setInterval(() => {
       setCurrentStep((prev) => (prev + 1) % loadingSteps.length);
-    }, 2500);
+    }, 2200);
 
     return () => {
       progress.removeListener(listener);
       clearInterval(stepInterval);
+      pulseLoop.stop();
     };
   }, []);
 
@@ -403,112 +420,98 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
   };
 
   return (
-    <View style={[styles.loadingContainer, { flex: 1, paddingVertical: 36, backgroundColor: theme.background }]}>
-
+    <View
+      style={[
+        styles.loadingContainer,
+        {
+          flex: 1,
+          paddingTop: Math.max(insets.top + 16, 42),
+          paddingBottom: Math.max(insets.bottom + 20, 28),
+          backgroundColor: theme.background,
+        },
+      ]}
+    >
       {/* 1. Üst Kısım: Animasyon ve Başlık */}
-      <View style={{ alignItems: 'center', marginTop: -10, marginBottom: 24 }}>
+      <View style={{ alignItems: 'center', marginBottom: 18 }}>
         <LottieView
           autoPlay
           loop
-          style={{
-            width: 240,
-            height: 240,
-            marginBottom: -8,
-          }}
+          style={{ width: 190, height: 190 }}
           source={require('../animations/Cooking.json')}
         />
-        <Text style={[styles.loadingTitle, { color: theme.text }]}>Tarif Hazırlanıyor...</Text>
-        <Text style={{ textAlign: 'center', color: theme.secondaryText, fontFamily: 'PlusJakartaSansRegular', fontSize: 14, marginTop: 4, maxWidth: 260 }}>
-          Yapay zeka şefimiz sizin için özel bir tarif oluşturuyor.
+        <Text style={[styles.loadingTitle, { color: theme.text, marginTop: -4, marginBottom: 0 }]}>
+          Tarif Hazırlanıyor
         </Text>
       </View>
 
-      {/* 2. İlerleme Kutusu */}
-      <View style={{
-        width: '100%',
-        backgroundColor: theme.card,
-        padding: 18,
-        borderRadius: 20,
-        marginBottom: 16,
-      }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ fontSize: 14, color: theme.secondaryText, fontFamily: 'PlusJakartaSansMedium', flex: 1 }}>
-            {loadingSteps[currentStep]}
-          </Text>
-          <Text style={{ fontSize: 18, color: '#ff7043', fontFamily: 'PlusJakartaSansExtraBold' }}>
-            %{percent}
-          </Text>
-        </View>
-
-        <View style={{ width: '100%', height: 10, backgroundColor: isDarkMode ? '#2a2a2a' : '#e5e5e5', borderRadius: 5, overflow: 'hidden' }}>
-          <Animated.View
-            style={{
-              height: '100%',
-              backgroundColor: '#ff7043',
-              width: widthInterpolate,
-              borderRadius: 5
-            }}
-          />
-        </View>
-      </View>
-
-      {/* 3. Malzemeler Kartı */}
-      <View style={{ width: '100%', flex: 1 }}>
+      {/* 2. Malzemeler / Konsept Kartı (Ortada, esnek yükseklik) */}
+      <View style={{ width: '100%', flex: 1, marginBottom: 14 }}>
         {isRandom ? (
-          <View style={{
-            width: '100%',
-            backgroundColor: theme.card,
-            borderRadius: 20,
-            padding: 24,
-            alignItems: 'center',
-          }}>
-            <View style={{
-              width: 64,
-              height: 64,
-              borderRadius: 20,
-              backgroundColor: 'rgba(255, 112, 67, 0.14)',
-              justifyContent: 'center',
+          <View
+            style={{
+              width: '100%',
+              flex: 1,
+              backgroundColor: theme.card,
+              borderRadius: 22,
+              padding: 22,
               alignItems: 'center',
-              marginBottom: 14,
-            }}>
-              <FontAwesome5 name="dice" size={28} color="#ff7043" />
+              justifyContent: 'center',
+            }}
+          >
+            <View
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 18,
+                backgroundColor: 'rgba(255, 112, 67, 0.14)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 12,
+              }}
+            >
+              <FontAwesome5 name="dice" size={24} color="#ff7043" />
             </View>
-            <Text style={[styles.loadingHighlightText, { color: theme.text }]}>{getRandomRecipeText().toUpperCase()}</Text>
-            <Text style={{ color: theme.secondaryText, fontFamily: 'PlusJakartaSansRegular', fontSize: 13, textAlign: 'center' }}>
-              Sizin için en uygun lezzeti seçiyoruz...
+            <Text style={[styles.loadingHighlightText, { color: theme.text }]}>
+              {getRandomRecipeText().toUpperCase()}
             </Text>
           </View>
         ) : (
-          <View style={{
-            width: '100%',
-            backgroundColor: theme.card,
-            borderRadius: 20,
-            padding: 18,
-            maxHeight: 230,
-          }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <View
+            style={{
+              width: '100%',
+              flex: 1,
+              backgroundColor: theme.card,
+              borderRadius: 22,
+              padding: 18,
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 10,
-                  backgroundColor: 'rgba(255, 112, 67, 0.14)',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: 10,
-                }}>
-                  <FontAwesome5 name="shopping-basket" size={13} color="#ff7043" />
+                <View
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 9,
+                    backgroundColor: 'rgba(255, 112, 67, 0.14)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 10,
+                  }}
+                >
+                  <FontAwesome5 name="shopping-basket" size={12} color="#ff7043" />
                 </View>
-                <Text style={{ fontSize: 15, fontFamily: 'PlusJakartaSansBold', color: theme.text }}>
+                <Text style={{ fontSize: 14.5, fontFamily: 'PlusJakartaSansBold', color: theme.text }}>
                   Seçilen Malzemeler
                 </Text>
               </View>
-              <View style={{
-                backgroundColor: 'rgba(255, 112, 67, 0.14)',
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-                borderRadius: 10,
-              }}>
+              <View
+                style={{
+                  backgroundColor: 'rgba(255, 112, 67, 0.14)',
+                  paddingHorizontal: 10,
+                  paddingVertical: 4,
+                  borderRadius: 10,
+                }}
+              >
                 <Text style={{ fontSize: 12, fontFamily: 'PlusJakartaSansBold', color: '#ff7043' }}>
                   {malzemeler?.length || 0} Malzeme
                 </Text>
@@ -516,48 +519,55 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
             </View>
 
             <ScrollView
-              style={{ width: '100%' }}
+              style={{ width: '100%', flex: 1 }}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingBottom: 4 }}
             >
-              {malzemeler && malzemeler.map((malzeme, index) => (
-                <View
-                  key={index}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    backgroundColor: isDarkMode ? '#262626' : '#ffffff',
-                    paddingHorizontal: 13,
-                    paddingVertical: 9,
-                    borderRadius: 13,
-                  }}
-                >
-                  <View style={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: 9,
-                    backgroundColor: 'rgba(255, 112, 67, 0.15)',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginRight: 8,
-                  }}>
-                    <FontAwesome5 name="check" size={9} color="#ff7043" />
+              {malzemeler &&
+                malzemeler.map((malzeme, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      backgroundColor: isDarkMode ? '#222226' : '#ffffff',
+                      paddingHorizontal: 12,
+                      paddingVertical: 8,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 17,
+                        height: 17,
+                        borderRadius: 8.5,
+                        backgroundColor: 'rgba(255, 112, 67, 0.15)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginRight: 7,
+                      }}
+                    >
+                      <FontAwesome5 name="check" size={8} color="#ff7043" />
+                    </View>
+                    <Text style={{ color: theme.text, fontSize: 13.5, fontFamily: 'PlusJakartaSansSemiBold' }}>
+                      {malzeme}
+                    </Text>
                   </View>
-                  <Text style={{ color: theme.text, fontSize: 14, fontFamily: 'PlusJakartaSansSemiBold' }}>{malzeme}</Text>
-                </View>
-              ))}
+                ))}
             </ScrollView>
 
             {mealTypeText ? (
-              <View style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: isDarkMode ? '#262626' : '#ffffff',
-                paddingHorizontal: 12,
-                paddingVertical: 10,
-                borderRadius: 12,
-                marginTop: 12,
-              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: isDarkMode ? '#222226' : '#ffffff',
+                  paddingHorizontal: 12,
+                  paddingVertical: 9,
+                  borderRadius: 12,
+                  marginTop: 10,
+                }}
+              >
                 <FontAwesome5 name="sliders-h" size={12} color="#ff7043" style={{ marginRight: 8 }} />
                 <Text style={{ color: theme.secondaryText, fontFamily: 'PlusJakartaSansMedium', fontSize: 12, flex: 1 }}>
                   {mealTypeText}
@@ -568,15 +578,55 @@ function LoadingAnimation({ malzemeler, mealTypeText, isRandom, mealTime, style 
         )}
       </View>
 
-      {/* 4. Footer ve Tahmini Süre (En Altta) */}
-      <View style={{ alignItems: 'center', width: '100%', marginTop: 'auto', marginBottom: 16 }}>
-        <View style={[styles.timeBadge, { marginBottom: 12, backgroundColor: theme.card, borderWidth: 0, paddingHorizontal: 22, paddingVertical: 11 }]}>
-          <FontAwesome5 name="hourglass-half" size={13} color={theme.secondaryText} />
-          <Text style={[styles.timeText, { fontSize: 13, color: theme.secondaryText }]}>Bu işlem yaklaşık 10 saniye sürer</Text>
+      {/* 3. En Altta: İlerleme Barı */}
+      <View
+        style={{
+          width: '100%',
+          backgroundColor: theme.card,
+          padding: 18,
+          borderRadius: 22,
+        }}
+      >
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, paddingRight: 10 }}>
+            <Animated.View
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: '#ff7043',
+                marginRight: 9,
+                opacity: pulseAnim,
+              }}
+            />
+            <Text style={{ fontSize: 13.5, color: theme.text, fontFamily: 'PlusJakartaSansSemiBold', flex: 1 }}>
+              {loadingSteps[currentStep]}
+            </Text>
+          </View>
+          <Text style={{ fontSize: 16, color: '#ff7043', fontFamily: 'PlusJakartaSansExtraBold' }}>
+            %{percent}
+          </Text>
         </View>
-        <Text style={[styles.aiFooterText, { color: theme.secondaryText, fontFamily: 'PlusJakartaSansRegular', opacity: 0.7, marginBottom: 4 }]}>Gemini AI ile güçlendirilmiştir</Text>
-      </View>
 
+        <View
+          style={{
+            width: '100%',
+            height: 8,
+            backgroundColor: isDarkMode ? '#27272a' : '#e7e7ea',
+            borderRadius: 4,
+            overflow: 'hidden',
+          }}
+        >
+          <Animated.View style={{ height: '100%', width: widthInterpolate, borderRadius: 4, overflow: 'hidden' }}>
+            <LinearGradient
+              colors={['#ff7043', '#ea580c']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{ flex: 1 }}
+            />
+          </Animated.View>
+        </View>
+      </View>
     </View>
   );
 }
@@ -1176,6 +1226,7 @@ const RecipeDetail = ({ route, navigation }) => {
               malzemeler,
               tarih: new Date().toISOString(),
               image: null,
+              isAI: true,
             },
           },
           meta: malzemeler.length > 0 ? `${malzemeler.length} malzeme` : 'Özel tarif',
@@ -1234,7 +1285,8 @@ const RecipeDetail = ({ route, navigation }) => {
           description: tarif.description,
           malzemeler: malzemeler,
           tarih: new Date().toISOString(),
-          image: null
+          image: null,
+          isAI: true,
         });
         setToastMessage('Tarif Kaydedildi');
         setIsSaved(true);
@@ -1492,6 +1544,22 @@ const RecipeDetail = ({ route, navigation }) => {
               <FontAwesome5 name="redo" size={14} color="#ff7043" />
               <Text style={[styles.voiceButtonText, { color: isDarkMode ? theme.text : '#d84315' }]}>Tarifi Yenile</Text>
             </TouchableOpacity>
+          </View>
+
+          <View style={styles.aiBadgeRow}>
+            <LinearGradient
+              colors={isDarkMode ? ['#261813', '#1c120e'] : ['#fff4ed', '#ffe8db']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.aiRecipeBadge}
+            >
+              <View style={styles.aiBadgeIconBox}>
+                <MaterialCommunityIcons name="creation" size={13} color="#fff" />
+              </View>
+              <Text style={[styles.aiBadgeText, { color: isDarkMode ? '#ffab91' : '#c2410c' }]}>
+                Yapay Zeka Tarifi
+              </Text>
+            </LinearGradient>
           </View>
 
           {/* Meta Bilgileri Kutuları */}
@@ -1947,7 +2015,34 @@ const styles = StyleSheet.create({
   actionButtonsRow: {
     flexDirection: 'row',
     gap: 12,
+    marginBottom: 12,
+  },
+  aiBadgeRow: {
+    alignSelf: 'flex-start',
     marginBottom: 20,
+  },
+  aiRecipeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 7,
+    paddingLeft: 8,
+    paddingRight: 13,
+    borderRadius: 20,
+    gap: 8,
+  },
+  aiBadgeIconBox: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#ff7043',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aiBadgeText: {
+    fontSize: 13,
+    lineHeight: 18,
+    includeFontPadding: false,
+    fontFamily: 'PlusJakartaSansBold',
   },
   iconButton: {
     width: 44,
@@ -2023,6 +2118,9 @@ const styles = StyleSheet.create({
   startButtonText: {
     color: '#fff',
     fontSize: 18,
+    lineHeight: 24,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
     fontFamily: 'PlusJakartaSansBold',
   },
   voiceButton: {
@@ -2033,7 +2131,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#6366f1',
     height: 46,
     paddingHorizontal: 14,
-    borderRadius: 14,
+    borderRadius: 23,
     gap: 8,
   },
   voiceButtonActive: {
@@ -2042,6 +2140,9 @@ const styles = StyleSheet.create({
   voiceButtonText: {
     color: '#fff',
     fontSize: 14,
+    lineHeight: 19,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
     fontFamily: 'PlusJakartaSansBold',
   },
   ingredientChip: {

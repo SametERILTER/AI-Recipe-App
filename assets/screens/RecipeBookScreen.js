@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Modal, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  TextInput,
+  Modal,
+  ScrollView,
+} from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
-
 
 const RecipeBookScreen = () => {
   const { isDarkMode, theme: globalTheme } = useTheme();
+  const insets = useSafeAreaInsets();
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,14 +28,64 @@ const RecipeBookScreen = () => {
   const navigation = useNavigation();
 
   const themes = [
-    { id: 'gold', name: 'Klasik Altın', primary: '#bfa100', bg: isDarkMode ? '#262626' : '#fffbe6', base: isDarkMode ? '#181818' : '#f6f1e7', cardBg: isDarkMode ? '#262626' : '#fff', border: isDarkMode ? '#383838' : '#f3e7b4' },
-    { id: 'green', name: 'Doğal Yeşil', primary: '#10b981', bg: isDarkMode ? '#064e3b' : '#ecfdf5', base: isDarkMode ? '#022c22' : '#f0fdf4', cardBg: isDarkMode ? '#064e3b' : '#fff', border: isDarkMode ? '#065f46' : '#d1fae5' },
-    { id: 'purple', name: 'Zarif Mor', primary: '#8b5cf6', bg: isDarkMode ? '#4c1d95' : '#f5f3ff', base: isDarkMode ? '#2e1065' : '#fafaff', cardBg: isDarkMode ? '#4c1d95' : '#fff', border: isDarkMode ? '#5b21b6' : '#ede9fe' },
-    { id: 'blue', name: 'Okyanus Mavisi', primary: '#3b82f6', bg: isDarkMode ? '#1e3a8a' : '#eff6ff', base: isDarkMode ? '#172554' : '#f8faff', cardBg: isDarkMode ? '#1e3a8a' : '#fff', border: isDarkMode ? '#1e40af' : '#dbeafe' },
-    { id: 'rose', name: 'Romantik Gül', primary: '#f43f5e', bg: isDarkMode ? '#881337' : '#fff1f2', base: isDarkMode ? '#4c0519' : '#fffbff', cardBg: isDarkMode ? '#881337' : '#fff', border: isDarkMode ? '#9f1239' : '#ffe4e6' },
+    {
+      id: 'gold',
+      name: 'Klasik Krem',
+      primary: '#c28b1a',
+      paper: isDarkMode ? '#121214' : '#fbf8f1',
+      headerBg: isDarkMode ? '#18181b' : '#f5efe2',
+      cardBg: isDarkMode ? '#1b1b1f' : '#fffdf9',
+      ruleLine: isDarkMode ? 'rgba(255, 255, 255, 0.06)' : '#ece3cf',
+      marginLine: isDarkMode ? 'rgba(194, 139, 26, 0.35)' : 'rgba(217, 119, 6, 0.28)',
+      border: isDarkMode ? '#2a2a30' : '#eadfc7',
+    },
+    {
+      id: 'green',
+      name: 'Adaçayı',
+      primary: '#10b981',
+      paper: isDarkMode ? '#101413' : '#f5faf7',
+      headerBg: isDarkMode ? '#151c19' : '#e8f5ee',
+      cardBg: isDarkMode ? '#18201d' : '#ffffff',
+      ruleLine: isDarkMode ? 'rgba(16, 185, 129, 0.12)' : '#d9efe3',
+      marginLine: isDarkMode ? 'rgba(16, 185, 129, 0.35)' : 'rgba(16, 185, 129, 0.3)',
+      border: isDarkMode ? '#23332d' : '#cdebd9',
+    },
+    {
+      id: 'purple',
+      name: 'Lavanta',
+      primary: '#8b5cf6',
+      paper: isDarkMode ? '#131217' : '#f8f6fc',
+      headerBg: isDarkMode ? '#1a1822' : '#efeafd',
+      cardBg: isDarkMode ? '#1d1b26' : '#ffffff',
+      ruleLine: isDarkMode ? 'rgba(139, 92, 246, 0.14)' : '#e6defa',
+      marginLine: isDarkMode ? 'rgba(139, 92, 246, 0.35)' : 'rgba(139, 92, 246, 0.28)',
+      border: isDarkMode ? '#2c283b' : '#ddd2f7',
+    },
+    {
+      id: 'blue',
+      name: 'Mürekkep',
+      primary: '#3b82f6',
+      paper: isDarkMode ? '#101318' : '#f4f8fd',
+      headerBg: isDarkMode ? '#161b24' : '#e7f0fc',
+      cardBg: isDarkMode ? '#191f2a' : '#ffffff',
+      ruleLine: isDarkMode ? 'rgba(59, 130, 246, 0.14)' : '#dbe8fa',
+      marginLine: isDarkMode ? 'rgba(59, 130, 246, 0.35)' : 'rgba(59, 130, 246, 0.28)',
+      border: isDarkMode ? '#263042' : '#cddff8',
+    },
+    {
+      id: 'rose',
+      name: 'Kuru Gül',
+      primary: '#f43f5e',
+      paper: isDarkMode ? '#161214' : '#fdf6f7',
+      headerBg: isDarkMode ? '#1f181c' : '#fae8ec',
+      cardBg: isDarkMode ? '#221b1f' : '#ffffff',
+      ruleLine: isDarkMode ? 'rgba(244, 63, 94, 0.14)' : '#f7dce1',
+      marginLine: isDarkMode ? 'rgba(244, 63, 94, 0.35)' : 'rgba(244, 63, 94, 0.28)',
+      border: isDarkMode ? '#35252b' : '#f2cfd6',
+    },
   ];
 
-  const currentTheme = themes.find(t => t.id === selectedTheme) || themes[0];
+  const currentTheme = themes.find((t) => t.id === selectedTheme) || themes[0];
 
   const categories = [
     { id: 'all', name: 'Tümü', icon: 'th-large' },
@@ -39,7 +99,7 @@ const RecipeBookScreen = () => {
   ];
 
   const getCategoryIcon = (catName) => {
-    return categories.find(c => c.name === catName)?.icon || 'book';
+    return categories.find((c) => c.name === catName)?.icon || 'book';
   };
 
   useFocusEffect(
@@ -82,216 +142,700 @@ const RecipeBookScreen = () => {
   useEffect(() => {
     let result = [...recipes];
     if (activeCategory !== 'Tümü') {
-      result = result.filter(r => r.category === activeCategory);
+      result = result.filter((r) => r.category === activeCategory);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLocaleLowerCase('tr-TR');
-      result = result.filter(r =>
-        (r.title || '').toLocaleLowerCase('tr-TR').includes(q) ||
-        (r.ingredients || []).join(' ').toLocaleLowerCase('tr-TR').includes(q)
+      result = result.filter(
+        (r) =>
+          (r.title || '').toLocaleLowerCase('tr-TR').includes(q) ||
+          (r.ingredients || []).join(' ').toLocaleLowerCase('tr-TR').includes(q)
       );
     }
     setFilteredRecipes(result);
   }, [searchQuery, activeCategory, recipes]);
 
+  const formatDate = (iso) => {
+    if (!iso) return '';
+    try {
+      return new Date(iso).toLocaleDateString('tr-TR', {
+        day: 'numeric',
+        month: 'short',
+      });
+    } catch {
+      return '';
+    }
+  };
+
   const renderEmpty = () => (
-    <View style={styles.emptyContainer}>
-      <FontAwesome5 name="book-open" size={64} color={currentTheme.primary} style={{ marginBottom: 20, opacity: 0.3 }} />
-      <Text style={styles.emptyTitle}>Henüz tarif eklemedin</Text>
-      <Text style={styles.emptySubtitle}>Favori tariflerini buraya ekleyerek kendi tarif defterini oluşturabilirsin!</Text>
+    <View
+      style={[
+        styles.emptyPageCard,
+        {
+          backgroundColor: currentTheme.cardBg,
+          borderColor: currentTheme.border,
+        },
+      ]}
+    >
+      <View
+        style={[
+          styles.emptyIconCircle,
+          { backgroundColor: currentTheme.primary + '18' },
+        ]}
+      >
+        <FontAwesome5 name="book-open" size={28} color={currentTheme.primary} />
+      </View>
+      <Text style={[styles.emptyTitle, { color: globalTheme.text }]}>
+        Defterin henüz boş
+      </Text>
+      <Text style={[styles.emptySubtitle, { color: globalTheme.secondaryText }]}>
+        Sevdiğin tarifleri kaydedip notlarınla birlikte kendi defterini oluşturabilirsin.
+      </Text>
     </View>
   );
 
   const ThemePreview = ({ theme, isSelected, onSelect }) => (
     <TouchableOpacity
-      style={[styles.themeOption, isSelected && { borderColor: theme.primary, borderWidth: 0 }]}
+      style={[
+        styles.themeOption,
+        isSelected && {
+          borderColor: theme.primary,
+          backgroundColor: theme.primary + '12',
+        },
+      ]}
       onPress={() => onSelect(theme.id)}
+      activeOpacity={0.85}
     >
-      <View style={[styles.miniPhone, { backgroundColor: theme.base, borderColor: theme.primary }]}>
-        <View style={[styles.miniHeader, { backgroundColor: theme.bg, borderBottomColor: theme.border }]} />
+      <View
+        style={[
+          styles.miniPhone,
+          { backgroundColor: theme.paper, borderColor: theme.border },
+        ]}
+      >
+        <View
+          style={[
+            styles.miniHeader,
+            { backgroundColor: theme.headerBg, borderBottomColor: theme.ruleLine },
+          ]}
+        />
         <View style={styles.miniContent}>
-          {[1, 2].map(i => <View key={i} style={[styles.miniCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]} />)}
-        </View>
-        <View style={[styles.miniTabbar, { backgroundColor: theme.cardBg, borderTopColor: theme.border }]}>
-          <View style={styles.miniTab} />
-          <View style={[styles.miniTab, { backgroundColor: theme.primary, height: 4 }]} />
-          <View style={styles.miniTab} />
+          <View
+            style={[
+              styles.miniMarginRule,
+              { backgroundColor: theme.marginLine },
+            ]}
+          />
+          {[1, 2, 3].map((i) => (
+            <View
+              key={i}
+              style={[
+                styles.miniCard,
+                { backgroundColor: theme.cardBg, borderColor: theme.ruleLine },
+              ]}
+            />
+          ))}
         </View>
       </View>
-      <Text style={[styles.themeName, { color: isDarkMode ? '#fff' : '#737373' }, isSelected && { color: theme.primary, fontFamily: 'PlusJakartaSansBold' }]}>{theme.name}</Text>
+      <Text
+        style={[
+          styles.themeName,
+          { color: globalTheme.secondaryText },
+          isSelected && {
+            color: theme.primary,
+            fontFamily: 'PlusJakartaSansBold',
+          },
+        ]}
+      >
+        {theme.name}
+      </Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: currentTheme.base }]}>
-      <View style={[styles.header, { backgroundColor: currentTheme.bg, borderBottomColor: currentTheme.border }]}>
+    <View style={[styles.container, { backgroundColor: currentTheme.paper }]}>
+      {/* Üst Başlık ve Arama */}
+      <View
+        style={[
+          styles.header,
+          {
+            backgroundColor: currentTheme.headerBg,
+            borderBottomColor: currentTheme.ruleLine,
+          },
+        ]}
+      >
         <View style={styles.headerTop}>
-          <Text style={[styles.headerTitle, { color: currentTheme.primary }]}>{bookName}</Text>
+          <View style={styles.headerTitleCol}>
+            <Text
+              style={[styles.headerTitle, { color: currentTheme.primary }]}
+              numberOfLines={1}
+            >
+              {bookName || 'Tarif Defterim'}
+            </Text>
+            <Text style={[styles.headerMeta, { color: globalTheme.secondaryText }]}>
+              {recipes.length > 0
+                ? `${recipes.length} kayıtlı tarif`
+                : 'Kişisel tarif koleksiyonun'}
+            </Text>
+          </View>
           <TouchableOpacity
-            style={[styles.settingsBtn, { backgroundColor: currentTheme.primary + '15' }]}
+            style={[
+              styles.settingsBtn,
+              {
+                backgroundColor: currentTheme.cardBg,
+                borderColor: currentTheme.border,
+              },
+            ]}
             onPress={() => setIsModalVisible(true)}
+            activeOpacity={0.8}
           >
-            <FontAwesome5 name="cog" size={18} color={currentTheme.primary} />
+            <FontAwesome5 name="sliders-h" size={16} color={currentTheme.primary} />
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.searchBar, { backgroundColor: isDarkMode ? '#181818' : '#fff', borderColor: isDarkMode ? currentTheme.border : '#e5e5e5' }]}>
-          <FontAwesome5 name="search" size={14} color={isDarkMode ? '#737373' : '#a3a3a3'} style={{ marginLeft: 14 }} />
+        <View
+          style={[
+            styles.searchBar,
+            {
+              backgroundColor: currentTheme.cardBg,
+              borderColor: currentTheme.border,
+            },
+          ]}
+        >
+          <FontAwesome5
+            name="search"
+            size={13}
+            color={globalTheme.secondaryText}
+            style={{ marginLeft: 14 }}
+          />
           <TextInput
-            placeholder="Ara..."
-            style={[styles.searchInput, { color: isDarkMode ? '#fff' : '#383838' }]}
+            placeholder="Defterde ara..."
+            style={[styles.searchInput, { color: globalTheme.text }]}
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholderTextColor={isDarkMode ? '#737373' : '#a3a3a3'}
+            placeholderTextColor={globalTheme.secondaryText}
           />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity
+              onPress={() => setSearchQuery('')}
+              style={{ paddingHorizontal: 12 }}
+            >
+              <FontAwesome5 name="times" size={13} color={globalTheme.secondaryText} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
-      <View style={[styles.categoryBar, { backgroundColor: currentTheme.bg, borderBottomColor: currentTheme.border }]}>
+      {/* Kategori Şeridi */}
+      <View
+        style={[
+          styles.categoryBar,
+          {
+            backgroundColor: currentTheme.paper,
+            borderBottomColor: currentTheme.ruleLine,
+          },
+        ]}
+      >
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
           data={categories}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingHorizontal: 20 }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.categoryChip,
-                { borderColor: currentTheme.border },
-                activeCategory === item.name && { backgroundColor: currentTheme.primary, borderColor: currentTheme.primary }
-              ]}
-              onPress={() => setActiveCategory(item.name)}
-            >
-              <FontAwesome5
-                name={item.icon}
-                size={12}
-                color={activeCategory === item.name ? '#fff' : currentTheme.primary}
-                style={{ marginRight: 8 }}
-              />
-              <Text style={[
-                styles.categoryText,
-                { color: activeCategory === item.name ? '#fff' : currentTheme.primary }
-              ]}>
-                {item.name}
-              </Text>
-            </TouchableOpacity>
-          )}
+          renderItem={({ item }) => {
+            const isActive = activeCategory === item.name;
+            return (
+              <TouchableOpacity
+                style={[
+                  styles.categoryChip,
+                  {
+                    backgroundColor: isActive
+                      ? currentTheme.primary
+                      : currentTheme.cardBg,
+                    borderColor: isActive
+                      ? currentTheme.primary
+                      : currentTheme.border,
+                  },
+                ]}
+                onPress={() => setActiveCategory(item.name)}
+                activeOpacity={0.82}
+              >
+                <FontAwesome5
+                  name={item.icon}
+                  size={11}
+                  color={isActive ? '#fff' : currentTheme.primary}
+                  style={{ marginRight: 7 }}
+                />
+                <Text
+                  style={[
+                    styles.categoryText,
+                    { color: isActive ? '#fff' : globalTheme.text },
+                  ]}
+                >
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
         />
       </View>
 
+      {/* Defter Sayfaları / Tarif Listesi */}
       <FlatList
         data={filteredRecipes}
-        keyExtractor={(item, idx) => idx.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[styles.recipeCard, { backgroundColor: currentTheme.cardBg, borderColor: currentTheme.border }]}
-            onPress={() => navigation.navigate('RecipeDetailBook', { recipe: item })}
-          >
-            <View style={[styles.recipeCardIcon, { backgroundColor: currentTheme.bg, borderColor: currentTheme.border }]}>
-              <FontAwesome5 name={getCategoryIcon(item.category)} size={18} color={currentTheme.primary} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.recipeTitle, { color: isDarkMode ? '#fff' : '#262626' }]}>{item.title}</Text>
-              <Text style={[styles.recipeCategory, { color: currentTheme.primary }]}>{item.category || 'Genel'}</Text>
-            </View>
-            <FontAwesome5 name="chevron-right" size={14} color={isDarkMode ? currentTheme.primary : "#e5e5e5"} />
-          </TouchableOpacity>
-        )}
+        keyExtractor={(item, idx) => item.id?.toString() || idx.toString()}
+        renderItem={({ item, index }) => {
+          const ingredientCount = Array.isArray(item.ingredients)
+            ? item.ingredients.length
+            : 0;
+          const dateLabel = formatDate(item.createdAt);
+          return (
+            <TouchableOpacity
+              style={[
+                styles.recipeCard,
+                {
+                  backgroundColor: currentTheme.cardBg,
+                },
+              ]}
+              onPress={() => navigation.navigate('RecipeDetailBook', { recipe: item })}
+              activeOpacity={0.85}
+            >
+              <View
+                style={[
+                  styles.recipeCardIcon,
+                  {
+                    backgroundColor: currentTheme.primary + '14',
+                  },
+                ]}
+              >
+                <FontAwesome5
+                  name={getCategoryIcon(item.category)}
+                  size={15}
+                  color={currentTheme.primary}
+                />
+              </View>
+              <View style={styles.recipeInfoCol}>
+                <Text
+                  style={[styles.recipeTitle, { color: globalTheme.text }]}
+                  numberOfLines={1}
+                >
+                  {item.title}
+                </Text>
+                <View style={styles.recipeMetaRow}>
+                  <Text
+                    style={[styles.recipeCategory, { color: currentTheme.primary }]}
+                  >
+                    {item.category || 'Genel'}
+                  </Text>
+                  {ingredientCount > 0 && (
+                    <Text
+                      style={[
+                        styles.recipeMetaDot,
+                        { color: globalTheme.secondaryText },
+                      ]}
+                    >
+                      • {ingredientCount} malzeme
+                    </Text>
+                  )}
+                  {dateLabel ? (
+                    <Text
+                      style={[
+                        styles.recipeMetaDot,
+                        { color: globalTheme.secondaryText },
+                      ]}
+                    >
+                      • {dateLabel}
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
+              <FontAwesome5
+                name="chevron-right"
+                size={13}
+                color={globalTheme.secondaryText}
+                style={{ opacity: 0.55 }}
+              />
+            </TouchableOpacity>
+          );
+        }}
         ListEmptyComponent={renderEmpty}
-        contentContainerStyle={{ padding: 20, paddingBottom: 120 }}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
       />
 
-      <Modal visible={isModalVisible} animationType="slide" transparent={true}>
+      {/* Özelleştirme Modalı */}
+      <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        transparent
+        statusBarTranslucent
+        onRequestClose={() => setIsModalVisible(false)}
+      >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { backgroundColor: globalTheme.background }]}>
+          <View
+            style={[
+              styles.modalContainer,
+              {
+                backgroundColor: globalTheme.background,
+                paddingBottom: Math.max(insets.bottom + 16, 28),
+              },
+            ]}
+          >
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalHeading, { color: globalTheme.text }]}>Tarif Defterinizi Özelleştirin</Text>
-              <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeBtn}>
-                <FontAwesome5 name="times" size={20} color={globalTheme.secondaryText} />
+              <Text style={[styles.modalHeading, { color: globalTheme.text }]}>
+                Defterini Özelleştir
+              </Text>
+              <TouchableOpacity
+                onPress={() => setIsModalVisible(false)}
+                style={styles.closeBtn}
+              >
+                <FontAwesome5 name="times" size={19} color={globalTheme.secondaryText} />
               </TouchableOpacity>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
               <View style={styles.settingSection}>
-                <Text style={[styles.settingLabel, { color: globalTheme.secondaryText }]}>Tarif Defteri Adı</Text>
-                <View style={[styles.nameInputWrapper, { backgroundColor: globalTheme.card, borderColor: globalTheme.border }]}>
-                  <FontAwesome5 name="pen" size={12} color={currentTheme.primary} style={{ marginRight: 12 }} />
+                <Text style={[styles.settingLabel, { color: globalTheme.secondaryText }]}>
+                  Defter Adı
+                </Text>
+                <View
+                  style={[
+                    styles.nameInputWrapper,
+                    {
+                      backgroundColor: globalTheme.card,
+                      borderColor: currentTheme.border,
+                    },
+                  ]}
+                >
+                  <FontAwesome5
+                    name="pen"
+                    size={12}
+                    color={currentTheme.primary}
+                    style={{ marginRight: 12 }}
+                  />
                   <TextInput
                     style={[styles.nameInput, { color: globalTheme.text }]}
                     value={bookName}
                     onChangeText={saveBookName}
-                    placeholder="İsim verin..."
+                    placeholder="Deftere isim verin..."
                     placeholderTextColor={globalTheme.secondaryText}
                   />
                 </View>
               </View>
 
               <View style={styles.settingSection}>
-                <Text style={[styles.settingLabel, { color: globalTheme.secondaryText }]}>Renk Teması</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingVertical: 10 }}>
-                  {themes.map(t => <ThemePreview key={t.id} theme={t} isSelected={selectedTheme === t.id} onSelect={saveTheme} />)}
+                <Text style={[styles.settingLabel, { color: globalTheme.secondaryText }]}>
+                  Kağıt ve Mürekkep Teması
+                </Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingVertical: 8 }}
+                >
+                  {themes.map((t) => (
+                    <ThemePreview
+                      key={t.id}
+                      theme={t}
+                      isSelected={selectedTheme === t.id}
+                      onSelect={saveTheme}
+                    />
+                  ))}
                 </ScrollView>
               </View>
 
-              <TouchableOpacity style={[styles.doneBtn, { backgroundColor: currentTheme.primary }]} onPress={() => setIsModalVisible(false)}>
-                <Text style={styles.doneBtnText}>Kaydet ve Kapat</Text>
+              <TouchableOpacity
+                style={[styles.doneBtn, { backgroundColor: currentTheme.primary }]}
+                onPress={() => setIsModalVisible(false)}
+                activeOpacity={0.88}
+              >
+                <Text style={styles.doneBtnText}>Tamamla</Text>
               </TouchableOpacity>
-              <View style={{ height: 30 }} />
             </ScrollView>
           </View>
         </View>
       </Modal>
 
-      <View style={styles.addButtonContainer}>
-        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddRecipe')}>
-          <FontAwesome5 name="plus" size={20} color="#fff" style={{ marginRight: 10 }} />
-          <Text style={styles.addButtonText}>Tarif Ekle</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Sağ Alt FAB - Tarif Ekle */}
+      <TouchableOpacity
+        style={[
+          styles.addFab,
+          { backgroundColor: currentTheme.primary },
+        ]}
+        onPress={() => navigation.navigate('AddRecipe')}
+        activeOpacity={0.88}
+      >
+        <FontAwesome5 name="plus" size={15} color="#fff" style={{ marginRight: 8 }} />
+        <Text style={styles.addFabText}>Tarif Ekle</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20, borderWidth: 0 },
-  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
-  headerTitle: { fontSize: 28, fontFamily: 'Handwriting' },
-  settingsBtn: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, height: 46, borderWidth: 0, borderColor: '#e5e5e5' },
-  searchInput: { flex: 1, paddingHorizontal: 12, fontFamily: 'PlusJakartaSansRegular', fontSize: 14 },
-  categoryBar: { paddingVertical: 12, borderWidth: 0 },
-  categoryChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10, marginRight: 8, borderWidth: 0 },
-  categoryText: { fontSize: 13, fontFamily: 'PlusJakartaSansBold' },
-  recipeCard: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 15, flexDirection: 'row', alignItems: 'center', borderWidth: 0 },
-  recipeCardIcon: { width: 42, height: 42, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 15, borderWidth: 0 },
-  recipeTitle: { fontSize: 17, fontFamily: 'PlusJakartaSansBold', color: '#262626', marginBottom: 2 },
-  recipeCategory: { fontSize: 12, fontFamily: 'PlusJakartaSansBold' },
-  addButtonContainer: { position: 'absolute', left: 20, right: 20, bottom: 24, zIndex: 10 },
-  addButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ff7043', borderRadius: 16, paddingVertical: 16, elevation: 5 },
-  addButtonText: { fontSize: 16, fontFamily: 'PlusJakartaSansBold', color: '#fff' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  modalContainer: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, height: 600 },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  modalHeading: { fontSize: 20, fontFamily: 'PlusJakartaSansExtraBold', color: '#262626' },
-  settingSection: { marginBottom: 20 },
-  settingLabel: { fontSize: 15, fontFamily: 'PlusJakartaSansBold', color: '#737373', marginBottom: 10 },
-  nameInputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 12, paddingHorizontal: 15, height: 50, borderWidth: 0, borderColor: '#e5e5e5' },
-  nameInput: { flex: 1, fontSize: 15, fontFamily: 'PlusJakartaSansRegular', color: '#262626' },
-  themeOption: { width: 90, marginRight: 12, alignItems: 'center', padding: 4, borderRadius: 12, borderWidth: 0, borderColor: 'transparent' },
-  miniPhone: { width: 70, height: 100, borderRadius: 10, borderWidth: 0, overflow: 'hidden', marginBottom: 5 },
-  miniHeader: { height: 20, borderWidth: 0 },
-  miniContent: { padding: 4, gap: 3 },
-  miniCard: { height: 10, borderRadius: 3, backgroundColor: '#fff', borderWidth: 0 },
-  miniTabbar: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 12, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', borderWidth: 0, borderTopColor: '#eee' },
-  miniTab: { width: 8, height: 2, backgroundColor: '#eee' },
-  themeName: { fontSize: 11, fontFamily: 'PlusJakartaSansRegular' },
-  doneBtn: { height: 50, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
-  doneBtnText: { color: '#fff', fontSize: 15, fontFamily: 'PlusJakartaSansBold' },
-  emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 40 },
-  emptyTitle: { fontSize: 18, fontFamily: 'PlusJakartaSansBold', color: '#737373', marginBottom: 5 },
-  emptySubtitle: { fontSize: 14, color: '#a3a3a3', textAlign: 'center' },
+  container: {
+    flex: 1,
+  },
+  header: {
+    paddingTop: 58,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  headerTitleCol: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  headerTitle: {
+    fontSize: 32,
+    lineHeight: 38,
+    fontFamily: 'Handwriting',
+  },
+  headerMeta: {
+    fontSize: 12,
+    fontFamily: 'PlusJakartaSansMedium',
+    marginTop: 2,
+  },
+  settingsBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 14,
+    height: 44,
+    borderWidth: 1,
+  },
+  searchInput: {
+    flex: 1,
+    paddingHorizontal: 10,
+    fontFamily: 'PlusJakartaSansRegular',
+    fontSize: 14,
+  },
+  categoryBar: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  categoryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 13,
+    paddingVertical: 8,
+    borderRadius: 11,
+    marginRight: 8,
+    borderWidth: 1,
+  },
+  categoryText: {
+    fontSize: 12.5,
+    fontFamily: 'PlusJakartaSansBold',
+  },
+  listContent: {
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 110,
+  },
+  recipeCard: {
+    borderRadius: 16,
+    padding: 15,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  recipeCardIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 13,
+  },
+  recipeInfoCol: {
+    flex: 1,
+    paddingRight: 8,
+  },
+  recipeTitle: {
+    fontSize: 16,
+    fontFamily: 'PlusJakartaSansBold',
+    marginBottom: 3,
+  },
+  recipeMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  recipeCategory: {
+    fontSize: 12,
+    fontFamily: 'PlusJakartaSansBold',
+  },
+  recipeMetaDot: {
+    fontSize: 12,
+    fontFamily: 'PlusJakartaSansRegular',
+    marginLeft: 5,
+  },
+  addFab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 999,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
+    elevation: 6,
+    zIndex: 10,
+  },
+  addFabText: {
+    fontSize: 14.5,
+    lineHeight: 19,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+    fontFamily: 'PlusJakartaSansBold',
+    color: '#fff',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 22,
+    paddingTop: 22,
+    maxHeight: '82%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalHeading: {
+    fontSize: 20,
+    fontFamily: 'PlusJakartaSansExtraBold',
+  },
+  closeBtn: {
+    padding: 4,
+  },
+  settingSection: {
+    marginBottom: 22,
+  },
+  settingLabel: {
+    fontSize: 13.5,
+    fontFamily: 'PlusJakartaSansBold',
+    marginBottom: 10,
+  },
+  nameInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    height: 48,
+    borderWidth: 1,
+  },
+  nameInput: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: 'PlusJakartaSansRegular',
+  },
+  themeOption: {
+    width: 92,
+    marginRight: 12,
+    alignItems: 'center',
+    padding: 6,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+  },
+  miniPhone: {
+    width: 68,
+    height: 92,
+    borderRadius: 10,
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginBottom: 6,
+  },
+  miniHeader: {
+    height: 20,
+    borderBottomWidth: 1,
+  },
+  miniContent: {
+    flex: 1,
+    paddingLeft: 10,
+    paddingRight: 5,
+    paddingTop: 6,
+    gap: 5,
+  },
+  miniMarginRule: {
+    position: 'absolute',
+    left: 6,
+    top: 0,
+    bottom: 0,
+    width: 1,
+  },
+  miniCard: {
+    height: 12,
+    borderRadius: 3,
+    borderWidth: 1,
+  },
+  themeName: {
+    fontSize: 11.5,
+    fontFamily: 'PlusJakartaSansMedium',
+    textAlign: 'center',
+  },
+  doneBtn: {
+    height: 50,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  doneBtnText: {
+    color: '#fff',
+    fontSize: 15,
+    fontFamily: 'PlusJakartaSansBold',
+  },
+  emptyPageCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    paddingVertical: 38,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  emptyIconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  emptyTitle: {
+    fontSize: 17,
+    fontFamily: 'PlusJakartaSansBold',
+    marginBottom: 6,
+  },
+  emptySubtitle: {
+    fontSize: 13.5,
+    fontFamily: 'PlusJakartaSansRegular',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
 });
 
 export default RecipeBookScreen;

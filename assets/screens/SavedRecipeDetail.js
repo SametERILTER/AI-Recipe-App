@@ -222,6 +222,7 @@ const SavedRecipeDetail = ({ route, navigation }) => {
   const recipeImage = recipe.image || (recipe.imageData?.url ? recipe.imageData.url : (typeof recipe.imageData === 'string' ? recipe.imageData : null));
   const hasImage = typeof recipeImage === 'string' && recipeImage.trim() !== '';
   const photographer = recipe.imageData?.photographer || null;
+  const isAIRecipe = Boolean(recipe?.isAI || recipe?.tarih);
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSavedInStorage, setIsSavedInStorage] = useState(false);
@@ -461,33 +462,37 @@ const SavedRecipeDetail = ({ route, navigation }) => {
       >
         {/* Header Buttons if NO Image */}
         {!hasImage && (
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 56, marginBottom: 14 }}>
+          <View style={styles.cleanTopBar}>
             <TouchableOpacity
-              style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}
+              style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5' }]}
               onPress={() => navigation.goBack()}
+              activeOpacity={0.8}
             >
-              <FontAwesome5 name="arrow-left" size={20} color={theme.text} />
+              <FontAwesome5 name="arrow-left" size={18} color={theme.text} />
             </TouchableOpacity>
 
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <TouchableOpacity
-                style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#eeeeee', borderColor: isDarkMode ? theme.border : '#e5e5e5' }]}
+                style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#f5f5f5' }]}
                 onPress={handleShare}
+                activeOpacity={0.8}
               >
                 <Octicons name="share" size={18} color={theme.text} />
               </TouchableOpacity>
 
               {isSavedInStorage ? (
                 <TouchableOpacity
-                  style={[styles.iconButton, { backgroundColor: '#fee2e2', borderColor: '#fecaca' }]}
+                  style={[styles.iconButton, { backgroundColor: isDarkMode ? '#3b1c1f' : '#fee2e2' }]}
                   onPress={handleDeleteRecipe}
+                  activeOpacity={0.8}
                 >
                   <FontAwesome5 name="trash-alt" size={18} color="#ef4444" />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
-                  style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#fff7ed', borderColor: isDarkMode ? theme.border : '#fed7aa' }]}
+                  style={[styles.iconButton, { backgroundColor: isDarkMode ? theme.card : '#fff7ed' }]}
                   onPress={handleSaveToBookmark}
+                  activeOpacity={0.8}
                 >
                   <FontAwesome5 name="bookmark" size={18} color="#ff7043" />
                 </TouchableOpacity>
@@ -522,8 +527,9 @@ const SavedRecipeDetail = ({ route, navigation }) => {
               <TouchableOpacity
                 style={styles.iconButton}
                 onPress={() => navigation.goBack()}
+                activeOpacity={0.8}
               >
-                <FontAwesome5 name="arrow-left" size={20} color="#fff" />
+                <FontAwesome5 name="arrow-left" size={18} color="#fff" />
               </TouchableOpacity>
 
               <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -572,6 +578,22 @@ const SavedRecipeDetail = ({ route, navigation }) => {
                 {isSpeaking ? "Durdur" : "Sesli Oku"}
               </Text>
             </TouchableOpacity>
+
+            {isAIRecipe && (
+              <LinearGradient
+                colors={isDarkMode ? ['#261813', '#1c120e'] : ['#fff4ed', '#ffe8db']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.aiRecipeBadge}
+              >
+                <View style={styles.aiBadgeIconBox}>
+                  <MaterialCommunityIcons name="creation" size={13} color="#fff" />
+                </View>
+                <Text style={[styles.aiBadgeText, { color: isDarkMode ? '#ffab91' : '#c2410c' }]}>
+                  Yapay Zeka Tarifi
+                </Text>
+              </LinearGradient>
+            )}
           </View>
 
           {/* Meta Bilgileri Kutuları */}
@@ -690,6 +712,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffffff',
+  },
+  aiRecipeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 46,
+    paddingLeft: 12,
+    paddingRight: 16,
+    borderRadius: 23,
+    gap: 8,
+  },
+  aiBadgeIconBox: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#ff7043',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aiBadgeText: {
+    fontSize: 13,
+    lineHeight: 18,
+    includeFontPadding: false,
+    fontFamily: 'PlusJakartaSansBold',
   },
   scrollContent: {
     paddingBottom: 40,
@@ -908,13 +953,23 @@ const styles = StyleSheet.create({
     right: 0,
     height: 160,
   },
-  headerButtons: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    right: 20,
+  cleanTopBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 56,
+    marginBottom: 14,
+    zIndex: 10,
+  },
+  headerButtons: {
+    position: 'absolute',
+    top: 56,
+    left: 24,
+    right: 24,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     zIndex: 10,
   },
   iconButton: {
@@ -956,6 +1011,9 @@ const styles = StyleSheet.create({
   startButtonText: {
     color: '#fff',
     fontSize: 18,
+    lineHeight: 24,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
     fontFamily: 'PlusJakartaSansBold',
     zIndex: 6
   },
@@ -999,11 +1057,12 @@ const styles = StyleSheet.create({
   voiceButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#6366f1',
     alignSelf: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    height: 46,
+    paddingHorizontal: 18,
+    borderRadius: 23,
     marginBottom: 16,
     gap: 8,
   },
@@ -1013,6 +1072,9 @@ const styles = StyleSheet.create({
   voiceButtonText: {
     color: '#fff',
     fontSize: 14,
+    lineHeight: 19,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
     fontFamily: 'PlusJakartaSansBold',
   },
   termBox: {
