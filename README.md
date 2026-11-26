@@ -1,14 +1,67 @@
-# YemekTarif - AI-Powered Kitchen and Recipe Assistant
+# AI-Powered Kitchen and Recipe Assistant
 
 > **Project Status:** This project is currently under active development. New features, user interface refinements, and performance optimizations are continuously being implemented.
+
+<p align="center">
+  <img src="screenshoots/ss1.jpeg" width="260" alt="Home Screen" />
+</p>
 
 ---
 
 ## Overview
 
-**YemekTarif** is a comprehensive mobile application built with React Native and Expo that generates personalized meal and dessert recipes using artificial intelligence based on the ingredients available in the user's kitchen, serving size, meal style preferences, and culinary experience level. In addition to AI-driven recipe generation, the application includes a curated offline catalog of over 170 traditional and modern Turkish recipes.
+This comprehensive mobile application, built with React Native and Expo, generates personalized meal and dessert recipes using artificial intelligence based on the ingredients available in the user's kitchen, serving size, meal style preferences, and culinary experience level. In addition to AI-driven recipe generation, the application includes a curated offline catalog of over 170 traditional and modern Turkish recipes.
 
-Beyond static recipe browsing, YemekTarif acts as an interactive kitchen companion. It guides users step-by-step through the cooking process, supports hands-free step navigation via hardware sensors (device shake and ambient light/proximity detection) when hands are occupied, reads steps aloud using Text-to-Speech (TTS), and provides background kitchen music with automatic audio ducking.
+Beyond static recipe browsing, the app acts as an interactive kitchen companion. It guides users step-by-step through the cooking process, supports hands-free step navigation via hardware sensors (device shake and ambient light/proximity detection) when hands are occupied, reads steps aloud using Text-to-Speech (TTS), and provides background kitchen music with automatic audio ducking.
+
+---
+
+## Screenshots
+
+### Light & Dark Mode
+<p align="center">
+  <img src="screenshoots/ss1_ss2_split.jpeg" width="260" alt="Light and Dark Mode Split View" />
+</p>
+
+### Core Experience
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="screenshoots/ss3.jpeg" width="220" alt="Recipe Wizard" /><br />
+        <sub><b>Recipe Wizard</b></sub>
+      </td>
+      <td align="center">
+        <img src="screenshoots/ss4.jpeg" width="220" alt="Visual Ingredient Picker" /><br />
+        <sub><b>Visual Ingredient Picker</b></sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="screenshoots/ss5.jpeg" width="220" alt="AI Recipe Detail" /><br />
+        <sub><b>AI Recipe Detail</b></sub>
+      </td>
+      <td align="center">
+        <img src="screenshoots/ss6.jpeg" width="220" alt="Hands-Free Cooking Mode" /><br />
+        <sub><b>Hands-Free Cooking Mode</b></sub>
+      </td>
+    </tr>
+  </table>
+</div>
+
+### Personal Recipe Book Themes
+<p align="center">
+  <img src="screenshoots/ss7.jpeg" width="145" alt="Recipe Book Theme 1" />
+  <img src="screenshoots/ss8.jpeg" width="145" alt="Recipe Book Theme 2" />
+  <img src="screenshoots/ss9.jpeg" width="145" alt="Recipe Book Theme 3" />
+  <img src="screenshoots/ss10.jpeg" width="145" alt="Recipe Book Theme 4" />
+  <img src="screenshoots/ss11.jpeg" width="145" alt="Recipe Book Theme 5" />
+</p>
+
+### Menu of the Day
+<p align="center">
+  <img src="screenshoots/ss12.jpeg" width="230" alt="Menu of the Day" />
+</p>
 
 ---
 
@@ -57,7 +110,7 @@ Beyond static recipe browsing, YemekTarif acts as an interactive kitchen compani
 ## Project Structure
 
 ```text
-YemekTarif/
+project-root/
 ├── assets/
 │   ├── animations/              # Lottie animation assets (Chef, Loading, Success, etc.)
 │   ├── config/
@@ -67,7 +120,7 @@ YemekTarif/
 │   │   └── ThemeContext.js      # Light / Dark theme provider and AsyncStorage persistence
 │   ├── data/
 │   │   └── recipes.json         # Curated dataset of 171 categorized recipes
-│   ├── fonts/                   # Nunito and Parisienne custom font files
+│   ├── fonts/                   # Plus Jakarta Sans and Parisienne custom font files
 │   ├── images/                  # Ingredient thumbnails and meal category placeholders
 │   ├── musics/                  # Background audio tracks and completion sound effects
 │   └── screens/
@@ -141,7 +194,6 @@ eas build -p android --profile preview
 ```
 
 ---
-
 
 ## License
 
